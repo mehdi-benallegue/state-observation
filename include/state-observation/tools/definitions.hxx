@@ -101,11 +101,12 @@ inline bool IndexedMatrixT<MatrixType,lazy>::isSet()const
 
 ///Set the value of the matrix and the time sample
 template <typename MatrixType, bool lazy>
-inline void IndexedMatrixT<MatrixType,lazy>::set(const MatrixType& v,TimeIndex k)
+inline MatrixType IndexedMatrixT<MatrixType,lazy>::set(const MatrixType& v,TimeIndex k)
 {
   IsSet::set(true);
   k_=k;
   v_=v;
+  return(v);
 }
 
 ///Set the value of the matrix and the time sample
