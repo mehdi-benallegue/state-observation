@@ -224,7 +224,7 @@ namespace stateObservation
     IndexedMatrixT(const MatrixType& v, TimeIndex k);
 
     ///Set the value of the matrix and the time sample
-    inline void set(const MatrixType& v,TimeIndex k);
+    inline MatrixType set(const MatrixType& v,TimeIndex k);
 
     ///Switch the vector to "initialized" state
     inline void set(bool value=true);
