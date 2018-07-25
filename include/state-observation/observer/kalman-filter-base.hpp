@@ -328,6 +328,8 @@ namespace stateObservation
 
         void (* sum_)(const  Vector& stateVector, const Vector& tangentVector, Vector& result);
         void (* difference_)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+    public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
     /*inline*/ Vector KalmanFilterBase::updateStatePrediction()
