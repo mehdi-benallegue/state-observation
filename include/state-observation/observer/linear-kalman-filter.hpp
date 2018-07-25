@@ -136,6 +136,9 @@ namespace stateObservation
         /// The container of the Input-Measurement matrix
         Matrix b_;
 
+    public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
         struct
         {
           Vector prediction;
