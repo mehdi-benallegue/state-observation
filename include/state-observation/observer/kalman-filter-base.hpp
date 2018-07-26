@@ -289,7 +289,6 @@ namespace stateObservation
         virtual MeasureVector simulateSensor_(const StateVector& x, TimeIndex k)=0;
 
         /// Predicts the sensor measurement,
-        /// by default simulates the sensor on the predicted state
         virtual MeasureVector predictSensor_(TimeIndex k);
 
         /// Containers for the jacobian matrix of the process
@@ -307,15 +306,18 @@ namespace stateObservation
         /// Container for the covariance matrix of the estimation error
         Matrix pr_;
 
-        ///Vector of the simulated measurement of the predicted state
-        Vector predictedMeasurement_;
+        /// container for the prediction
+        IndexedVector xbar_;
+
+        /// container for the prediction of the sensor
+        IndexedVector ybar_;
 
         ///Vector containing the inovation of the Kalman filter
         Vector innovation_;
 
         struct optimizationContainer
         {
-            Vector xbar;
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
             Matrix pbar;
             Vector xhat;
             Vector inoMeas;
@@ -334,13 +336,15 @@ namespace stateObservation
 
     /*inline*/ Vector KalmanFilterBase::updateStatePrediction()
     {
-        return oc_.xbar = prediction_(this->x_.getTime()+1);
+        prediction_(this->x_.getTime()+1);
+        return xbar_();
     }
 
     /*inline*/ Vector KalmanFilterBase::updateStateAndMeasurementPrediction()
     {
         updateStatePrediction();
-        return predictedMeasurement_=predictSensor_(this->x_.getTime()+1);
+        predictSensor_(this->x_.getTime()+1);
+        return ybar_();
     }
 
 

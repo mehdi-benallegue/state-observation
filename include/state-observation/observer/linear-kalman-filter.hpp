@@ -139,11 +139,6 @@ namespace stateObservation
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        struct
-        {
-          Vector prediction;
-          Vector sensorSimulation;
-        } optlkf_;
     };
 
 
