@@ -38,7 +38,7 @@ namespace stateObservation
 
     ObserverBase::StateVector ExtendedKalmanFilter::prediction_(TimeIndex k)
     {
-        if (!this->xbar_.isSet() || this->xbar_.getTime()!=k)
+        if (!xbar_.isSet() || xbar_.getTime()!=k)
         {
             if ((p_>0) && (directInputStateProcessFeedthrough_))
             {
@@ -51,7 +51,6 @@ namespace stateObservation
             {
                 opt.u_ = inputVectorZero();
             }
-
             BOOST_ASSERT (f_!=0x0 && "ERROR: The Kalman filter functor is not set");
             xbar_.set(f_->stateDynamics(
                       this->x_(),
@@ -108,7 +107,9 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
     {
         TimeIndex k=this->x_.getTime();
         opt.a_.resize(nt_,nt_);
-        opt.xbar_=prediction_(k+1);
+        updateStatePrediction();
+
+
         opt.x_=this->x_();
         opt.dx_.resize(nt_);
 
@@ -131,7 +132,7 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
 
             opt.xp_=f_->stateDynamics(opt.x_,opt.u_,k);
 
-            difference_(opt.xp_,opt.xbar_,opt.dx_);
+            difference_(opt.xp_,xbar_(),opt.dx_);
 
             opt.dx_/=dx[i];
 
@@ -148,10 +149,9 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
 
         opt.c_.resize(m_,nt_);
 
-        opt.xbar_=prediction_(k+1);
-        opt.xp_ = opt.xbar_;
+        updateStateAndMeasurementPrediction();
 
-        opt.y_=predictSensor_(k+1);
+        xbar_.set(prediction_(k+1),k+1);
 
         opt.dx_.resize(nt_);
 
@@ -160,11 +160,11 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
             opt.dx_.setZero();
             opt.dx_[i]=dx[i];
 
-            sum_(opt.xbar_,opt.dx_,opt.xp_);
+            sum_(xbar_(),opt.dx_,opt.xp_);
 
             opt.yp_=simulateSensor_(opt.xp_, k+1);
 
-            opt.yp_-=opt.y_;
+            opt.yp_-=ybar_();
             opt.yp_/=dx[i];
 
             opt.c_.col(i)=opt.yp_;

@@ -146,11 +146,7 @@ namespace stateObservation
         /// predicts the measurement using the functor, assumed that the predicted state is up-to-date
         virtual MeasureVector predictSensor_(TimeIndex k);
 
-        /// container for the prediction
-        IndexedVector xbar_;
 
-        /// container for the prediction of the sensor
-        IndexedVector ybar_;
 
         /// boolean that provides if theris a need of not for input for the masurement
         bool directInputOutputFeedthrough_;
@@ -169,10 +165,8 @@ namespace stateObservation
           KalmanFilterBase::Amatrix a_;
           KalmanFilterBase::Cmatrix c_;
           ObserverBase::StateVector x_;
-          ObserverBase::StateVector xbar_;
           ObserverBase::StateVector dx_;
           ObserverBase::StateVector xp_;
-          ObserverBase::MeasureVector y_;
           ObserverBase::MeasureVector yp_;
 
         } opt;
