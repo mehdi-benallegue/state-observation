@@ -61,10 +61,8 @@ namespace stateObservation
     Vector3 accelerationInput =u.head(3);
     Vector3 angularAccelerationInput =u.tail(3);
 
-    xk1.segment(indexes::linAcc,3)+=accelerationInput;
-    xk1.segment(indexes::angAcc,3)+=angularAccelerationInput;
-
-
+    xk1.segment<3>(indexes::linAcc)=accelerationInput;
+    xk1.segment<3>(indexes::angAcc)=angularAccelerationInput;
 
     if (processNoise_!=0x0)
       return processNoise_->addNoise(xk1);
