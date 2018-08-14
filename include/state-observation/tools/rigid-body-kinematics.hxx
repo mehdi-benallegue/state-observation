@@ -359,6 +359,34 @@ namespace stateObservation
                                 * R * fixedPoint;
     }
 
+    ///Computes the multiplicative Jacobians for
+    ///Kalman filtering for examole
+    inline void derivateRotationMultiplicative
+        (const Vector3 & deltaR, Matrix3 & dRdR, Matrix3& dRddeltaR)
+    {
+      dRdR = rotationVectorToRotationMatrix(deltaR);
+      double d = deltaR.norm();
+
+      if (d<cst::epsilonAngle)
+      {
+        dRddeltaR = Matrix3::Identity();
+      }
+      else
+      {
+        double cosd = cos(d);
+        double sind = sin(d);
+
+        double d2=d*d;
+        double d3=d2*d;
+
+        dRddeltaR.noalias()= deltaR*deltaR.transpose() * (d-sind)/d3
+                              + Matrix3::Identity() * sind / d
+                              + skewSymmetric(deltaR) * (1-cosd)/d2;
+      }
+
+    }
+
+
 
 
     ///derivates a quaternion using finite difference to get a angular velocity vector
@@ -414,8 +442,8 @@ namespace stateObservation
     ///uses the derivation to reconstruct the velocities and accelerations given
     ///trajectories in positions and orientations only
     inline IndexedVectorArray reconstructStateTrajectory
-    (const IndexedVectorArray & positionOrientation,
-     double dt)
+        (const IndexedVectorArray & positionOrientation,
+         double dt)
     {
       typedef kine::indexes<kine::rotationVector> indexes;
 
