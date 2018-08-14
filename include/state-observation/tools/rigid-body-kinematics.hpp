@@ -148,6 +148,17 @@ namespace stateObservation
     inline Vector6 derivatePoseThetaUFD
     (const Vector6 & v1, const Vector6 & v2, double dt );
 
+    ///Computes the "multiplicative Jacobian" for
+    ///Kalman filtering for example
+    ///orientation is the current orientation
+    ///dR is the rotation delta between the current orientation and the orientation
+    ///at the next step.
+    ///dRdR is the "multiplicative" Jacobian with regard to variations of orientation
+    ///dRddeltaR is the "multiplicative" Jacobian with regard to variations of deltaR
+    inline void derivateRotationMultiplicative
+                    (const Vector3 & deltaR, Matrix3 & dRdR, Matrix3& dRddeltaR);
+
+
     ///uses the derivation to reconstruct the velocities and accelerations given
     ///trajectories in positions and orientations only
     inline IndexedVectorArray reconstructStateTrajectory
