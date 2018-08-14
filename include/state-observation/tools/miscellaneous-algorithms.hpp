@@ -58,12 +58,12 @@ namespace stateObservation
         ///provides an acceleration giving a finite time convergence to zero
         ///the state is the position x and the derivative xd and the output is the
         ///acceleration. The gains kp, kv must be negative
-        inline double finiteTimeAccControl(const double &x, const double &xd, double kp=-1, double kv=-1)
+        inline double finiteTimeAccControl(double x, double xd, double kp=-1, double kv=-1)
         {
-          double sax = sqrt(abs(x));
+          double sax = sqrt(fabs(x));
           double xdr = kp*signum(x)*sax;
           double y = xd - xdr;
-          double ydr = -kv*signum(y)*sqrt(abs(y));
+          double ydr = -kv*signum(y)*sqrt(fabs(y));
           return ydr - kp*xd/(2*sax);
         }
 

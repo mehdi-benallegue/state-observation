@@ -138,7 +138,7 @@ namespace stateObservation
     inline Vector3 derivateRotationFD
     (const Quaternion & q1, const Quaternion & q2, double dt);
 
-    ///derivates a quaternion using finite difference to get a angular velocity vector
+    ///derivates a rotation vector using finite difference to get a angular velocity vector
     inline Vector3 derivateRotationFD
     (const Vector3 & o1, const Vector3 & o2, double dt);
 
