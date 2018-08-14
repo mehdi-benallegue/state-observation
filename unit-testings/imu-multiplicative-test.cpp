@@ -164,12 +164,12 @@ int test()
 
     if (dx* 180 / M_PI < 1)
     {
-        std::cout<<"Test succeeded";
+        std::cout<<" Test succeeded" <<std::endl;
         return 0;
     }
     else
     {
-        std::cout<<"Test failed";
+        std::cout<<" Test failed" << std::endl;
         return 1;
     }
 }
