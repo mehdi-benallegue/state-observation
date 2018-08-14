@@ -7,7 +7,7 @@ namespace stateObservation
 {
 
   IMUMltpctiveDynamicalSystem::IMUMltpctiveDynamicalSystem()
-    :processNoise_(0x0),dt_(1)
+    :opt_(stateTangentSize_),processNoise_(0x0),dt_(1)
   {
 #ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
     std::cout<<std::endl<<"IMUFixedContactDynamicalSystem Constructor"<<std::endl;
@@ -95,6 +95,33 @@ namespace stateObservation
 
     return sensor_.getMeasurements();
   }
+
+
+  Matrix IMUMltpctiveDynamicalSystem::getAMatrix (const Vector& xh)
+  {
+
+
+    opt_.deltaR=xh.segment<3>(indexes::angVel)*dt_+xh.segment<3>(indexes::angAcc)*dt_*dt_/2;
+
+    kine::derivateRotationMultiplicative(opt_.deltaR, opt_.jRR, opt_.jRv);
+
+
+    opt_.AJacobian.block<3,3>(indexesTangent::ori,indexesTangent::ori)=opt_.jRR;
+
+
+
+    opt_.AJacobian.block<3,3>(indexesTangent::pos,indexesTangent::linVel).diagonal().setConstant(dt_);
+    opt_.AJacobian.block<3,3>(indexesTangent::ori,indexesTangent::angVel)=opt_.jRv*dt_;
+    opt_.AJacobian.block<6,6>(indexesTangent::linVel,indexesTangent::linAcc).diagonal().setConstant(dt_);
+
+
+    opt_.AJacobian.block< 3, 3>(indexesTangent::pos,indexesTangent::linAcc).diagonal().setConstant(dt_*dt_*0.5);
+    opt_.AJacobian.block< 3, 3>(indexesTangent::ori,indexesTangent::angAcc)=opt_.jRv*dt_*dt_/2;
+
+    return opt_.AJacobian;
+  }
+
+
 
   void IMUMltpctiveDynamicalSystem::setProcessNoise( NoiseBase * n)
   {

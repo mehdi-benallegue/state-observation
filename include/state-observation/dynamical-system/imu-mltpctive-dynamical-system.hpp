@@ -64,6 +64,8 @@ namespace stateObservation
         ///Set the period of the time discretization
         virtual void setSamplingPeriod(double dt);
 
+        virtual Matrix getAMatrix(const Vector &xh);
+
         ///Gets the state size
         virtual unsigned getStateSize() const;
         ///Gets the input size
@@ -76,8 +78,31 @@ namespace stateObservation
         static void stateDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
     protected:
+        static const unsigned stateSize_=19;
+        static const unsigned stateTangentSize_=18;
+        static const unsigned inputSize_=6;
+        static const unsigned measurementSize_=6;
         typedef kine::indexes<kine::quaternion> indexes;
         typedef kine::indexes<kine::rotationVector> indexesTangent;
+
+        struct opt
+        {
+          ///containers for Jacobians
+          Matrix3 jRR, jRv;
+
+          Vector3 deltaR;
+
+          Matrix AJacobian;
+
+          opt(int stateSize):
+          AJacobian(stateSize,stateSize)
+          {
+            AJacobian.setZero();
+            AJacobian.block<3,3>(indexesTangent::pos,indexesTangent::pos).setIdentity();
+            AJacobian.block<6,6>(indexesTangent::linVel,indexesTangent::linVel).setIdentity();
+          }
+        } opt_;
+
 
         AccelerometerGyrometer sensor_;
 
@@ -85,9 +110,7 @@ namespace stateObservation
 
         double dt_;
 
-        static const unsigned stateSize_=19;
-        static const unsigned inputSize_=6;
-        static const unsigned measurementSize_=6;
+
 
     private:
 
