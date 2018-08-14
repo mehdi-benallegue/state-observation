@@ -301,7 +301,9 @@ void IndexedMatrixArrayT<MatrixType>::clear()
 template <typename MatrixType>
 inline bool IndexedMatrixArrayT<MatrixType>::checkIndex(TimeIndex time) const
 {
-    return (v_.size()>0 && k_<=time && TimeIndex(k_+v_.size()) > time);
+    return (v_.size()>0 &&
+            k_<=time &&
+            TimeIndex(k_+v_.size()) > time);
 }
 
 ///Checks whether the matrix is set or not (assert)
@@ -325,7 +327,7 @@ template <typename MatrixType>
 inline void IndexedMatrixArrayT<MatrixType>::checkNext_(TimeIndex time)const
 {
     (void)time;//avoid warning
-    BOOST_ASSERT( (v_.size()==0 || TimeIndex(k_+v_.size()) == time )&&
+    BOOST_ASSERT( (v_.size()==0 || TimeIndex( k_+v_.size()) == time )&&
                   "Error: New time instants must be consecutive to existing ones");
 }
 
