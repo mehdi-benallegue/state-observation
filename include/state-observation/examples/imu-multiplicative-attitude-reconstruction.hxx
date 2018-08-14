@@ -48,6 +48,9 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   IndexedVectorArray xh;
   xh.setValue(xh0,y.getFirstIndex()-1);
 
+
+  Vector xkp=xh0;//previous xk
+
   ///the reconstruction of the state
   for (TimeIndex i=y.getFirstIndex(); i<y.getNextIndex(); ++i)
   {
@@ -63,14 +66,10 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
     ///Matrix a=filter.getAMatrixFD(dx);
     Matrix c= filter.getCMatrixFD(dx);
 
-    Matrix a = filter.getAmatrixIdentity();
-
-    a.block<12,12>(0,indexesTangent::linVel).diagonal().setConstant(dt);
-    a.block<6,6>(0,indexesTangent::linAcc).diagonal().setConstant(dt*dt*0.5);
+    Matrix a= imuFunctor.getAMatrix(xkp);
 
     //std::cout<<"a" << std::endl << a <<std::endl;
     //std::cout<<"c" << std::endl << c <<std::endl;
-
 
     filter.setA(a);
     filter.setC(c);
@@ -81,16 +80,14 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
 
     //std::cout<<"xh"<< xhk.transpose() <<std::endl;
 
-    ///regulate the part of orientation vector in the state vector
-    xhk.segment(indexes::ori,3)=kine::regulateOrientationVector
-                                (xhk.segment(indexes::ori,3));
-
     ///give the new value of the state to the kalman filter.
     ///This step is usually unnecessary, unless we modify the
     ///value of the state esimation which is the case here.
     filter.setState(xhk,i);
 
     xh.setValue(xhk,i);
+
+    xkp = xhk;
   }
 
   return xh;
