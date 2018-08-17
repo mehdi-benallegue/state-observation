@@ -387,7 +387,7 @@ namespace stateObservation
             contactPositions_.clear();
             for (unsigned j = 0; j<functor_.getContactsNumber() ; ++j)
             {
-              contactPositions_.push_back(getInput().segment<3>(42 + 12*i));
+              contactPositions_.push_back(getInput().segment<3>(42 + 12*j));
             }
             ekf_.getEstimatedState(i);
 
