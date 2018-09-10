@@ -29,6 +29,9 @@ namespace stateObservation
         class MagneticField
         {
         public:
+
+            MagneticField();
+
             ///virtual destructor
             virtual ~MagneticField(){}
 
@@ -36,7 +39,7 @@ namespace stateObservation
             Vector3 magneticFieldMeasure(const Matrix3 & orientation) const;
 
         private:
-            static Vector3 earthLocalMagneticField_;
+            Vector3 earthLocalMagneticField_;
         };
     }
 
