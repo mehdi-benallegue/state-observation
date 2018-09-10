@@ -13,7 +13,7 @@ typedef kine::indexes<kine::quaternion> indexes2;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=3000;
+    const unsigned kmax=1000000;
 
     ///sampling period
     const double dt=1e-3;
@@ -118,15 +118,22 @@ int test()
     Matrix p=Matrix::Identity(stateTangentSize,stateTangentSize);
 
 
+    tools::SimplestStopwatch timer;
+    timer.start();
     IndexedVectorArray xh = examples::imuMultiplicativeAttitudeReconstruction
                                                     (y, u, xh0, p, q, r, dt);
 
+    double duration = timer.stop();
 
     ///file of output
     std::ofstream f;
     f.open("trajectory.dat");
 
+
     double dx;
+
+
+
 
     ///the reconstruction of the state
     for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
@@ -156,22 +163,26 @@ int test()
 
         dx= acos(double(g.transpose()*gh));
 
+
         f << i<< " \t "<<  dx * 180 / M_PI << " \t\t\t "
         << g.transpose() << " \t\t\t " << gh.transpose() << std::endl;
     }
 
-    std::cout << "Verticality estimation error (degrees):" << dx* 180 / M_PI;
+
+    std::cout << "computation time: " << duration/kmax << ". ";
+    std::cout << "Verticality estimation error (degrees): " << dx* 180 / M_PI;
 
     if (dx* 180 / M_PI < 1)
     {
-        std::cout<<" Test succeeded" <<std::endl;
+        std::cout<<" Test succeeded " <<std::endl;
         return 0;
     }
     else
     {
-        std::cout<<" Test failed" << std::endl;
+        std::cout<<" Test failed " <<std::endl;
         return 1;
     }
+    std::cout << "computation time: " << duration << std::endl;
 }
 
 int main()
