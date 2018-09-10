@@ -11,7 +11,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=3000;
+    const unsigned kmax=1000000;
 
     ///sampling period
     const double dt=1e-3;
@@ -111,9 +111,14 @@ int test()
     }
     p=p*p.transpose();
 
+    tools::SimplestStopwatch timer;
+    timer.start();
 
     IndexedVectorArray xh = examples::imuAttitudeTrajectoryReconstruction
                                                     (y, u, xh0, p, q, r, dt);
+
+    double duration = timer.stop();
+
 
 
     ///file of output
@@ -122,7 +127,8 @@ int test()
 
     double dx;
 
-    ///the reconstruction of the state
+
+
     for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
     {
         ///display part, useless
@@ -154,22 +160,29 @@ int test()
 
         dx= acos(double(g.transpose()*gh));
 
+
         f << i<< " \t "<<  dx * 180 / M_PI << " \t\t\t "
         << g.transpose() << " \t\t\t " << gh.transpose() << std::endl;
+
     }
 
-    std::cout << "Verticality estimation error (degrees):" << dx* 180 / M_PI;
+
+    std::cout << "computation time: " << duration/kmax << ". ";
+    std::cout << "Verticality estimation error (degrees): " << dx* 180 / M_PI;
+
 
     if (dx* 180 / M_PI < 1)
     {
-        std::cout<<"Test succeeded";
+        std::cout<<" Test succeeded"<< std::endl;
         return 0;
     }
     else
     {
-        std::cout<<"Test failed";
+        std::cout<<" Test failed"<< std::endl;
         return 1;
     }
+
+
 }
 
 int main()
