@@ -33,8 +33,7 @@ namespace stateObservation
             virtual ~RotationVelocity(){}
 
             ///The angular velocity measurement in the local frame represented by the orientation Matrix
-            Vector3 rotationVelocityMeasure(const Vector3 & rotationVector, const Matrix3 & orientation) const;
-
+            Vector3 rotationVelocityMeasure(const Vector3 & angVelocityVector, const Matrix3 & orientation) const;
 
         protected:
 
