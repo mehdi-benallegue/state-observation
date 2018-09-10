@@ -7,7 +7,7 @@ namespace stateObservation
 {
 
   IMUMltpctiveDynamicalSystem::IMUMltpctiveDynamicalSystem()
-    :opt_(stateTangentSize_),processNoise_(0x0),dt_(1)
+    :opt_(stateTangentSize_,measurementSize_),processNoise_(0x0),dt_(1)
   {
 #ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
     std::cout<<std::endl<<"IMUFixedContactDynamicalSystem Constructor"<<std::endl;
@@ -119,6 +119,24 @@ namespace stateObservation
     opt_.AJacobian.block< 3, 3>(indexesTangent::ori,indexesTangent::angAcc)=opt_.jRv*dt_*dt_/2;
 
     return opt_.AJacobian;
+  }
+
+  Matrix IMUMltpctiveDynamicalSystem::getCMatrix (const Vector& xp)
+  {
+    opt_.Rt = Quaternion(xp.segment<4>(indexes::ori)).toRotationMatrix().transpose();
+
+    opt_.CJacobian.block<3,3>(0,indexesTangent::ori).noalias()=
+              opt_.Rt*kine::skewSymmetric(xp.segment<3>(indexes::linAcc)+cst::gravity);
+
+    opt_.CJacobian.block<3,3>(0,indexesTangent::linAcc).noalias()= opt_.Rt;
+
+    opt_.CJacobian.block<3,3>(3,indexesTangent::ori).noalias()=
+              opt_.Rt*kine::skewSymmetric(xp.segment<3>(indexes::angVel));
+
+
+    opt_.CJacobian.block<3,3>(3,indexesTangent::angVel).noalias()= opt_.Rt;
+
+    return opt_.CJacobian;
   }
 
 

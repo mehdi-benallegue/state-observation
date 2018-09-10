@@ -159,6 +159,12 @@ namespace stateObservation
                     (const Vector3 & deltaR, Matrix3 & dRdR, Matrix3& dRddeltaR);
 
 
+    ///Computes the "multiplicative Jacobian" for
+    ///a function R^T.v giving a vector v expressed in a local frame
+    ///with regard to Rotations of this local frame
+    inline Matrix3 derivateRtvMultiplicative(const Matrix3 & R, const Vector3 &v);
+
+
     ///uses the derivation to reconstruct the velocities and accelerations given
     ///trajectories in positions and orientations only
     inline IndexedVectorArray reconstructStateTrajectory
