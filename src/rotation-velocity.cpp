@@ -4,9 +4,10 @@ namespace stateObservation
 {
     namespace algorithm
     {
-        Vector3 RotationVelocity::rotationVelocityMeasure(const Vector3 & rotationVector, const Matrix3 & orientation) const
+        Vector3 RotationVelocity::rotationVelocityMeasure(const Vector3 & angVelocityVector, const Matrix3 & orientation) const
         {
-            return Vector3(orientation.transpose()*rotationVector);
+          return Vector3(orientation.transpose()*angVelocityVector);
         }
+
     }
 }
