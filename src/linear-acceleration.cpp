@@ -6,9 +6,8 @@ namespace stateObservation
     {
         Vector3 LinearAcceleration::accelerationMeasure(const Vector3 & acceleration, const Matrix3 & orientation) const
         {
-            Vector3 localAcceleration (acceleration);
-            localAcceleration += cst::gravity;
-            return  Vector3(orientation.transpose()*localAcceleration);
+          return  Vector3(orientation.transpose()*(acceleration + cst::gravity));
         }
+
     }
 }
