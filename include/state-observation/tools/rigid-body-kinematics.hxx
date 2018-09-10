@@ -383,7 +383,13 @@ namespace stateObservation
                               + Matrix3::Identity() * sind / d
                               + skewSymmetric(deltaR) * (1-cosd)/d2;
       }
+    }
 
+    ///Computes the multiplicative Jacobians for a vector expressed in
+    ///local frame
+    inline Matrix3 derivateRtvMultiplicative(const Matrix3 & R, const Vector3 &v)
+    {
+      return -R.transpose()*skewSymmetric(v);
     }
 
 

@@ -65,6 +65,7 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         virtual Matrix getAMatrix(const Vector &xh);
+        virtual Matrix getCMatrix(const Vector &xp);
 
         ///Gets the state size
         virtual unsigned getStateSize() const;
@@ -93,13 +94,20 @@ namespace stateObservation
           Vector3 deltaR;
 
           Matrix AJacobian;
+          Matrix CJacobian;
 
-          opt(int stateSize):
-          AJacobian(stateSize,stateSize)
+          Matrix3 Rt;
+
+          opt(int stateSize, int measurementSize):
+          AJacobian(stateSize,stateSize),
+          CJacobian(measurementSize,stateSize)
           {
             AJacobian.setZero();
             AJacobian.block<3,3>(indexesTangent::pos,indexesTangent::pos).setIdentity();
             AJacobian.block<6,6>(indexesTangent::linVel,indexesTangent::linVel).setIdentity();
+
+
+            CJacobian.setZero();
           }
         } opt_;
 
