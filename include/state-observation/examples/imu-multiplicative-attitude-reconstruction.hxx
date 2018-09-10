@@ -41,9 +41,6 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   filter.setR(r);
   filter.setQ(q);
 
-  ///set the derivation step for the finite difference method
-  Vector dx=filter.stateVectorConstant(1)*1e-2;
-
   ///the array of the state estimations over time
   IndexedVectorArray xh;
   xh.setValue(xh0,y.getFirstIndex()-1);
@@ -61,12 +58,11 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
     if (i<y.getLastIndex())
       filter.setInput(u[i],i);
 
-    ///get the jacobians by finite differences and provide
-    ///them to the Kalman filter
-    ///Matrix a=filter.getAMatrixFD(dx);
-    Matrix c= filter.getCMatrixFD(dx);
-
     Matrix a= imuFunctor.getAMatrix(xkp);
+
+    filter.updateStatePrediction();
+    Matrix c= imuFunctor.getCMatrix(filter.getLastPrediction());
+
 
     //std::cout<<"a" << std::endl << a <<std::endl;
     //std::cout<<"c" << std::endl << c <<std::endl;
