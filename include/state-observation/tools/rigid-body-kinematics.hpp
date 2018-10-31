@@ -224,14 +224,63 @@ namespace stateObservation
     const double quatNormTol = 1e-6;
 
 
+    class Orientation
+    {
+    public:
+      Orientation();
+
+      Orientation(const Vector3& v);
+
+      Orientation(const Quaternion& q);
+
+      Orientation(const Matrix3& m);
+
+      Orientation(const AngleAxis& aa);
+
+      Orientation(const Quaternion& q, const Matrix3& m);
+
+      inline const Orientation & operator=(const Vector3& v);
+
+      inline const Orientation & operator=(const Quaternion& q);
+
+      inline const Orientation & operator=(const Matrix3& m);
+
+      inline const Orientation & operator=(const AngleAxis& aa);
+
+      inline operator Matrix3();
+
+      inline operator Quaternion();
+
+      inline const Matrix3& getMatrixRef();
+
+      inline const Quaternion& getQuaternionRef();
+
+      inline Orientation operator*( const Orientation& R2);
+
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 
+    private:
+
+      void affectation_(const Vector3& v);
+
+      void affectation_(const Quaternion& q);
+
+      void affectation_(const Matrix3& m);
+
+      void affectation_(const AngleAxis& aa);
+
+      void affectation_(const Quaternion& q, const Matrix3&m);
+
+      void check_() const;
 
 
+      CheckedQuaternion q_;
+      CheckedMatrix3 m_;
+    };
 
 
-    struct kinematics
-
+    struct Kinematics
     {
       struct Flags
       {
@@ -248,10 +297,29 @@ namespace stateObservation
         linVel | angVel | linAcc | angAcc;
       };
 
+      Kinematics setOrientation(const Orientation &);
+      Kinematics setPosition(const Vector3 & pos);
+
+
+      Kinematics integrate(double dt, Flags::byte=Flags::all);
+
+      Kinematics update(const Kinematics & newValue, Flags::byte=Flags::all);
+
+      Kinematics updateWithVector(const Vector & newVector);
+
+      ///composition of transformation
+      Kinematics operator* (const Vector & ) const;
+
+      Kinematics synchronizeRotations();
+
+      Vector3 rotateVector( const Vector3 & input)const ;
+
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    private:
 
       CheckedVector3 position;
-      CheckedQuaternion orienation;
-      CheckedMatrix3 rotationMat;
+      Orientation orienation;
 
       CheckedVector3 linVel;
       CheckedVector3 angVel;
@@ -259,16 +327,7 @@ namespace stateObservation
       CheckedVector3 linAcc;
       CheckedVector3 angAcc;
 
-      kinematics integrate(double dt, Flags::byte=Flags::all);
 
-      kinematics update(const kinematics & newValue, double dt, Flags::byte=Flags::all);
-
-      kinematics synchronizeRotations();
-
-      Vector3 rotateVector( const Vector3 & input);
-
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     };
 
