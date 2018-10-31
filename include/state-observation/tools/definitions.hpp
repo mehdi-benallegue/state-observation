@@ -120,6 +120,7 @@ namespace stateObservation
   template <typename T, const T& defaultValue>
   class DebugItem<T,defaultValue,false>
   {
+  public:
     DebugItem() {}
     explicit DebugItem(T v) {}
     inline T operator=(T v)
