@@ -131,7 +131,7 @@ namespace stateObservation
     {
       return defaultValue;
     }
-    inline T set(T v)
+    inline T set(const T& v)
     {
       return defaultValue;
     }
@@ -140,7 +140,7 @@ namespace stateObservation
       return defaultValue;
     }
   private:
-    ///no boolean
+    T b_;
   };
 
   namespace detail
@@ -156,7 +156,7 @@ namespace stateObservation
   }
 
   ///this is simply a structure allowing for automatically verifying that
-  /// the item has been initialized or not. The reset() function allows to
+  /// the item has been initialized or not. The chckitm_reset() function allows to
   /// set it back to "not initialized" state.
   /// -lazy means that the "set" value is true all the time if NDEBUG is defined
   /// -alwaysCheck means that the check is always performed and throws exception
@@ -177,7 +177,7 @@ namespace stateObservation
   public:
     typedef DebugItem<bool,detail::defaultTrue,!lazy || isDebug> IsSet;
     typedef DebugItem<const char*,detail::defaultErrorMSG,
-            ( !lazy || isDebug ) && !assertion> AssertMsg;
+            ( !lazy || isDebug ) && assertion> AssertMsg;
     typedef DebugItem<const std::exception*,detail::defaultExcepionAddr,
             ( !lazy || isDebug ) && !assertion> ExceptionPtr;
     CheckedItem();
@@ -185,6 +185,9 @@ namespace stateObservation
     virtual ~CheckedItem() {}
     inline T operator=(const T&);
     inline operator T() const ;
+
+    inline T chckitm_getValue() const;
+    inline const T& chckitm_getRef() const;
 
     inline bool chckitm_isSet() const;
     inline void chckitm_reset();

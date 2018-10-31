@@ -20,6 +20,19 @@ inline T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline  CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator T() const
 {
+  return chckitm_getRef();
+}
+
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_getValue() const
+{
+  return chckitm_getRef();
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  const T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_getRef() const
+{
   chckitm_check_();
   return v_;
 }
