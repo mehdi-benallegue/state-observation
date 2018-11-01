@@ -96,7 +96,7 @@ namespace stateObservation
   public:
     DebugItem():b_(defaultValue) {}
     explicit DebugItem(const T& v):b_(v) {}
-    inline T operator=(T v)
+    inline T& operator=(T v)
     {
       return b_=v;
     }
@@ -123,7 +123,7 @@ namespace stateObservation
   public:
     DebugItem() {}
     explicit DebugItem(T v) {}
-    inline T operator=(T v)
+    inline T& operator=(T v)
     {
       return defaultValue;
     }
@@ -167,23 +167,17 @@ namespace stateObservation
   /// new operator (see eigen documentation)
   template <typename T, bool lazy=false, bool alwaysCheck = false,
                   bool assertion=true, bool eigenAlignedNew=false>
-  class CheckedItem:
-    protected DebugItem<bool,detail::defaultTrue,!lazy || isDebug>,
-    protected DebugItem<const char*,detail::defaultErrorMSG,
-    ( !lazy || isDebug ) && assertion>,
-    protected DebugItem<const std::exception*,detail::defaultExcepionAddr,
-    ( !lazy || isDebug ) && !assertion>
+  class CheckedItem
   {
   public:
-    typedef DebugItem<bool,detail::defaultTrue,!lazy || isDebug> IsSet;
-    typedef DebugItem<const char*,detail::defaultErrorMSG,
-            ( !lazy || isDebug ) && assertion> AssertMsg;
-    typedef DebugItem<const std::exception*,detail::defaultExcepionAddr,
-            ( !lazy || isDebug ) && !assertion> ExceptionPtr;
+
     CheckedItem();
     explicit CheckedItem(const T&);
+    CheckedItem( const CheckedItem &);
     virtual ~CheckedItem() {}
-    inline T operator=(const T&);
+
+    inline CheckedItem& operator=(const CheckedItem & );
+    inline T& operator=(const T&);
     inline operator T() const ;
 
     inline T chckitm_getValue() const;
@@ -191,6 +185,8 @@ namespace stateObservation
 
     inline bool chckitm_isSet() const;
     inline void chckitm_reset();
+
+    /// set the value of the initialization check boolean
     inline void chckitm_set(bool value=true);
 
     void chckitm_setAssertMessage(std::string s);
@@ -198,6 +194,22 @@ namespace stateObservation
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(eigenAlignedNew)
   protected:
+
+    static const bool do_check_ = !lazy || isDebug;
+    static const bool do_assert_ = do_check_ && assertion;
+    static const bool do_exception_ = do_check_ && !assertion;
+
+    typedef DebugItem<bool,detail::defaultTrue,do_check_> IsSet;
+    typedef DebugItem<const char*,detail::defaultErrorMSG, do_assert_> AssertMsg;
+    typedef DebugItem<const std::exception*,detail::defaultExcepionAddr,
+                                                    do_exception_> ExceptionPtr;
+
+
+
+    IsSet isSet_;
+    AssertMsg assertMsg_;
+    ExceptionPtr exceptionPtr_;
+
     bool chckitm_check_() const throw(std::exception);
     T v_;
   };
