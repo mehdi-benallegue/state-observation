@@ -1,20 +1,66 @@
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem():
-  IsSet(false)
+inline CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem():
+  isSet_(false)
 {
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-CheckedItem<T,lazy,alwaysCheck,assertion, eigenAlignedNew>::CheckedItem(const T& v):
-  IsSet(true), v_(v)
+inline CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem(const CheckedItem & c):
+  v_(c.v_)
+{
+  if (do_check_)
+  {
+    isSet_ = c.isSet_;
+  }
+
+  if (do_assert_)
+  {
+    assertMsg_ = c.assertMsg_;
+  }
+
+  if (do_exception_)
+  {
+    exceptionPtr_=c.exceptionPtr_;
+  }
+}
+
+
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline CheckedItem<T,lazy,alwaysCheck,assertion, eigenAlignedNew>::CheckedItem(const T& v):
+  isSet_(true), v_(v)
 {
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(const T& v)
+inline T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(const T& v)
 {
-  IsSet::set(true);
+  isSet_.set(true);
   return v_=v;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew> &
+    CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(const CheckedItem & c)
+{
+  v_=c.v_;
+
+  if (do_check_)
+  {
+    isSet_ = c.isSet_;
+  }
+
+  if (do_assert_)
+  {
+    assertMsg_ = c.assertMsg_;
+  }
+
+  if (do_exception_)
+  {
+    exceptionPtr_=c.exceptionPtr_;
+  }
+
+  return *this;
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
@@ -42,14 +88,14 @@ inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm
 {
   if (assertion)
   {
-    BOOST_ASSERT_MSG(chckitm_isSet(),AssertMsg::get());
+    BOOST_ASSERT_MSG(chckitm_isSet(),assertMsg_.get());
   }
 
   if (alwaysCheck || isDebug)
   {
     if (!chckitm_isSet())
     {
-      throw (*(ExceptionPtr::get()));
+      throw (*(exceptionPtr_.get()));
     }
   }
   return (chckitm_isSet());
@@ -58,32 +104,32 @@ inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_isSet() const
 {
-  return IsSet::get();
+  return isSet_.get();
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_reset()
 {
-  IsSet::set(false);
+  isSet_.set(false);
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_set(bool value)
 {
-  IsSet::set(value);
+  isSet_.set(value);
 }
 
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_setAssertMessage(std::string s)
 {
-  AssertMsg::set(s);
+  assertMsg_.set(s);
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_setExceptionPtr(std::exception* e)
 {
-  ExceptionPtr::set(e);
+  exceptionPtr_.set(e);
 }
 
 
