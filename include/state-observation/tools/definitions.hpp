@@ -181,13 +181,13 @@ namespace stateObservation
     inline operator T() const ;
 
     inline T chckitm_getValue() const;
-    inline const T& chckitm_getRef() const;
+    inline const T& operator()() const;
 
-    inline bool chckitm_isSet() const;
-    inline void chckitm_reset();
+    inline bool isSet() const;
+    inline void reset();
 
     /// set the value of the initialization check boolean
-    inline void chckitm_set(bool value=true);
+    inline void set(bool value=true);
 
     void chckitm_setAssertMessage(std::string s);
     void chckitm_setExceptionPtr(std::exception* e);

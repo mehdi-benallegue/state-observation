@@ -546,48 +546,58 @@ namespace stateObservation
     inline Orientation::Orientation()
     {}
 
-    inline Orientation::Orientation(const Vector3& v)
+    inline Orientation::Orientation(const Vector3& v):
+    q_(rotationVectorToQuaternion(v))
     {
-      affectation_(v);
     }
 
-    inline Orientation::Orientation(const Quaternion& q)
+    inline Orientation::Orientation(const Quaternion& q):
+      q_(q)
     {
-      affectation_(q);
     }
 
-    inline Orientation::Orientation(const Matrix3& m)
+    inline Orientation::Orientation(const Matrix3& m):
+      m_(m)
     {
-      affectation_(m);
     }
 
-    inline Orientation::Orientation(const AngleAxis& aa)
+    inline Orientation::Orientation(const AngleAxis& aa):
+      q_(Quaternion(aa))
     {
-      affectation_(aa);
     }
 
-
-    inline const Orientation & Orientation::operator=(const Vector3& v)
+    inline Orientation & Orientation::operator=(const Vector3& v)
     {
-      affectation_(v);
+      m_.reset();
+      q_=rotationVectorToQuaternion(v);
       return *this;
     }
 
-    inline const Orientation & Orientation::operator=(const Quaternion& q)
+    inline Orientation & Orientation::operator=(const Quaternion& q)
     {
-      affectation_(q);
+      m_.reset();
+      q_=q;
       return *this;
     }
 
-    inline const Orientation & Orientation::operator=(const Matrix3& m)
+    inline Orientation & Orientation::operator=(const Matrix3& m)
     {
-      affectation_(m);
+      q_.reset();
+      m_=m;
       return *this;
     }
 
-    inline const Orientation & Orientation::operator=(const AngleAxis& aa)
+    inline Orientation & Orientation::operator=(const AngleAxis& aa)
     {
-      affectation_(aa);
+      m_.reset();
+      q_=Quaternion(aa);
+      return *this;
+    }
+
+    inline Orientation & Orientation::setValue(const Quaternion& q,const Matrix3&m)
+    {
+      q_=q;
+      m_=m;
       return *this;
     }
 
@@ -601,12 +611,39 @@ namespace stateObservation
       return getQuaternionRef();
     }
 
+    inline Orientation::operator Matrix3() const
+    {
+      check_();
+      if (!m_.isSet())
+      {
+        return q_().toRotationMatrix();
+      }
+      else
+      {
+        return m_();
+      }
+
+    }
+
+    inline Orientation::operator Quaternion() const
+    {
+      check_();
+      if (!q_.isSet())
+      {
+        return q_();
+      }
+      else
+      {
+        return Quaternion(m_());
+      }
+    }
+
     inline const Matrix3& Orientation::getMatrixRef()
     {
       check_();
-      if (!m_.chckitm_isSet())
+      if (!m_.isSet())
       {
-        m_=q_.chckitm_getRef().toRotationMatrix();
+        quaternionToMatrix_();
       }
       return m_;
     }
@@ -614,77 +651,185 @@ namespace stateObservation
     inline const Quaternion& Orientation::getQuaternionRef()
     {
       check_();
-      if (!q_.chckitm_isSet())
+      if (!q_.isSet())
       {
-        q_=Quaternion(m_.chckitm_getRef());
+        matrixToQuaternion_();
       }
       return q_;
     }
 
-    inline Orientation Orientation::operator*( const Orientation& R2)
+    inline Orientation Orientation::operator*( Orientation& R2)
     {
-      Orientation result;
       check_();
       R2.check_();
-      if (q_.chckitm_isSet() && R2.q_.chckitm_isSet())
+      if (q_.isSet() && R2.q_.isSet())
       {
-        result.q_=q_.chckitm_getRef()*R2.q_.chckitm_getRef();
+        if (m_.isSet() && R2.m_.isSet())
+        {
+          return Orientation(Matrix3(m_()*R2.m_()));
+        }
+        else
+        {
+          return Orientation(q_()*R2.q_(),m_()*R2.m_());
+        }
       }
-
-      if (m_.chckitm_isSet() && R2.m_.chckitm_isSet())
+      else if (q_.isSet())
       {
-        result.m_=m_.chckitm_getRef()*R2.m_.chckitm_getRef();
+        return Orientation(Matrix3(quaternionToMatrix_()*R2.m_()));
       }
-      return result;
+      else
+      {
+        return (Matrix3(m_()*R2.quaternionToMatrix_()));
+      }
+    }
+
+    inline Orientation Orientation::operator*(const Orientation& R2)
+    {
+      check_();
+      R2.check_();
+      if (q_.isSet() && R2.q_.isSet())
+      {
+        if (m_.isSet() && R2.m_.isSet())
+        {
+          return Orientation(Matrix3(m_()*R2.m_()));
+        }
+        else
+        {
+          return Orientation(q_()*R2.q_(),m_()*R2.m_());
+        }
+      }
+      else if (q_.isSet())
+      {
+        return Orientation(Matrix3(quaternionToMatrix_()*R2.m_()));
+      }
+      else
+      {
+        return (Matrix3(m_()*R2.q_().toRotationMatrix()));
+      }
+    }
+
+    inline Orientation Orientation::operator*( Orientation& R2) const
+    {
+      check_();
+      R2.check_();
+      if (q_.isSet() && R2.q_.isSet())
+      {
+        if (m_.isSet() && R2.m_.isSet())
+        {
+          return Orientation(Matrix3(m_()*R2.m_()));
+        }
+        else
+        {
+          return Orientation(q_()*R2.q_(),m_()*R2.m_());
+        }
+      }
+      else if (q_.isSet())
+      {
+        return Orientation(Matrix3(q_().toRotationMatrix()*R2.m_()));
+      }
+      else
+      {
+        return (Matrix3(m_()*R2.quaternionToMatrix_()));
+      }
     }
 
 
-
-    inline void Orientation::affectation_(const Vector3& v)
+    inline Orientation Orientation::operator*(const Orientation& R2) const
     {
-      m_.chckitm_reset();
-      q_=rotationVectorToQuaternion(v);
+      check_();
+      R2.check_();
+      if (q_.isSet() && R2.q_.isSet())
+      {
+        if (m_.isSet() && R2.m_.isSet())
+        {
+          return Orientation(Matrix3(m_()*R2.m_()));
+        }
+        else
+        {
+          return Orientation(q_()*R2.q_(),m_()*R2.m_());
+        }
+      }
+      else if (q_.isSet())
+      {
+        return Orientation(Matrix3(q_().toRotationMatrix()*R2.m_()));
+      }
+      else
+      {
+        return (Matrix3(m_()*R2.q_().toRotationMatrix()));
+      }
     }
 
-    inline void Orientation::affectation_(const Quaternion& q)
+    inline Orientation Orientation::inverse() const
     {
-      m_.chckitm_reset();
-      q_=q;
+      check_();
+      if (q_.isSet())
+      {
+        if (m_.isSet())
+        {
+          return Orientation(q_().conjugate(), m_().transpose());
+        }
+        else
+        {
+          return Orientation(q_().conjugate());
+        }
+      }
+      else
+      {
+        return Orientation(Matrix3(m_().transpose()));
+      }
     }
 
-    inline void Orientation::affectation_(const Matrix3&m)
+    inline bool Orientation::isSet() const
     {
-      q_.chckitm_reset();
-      m_=m;
+      return (m_.isSet() || q_.isSet());
     }
 
-    inline void Orientation::affectation_(const AngleAxis& aa)
+    inline Vector3 Orientation::operator*( const Vector3& v)
     {
-      m_.chckitm_reset();
-      q_=Quaternion(aa);
+      check_();
+      if (!m_.isSet())
+      {
+        quaternionToMatrix_();
+      }
+      return m_()*v;
     }
 
-    inline void Orientation::affectation_(const Quaternion& q, const Matrix3&m)
+    inline Vector3 Orientation::operator*( const Vector3& v) const
     {
-      q_=q;
-      m_=m;
+      check_();
+      if (m_.isSet())
+      {
+        return m_()*v;
+      }
+      else
+      {
+        return q_()*v;
+      }
     }
 
     inline void Orientation::check_() const
     {
-      BOOST_ASSERT((q_.chckitm_isSet() || m_.chckitm_isSet()) && "The orientation is not initialized");
+      BOOST_ASSERT((q_.isSet() || m_.isSet()) && "The orientation is not initialized");
     }
 
+    inline Matrix3 & Orientation::quaternionToMatrix_()
+    {
+      return m_=q_().toRotationMatrix();
+    }
+
+    inline Quaternion & Orientation::matrixToQuaternion_()
+    {
+      return q_=Quaternion(m_());
+    }
 
 
     /// -------------------Kinematics structure implementation--------------
 
     inline Kinematics Kinematics::integrate(double dt, Flags::byte)
     {
-
     }
 
-    inline Kinematics Kinematics::update(const Kinematics & newValue, Flags::byte)
+    inline Kinematics Kinematics::update(const Kinematics & newValue, double dt, Flags::byte)
     {
     }
 
@@ -701,6 +846,14 @@ namespace stateObservation
     }
 
     inline Kinematics Kinematics::operator* (const Vector & ) const
+    {
+    }
+
+    inline Kinematics Kinematics::operator* (const Vector & )
+    {
+    }
+
+    inline Kinematics Kinematics::operator* (Vector & )
     {
     }
 

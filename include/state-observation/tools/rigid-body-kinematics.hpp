@@ -239,43 +239,62 @@ namespace stateObservation
 
       Orientation(const Quaternion& q, const Matrix3& m);
 
-      inline const Orientation & operator=(const Vector3& v);
+      inline Orientation & operator=(const Vector3& v);
 
-      inline const Orientation & operator=(const Quaternion& q);
+      inline Orientation & operator=(const Quaternion& q);
 
-      inline const Orientation & operator=(const Matrix3& m);
+      inline Orientation & operator=(const Matrix3& m);
 
-      inline const Orientation & operator=(const AngleAxis& aa);
+      inline Orientation & operator=(const AngleAxis& aa);
+
+      inline Orientation & setValue(const Quaternion& q, const Matrix3& m);
 
       inline operator Matrix3();
 
       inline operator Quaternion();
 
-      inline const Matrix3& getMatrixRef();
+      inline operator Matrix3() const;
 
+      inline operator Quaternion() const;
+
+
+      inline const Matrix3& getMatrixRef();
       inline const Quaternion& getQuaternionRef();
 
+
+      ///Multiply the orientation by a rotation
+      ///the non const versions allow to use more optimized methods
+
+      inline Orientation operator*( Orientation& R2);
+
       inline Orientation operator*( const Orientation& R2);
+
+      inline Orientation operator*( Orientation& R2) const;
+
+      inline Orientation operator*( const Orientation& R2) const;
+
+      inline Orientation inverse() const;
+
+      ///Rotate a vector
+
+      inline Vector3 operator*( const Vector3& v) const;
+
+      inline Vector3 operator*( const Vector3& v);
+
+      inline bool isSet() const;
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 
     private:
-
-      void affectation_(const Vector3& v);
-
-      void affectation_(const Quaternion& q);
-
-      void affectation_(const Matrix3& m);
-
-      void affectation_(const AngleAxis& aa);
-
-      void affectation_(const Quaternion& q, const Matrix3&m);
-
       void check_() const;
 
+      inline Matrix3 & quaternionToMatrix_();
+      inline Quaternion & matrixToQuaternion_();
 
       CheckedQuaternion q_;
+
+
       CheckedMatrix3 m_;
     };
 
@@ -297,22 +316,28 @@ namespace stateObservation
         linVel | angVel | linAcc | angAcc;
       };
 
-      Kinematics setOrientation(const Orientation &);
-      Kinematics setPosition(const Vector3 & pos);
+      inline Kinematics setOrientation(const Orientation &);
+      inline Kinematics setPosition(const Vector3 & pos);
 
 
-      Kinematics integrate(double dt, Flags::byte=Flags::all);
+      inline Kinematics integrate(double dt, Flags::byte=Flags::all);
 
-      Kinematics update(const Kinematics & newValue, Flags::byte=Flags::all);
+      inline Kinematics update(const Kinematics & newValue, double dt=0, Flags::byte=Flags::all);
 
-      Kinematics updateWithVector(const Vector & newVector);
+      inline Kinematics updateWithVector(const Vector & newVector);
 
       ///composition of transformation
-      Kinematics operator* (const Vector & ) const;
+      inline Kinematics operator* (const Vector & ) const;
 
-      Kinematics synchronizeRotations();
+      ///composition of transformation
+      inline Kinematics operator* (const Vector & );
 
-      Vector3 rotateVector( const Vector3 & input)const ;
+      ///composition of transformation
+      inline Kinematics operator* (Vector & );
+
+      inline Kinematics synchronizeRotations();
+
+      inline Vector3 rotateVector( const Vector3 & input)const ;
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -326,12 +351,7 @@ namespace stateObservation
 
       CheckedVector3 linAcc;
       CheckedVector3 angAcc;
-
-
-
     };
-
-
   }
 }
 
