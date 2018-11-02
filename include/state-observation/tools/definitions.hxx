@@ -66,18 +66,18 @@ inline CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew> &
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline  CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator T() const
 {
-  return chckitm_getRef();
+  return (*this)();
 }
 
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline  T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_getValue() const
 {
-  return chckitm_getRef();
+  return (*this)();
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline  const T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_getRef() const
+inline  const T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator()() const
 {
   chckitm_check_();
   return v_;
@@ -88,33 +88,33 @@ inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm
 {
   if (assertion)
   {
-    BOOST_ASSERT_MSG(chckitm_isSet(),assertMsg_.get());
+    BOOST_ASSERT_MSG(isSet(),assertMsg_.get());
   }
 
   if (alwaysCheck || isDebug)
   {
-    if (!chckitm_isSet())
+    if (!isSet())
     {
       throw (*(exceptionPtr_.get()));
     }
   }
-  return (chckitm_isSet());
+  return (isSet());
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_isSet() const
+inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::isSet() const
 {
   return isSet_.get();
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_reset()
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::reset()
 {
   isSet_.set(false);
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_set(bool value)
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::set(bool value)
 {
   isSet_.set(value);
 }
