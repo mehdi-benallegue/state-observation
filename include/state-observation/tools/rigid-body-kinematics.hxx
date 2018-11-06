@@ -251,23 +251,6 @@ namespace stateObservation
       return skewSymmetric2(v,R);
     }
 
-    inline Matrix3 computeInertiaTensor(const Vector6 inputInertia, Matrix3& inertiaTensor)
-    {
-
-      const double & Ixx=inputInertia[0];
-      const double & Iyy=inputInertia[1];
-      const double & Izz=inputInertia[2];
-      const double & Ixy=inputInertia[3];
-      const double & Ixz=inputInertia[4];
-      const double & Iyz=inputInertia[5];
-
-      inertiaTensor   <<    Ixx, Ixy, Ixz,
-                      Ixy, Iyy, Iyz,
-                      Ixz, Iyz, Izz;
-
-      return inertiaTensor;
-    }
-
     ///transforms a homogeneous matrix into 6d vector (position theta mu)
     inline Vector6 homogeneousMatrixToVector6(const Matrix4 & M)
     {

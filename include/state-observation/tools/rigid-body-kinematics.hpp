@@ -112,8 +112,6 @@ namespace stateObservation
     ///transform a 3d vector into a squared skew symmetric 3x3 matrix
     inline Matrix3 skewSymmetric2(const Vector3 & v);
 
-    inline Matrix3 computeInertiaTensor(const Vector6 inputInertia, Matrix3& inertiaTensor);
-
     ///transforms a homogeneous matrix into 6d vector (position theta mu)
     inline Vector6 homogeneousMatrixToVector6(const Matrix4 & M);
 

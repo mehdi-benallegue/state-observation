@@ -11,6 +11,24 @@
 
 namespace stateObservation
 {
+
+  inline Matrix3 buildInertiaTensor(const Vector6 inputInertia, Matrix3& inertiaTensor)
+  {
+
+    const double & Ixx=inputInertia[0];
+    const double & Iyy=inputInertia[1];
+    const double & Izz=inputInertia[2];
+    const double & Ixy=inputInertia[3];
+    const double & Ixz=inputInertia[4];
+    const double & Iyz=inputInertia[5];
+
+    inertiaTensor   <<    Ixx, Ixy, Ixz,
+                    Ixy, Iyy, Iyz,
+                    Ixz, Iyz, Izz;
+
+    return inertiaTensor;
+  }
+
   namespace flexibilityEstimation
   {
     using namespace stateObservation;
@@ -164,8 +182,8 @@ namespace stateObservation
         op_.positionCom-=op_.positionComBias;
       }
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
       op_.AngMomentum=u.segment<3>(input::angMoment);
       op_.dotAngMomentum=u.segment<3>(input::dotAngMoment);
 
@@ -440,8 +458,8 @@ namespace stateObservation
       op_.fm=x.segment(state::unmodeledForces,3);
       op_.tm=x.segment(state::unmodeledForces+3,3);
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
 
       unsigned nbContacts(getContactsNumber());
 
@@ -789,8 +807,8 @@ namespace stateObservation
       op_.fm=x.segment(state::unmodeledForces,3);
       op_.tm=x.segment(state::unmodeledForces+3,3);
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
 
       unsigned nbContacts(getContactsNumber());
 
@@ -915,8 +933,8 @@ namespace stateObservation
 
       op_.rFlex =computeRotation_(op_.orientationFlexV,0);
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
       unsigned nbContacts(getContactsNumber());
       for (unsigned i = 0; i<nbContacts ; ++i)
       {
