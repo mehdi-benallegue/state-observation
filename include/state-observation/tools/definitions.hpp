@@ -189,8 +189,8 @@ namespace stateObservation
     /// set the value of the initialization check boolean
     inline void set(bool value=true);
 
-    void chckitm_setAssertMessage(std::string s);
-    void chckitm_setExceptionPtr(std::exception* e);
+    void setAssertMessage(std::string s);
+    void setExceptionPtr(std::exception* e);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(eigenAlignedNew)
   protected:
