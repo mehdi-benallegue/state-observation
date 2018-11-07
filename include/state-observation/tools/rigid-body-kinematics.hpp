@@ -275,6 +275,9 @@ namespace stateObservation
       inline const Matrix3& getMatrixRef();
       inline const Quaternion& getQuaternionRef();
 
+      inline const Matrix3& getMatrixRef() const;
+      inline const Quaternion& getQuaternionRef() const;
+
 
       ///Multiply the orientation by a rotation
       ///the non const versions allow to use more optimized methods
@@ -301,6 +304,8 @@ namespace stateObservation
       inline bool isMatrixSet() const;
       inline bool isQuaternionSet() const;
 
+      inline CheckedMatrix3 & getMatrixRefUnsafe();
+      inline CheckedQuaternion & getQuaternionRefUnsafe();
 
       ///synchronizes the representations (quaternion and rotation matrix)
       inline void synchronize();
