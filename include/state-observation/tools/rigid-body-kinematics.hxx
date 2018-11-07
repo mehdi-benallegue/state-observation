@@ -947,6 +947,16 @@ namespace stateObservation
       }
     }
 
+    inline CheckedMatrix3 & Orientation::getMatrixRefUnsafe()
+    {
+      return m_;
+    }
+
+    inline CheckedQuaternion & Orientation::getQuaternionRefUnsafe()
+    {
+      return q_;
+    }
+
     inline void Orientation::check_() const
     {
       BOOST_ASSERT((isQuaternionSet()  || isMatrixSet()) && "The orientation is not initialized");
