@@ -100,6 +100,14 @@ namespace stateObservation
 
     inline Matrix3 rollPitchYawToRotationMatrix(Vector3 rpy);
 
+
+    /// Transform the roll pitch yaw into rotation matrix
+    ///( R = Ry*Rp*Rr)
+    inline Quaternion rollPitchYawToQuaternion(double roll, double pitch, double yaw);
+
+    inline Quaternion rollPitchYawToQuaternion(Vector3 rpy);
+
+
     ///transform a 3d vector into a skew symmetric 3x3 matrix
     inline Matrix3 skewSymmetric(const Vector3 & v, Matrix3 & R);
 
