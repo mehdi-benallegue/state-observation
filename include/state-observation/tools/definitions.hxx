@@ -84,6 +84,13 @@ inline  const T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::op
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator()()
+{
+  chckitm_check_();
+  return v_;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_check_() const throw(std::exception)
 {
   if (assertion)

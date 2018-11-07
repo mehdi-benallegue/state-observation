@@ -181,6 +181,8 @@ namespace stateObservation
     inline operator T() const ;
 
     inline T chckitm_getValue() const;
+
+    inline T& operator()();
     inline const T& operator()() const;
 
     inline bool isSet() const;
