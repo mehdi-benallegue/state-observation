@@ -296,6 +296,10 @@ namespace stateObservation
       inline Vector3 operator*( const Vector3& v);
 
       inline bool isSet() const;
+      inline void reset();
+
+      inline bool isMatrixSet() const;
+      inline bool isQuaternionSet() const;
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
