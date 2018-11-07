@@ -235,6 +235,7 @@ namespace stateObservation
     public:
       Orientation();
 
+      ///this is the rotation vector and NOT Euler angles
       Orientation(const Vector3& v);
 
       Orientation(const Quaternion& q);
@@ -244,6 +245,8 @@ namespace stateObservation
       Orientation(const AngleAxis& aa);
 
       Orientation(const Quaternion& q, const Matrix3& m);
+
+      Orientation(const double& roll, const double & pitch, const double & yaw);
 
       inline Orientation & operator=(const Vector3& v);
 
@@ -262,6 +265,11 @@ namespace stateObservation
       inline operator Matrix3() const;
 
       inline operator Quaternion() const;
+
+      inline Vector3 toRotationVector() const;
+      inline Vector3 toRollPitchYaw() const;
+      inline Vector3 toRollPitchYaw() ;
+      inline AngleAxis toAngleAxis() const;
 
 
       inline const Matrix3& getMatrixRef();
