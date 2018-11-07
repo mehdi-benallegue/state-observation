@@ -979,6 +979,8 @@ namespace stateObservation
     }
 
 
+
+
     /// -------------------Kinematics structure implementation--------------
 
     inline Kinematics Kinematics::integrate(double dt, Flags::byte)
@@ -1269,6 +1271,46 @@ namespace stateObservation
       }
 
       return *this;
+    }
+
+    inline Kinematics Kinematics::inverse() const
+    {
+      Kinematics inverted;
+
+      if (orientation.isSet())
+      {
+        inverted.orientation = orientation.inverse();
+        Orientation & r2 = inverted.orientation;
+
+        if (angVel.isSet())
+        {
+          inverted.angVel =  -(r2 * angVel()); //omega2
+
+          if (angAcc.isSet())
+          {
+            inverted.angAcc =   r2 * (angVel().cross(angVel()) - angAcc()); //omega2dot
+          }
+        }
+
+        if (position.isSet())
+        {
+          inverted.position= - (r2 * position()) ;
+
+          if (linVel.isSet())
+          {
+            Vector3 omegaxp= angVel().cross(position());
+            inverted.linVel= r2 * ( omegaxp - linVel()); //t2dot
+            if (linAcc.isSet())
+            {
+                inverted.linAcc=  r2 * ( angVel().cross(2 * linVel - omegaxp)
+                                        - linAcc() + angAcc().cross(position())); //t2dotdot
+            }
+          }
+        }
+      }
+
+      return inverted;
+
     }
 
     ///composition of transformation

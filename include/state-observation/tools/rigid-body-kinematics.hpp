@@ -352,6 +352,8 @@ namespace stateObservation
 
       inline Kinematics update(const Kinematics & newValue, double dt=0, Flags::byte=Flags::all);
 
+      inline Kinematics inverse() const;
+
       ///composition of transformation
       inline Kinematics operator* (const Kinematics & ) const;
       inline Kinematics operator* (const Kinematics & ) ;
