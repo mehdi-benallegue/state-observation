@@ -338,53 +338,41 @@ namespace stateObservation
       struct Flags
       {
         typedef unsigned char byte;
-        static const byte position= BOOST_BINARY(0000001);
-        static const byte quaternion= BOOST_BINARY(0000010);
-        static const byte rotationMatrix= BOOST_BINARY(0000100);
-        static const byte linVel= BOOST_BINARY(0001000);
-        static const byte angVel= BOOST_BINARY(0010000);
-        static const byte linAcc= BOOST_BINARY(0100000);
-        static const byte angAcc= BOOST_BINARY(1000000);
+        static const byte position=     BOOST_BINARY(000001);
+        static const byte orientation=  BOOST_BINARY(000010);
+        static const byte linVel=       BOOST_BINARY(000100);
+        static const byte angVel=       BOOST_BINARY(001000);
+        static const byte linAcc=       BOOST_BINARY(010000);
+        static const byte angAcc=       BOOST_BINARY(100000);
 
-        static const byte all= position | quaternion | rotationMatrix |
-        linVel | angVel | linAcc | angAcc;
+        static const byte all= position | orientation | linVel | angVel | linAcc | angAcc;
       };
-
-      inline Kinematics setOrientation(const Orientation &);
-      inline Kinematics setPosition(const Vector3 & pos);
-
 
       inline Kinematics integrate(double dt, Flags::byte=Flags::all);
 
       inline Kinematics update(const Kinematics & newValue, double dt=0, Flags::byte=Flags::all);
 
-      inline Kinematics updateWithVector(const Vector & newVector);
-
       ///composition of transformation
-      inline Kinematics operator* (const Vector & ) const;
-
-      ///composition of transformation
-      inline Kinematics operator* (const Vector & );
-
-      ///composition of transformation
-      inline Kinematics operator* (Vector & );
-
-      inline Kinematics synchronizeRotations();
-
-      inline Vector3 rotateVector( const Vector3 & input)const ;
-
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    private:
+      inline Kinematics operator* (const Kinematics & ) const;
+      inline Kinematics operator* (const Kinematics & ) ;
+      inline Kinematics operator* ( Kinematics & ) const;
+      inline Kinematics operator* (Kinematics & ) ;
 
       CheckedVector3 position;
-      Orientation orienation;
+      Orientation orientation;
 
       CheckedVector3 linVel;
       CheckedVector3 angVel;
 
       CheckedVector3 linAcc;
       CheckedVector3 angAcc;
+
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    private:
+      ///this is a helper function to avoid code duplication
+      template<typename thistype,typename kine>
+      static inline Kinematics multiply_(thistype* self, kine& multiplier);
     };
   }
 }
