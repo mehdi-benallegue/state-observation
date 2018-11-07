@@ -854,6 +854,34 @@ namespace stateObservation
       }
     }
 
+    inline Orientation Orientation::integrate(Vector3 dt_x_omega)
+    {
+      check_();
+      if (q_.isSet())
+      {
+        if (isMatrixSet())
+        {
+          Quaternion q=kine::rotationVectorToQuaternion(dt_x_omega );
+          q_ = q* q_();
+          m_ = q.toRotationMatrix()*m_();
+        }
+        else
+        {
+          q_ = kine::rotationVectorToQuaternion(dt_x_omega )* q_();
+        }
+      }
+      else
+      {
+        m_ = kine::rotationVectorToRotationMatrix(dt_x_omega )*m_();
+      }
+    }
+
+    inline Vector3 Orientation::differentiate(Orientation R_k1) const
+    {
+      check_();
+      return (inverse()*R_k1).toRotationVector();
+    }
+
     inline bool Orientation::isSet() const
     {
       return (isMatrixSet() || q_.isSet());

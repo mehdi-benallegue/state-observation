@@ -292,8 +292,17 @@ namespace stateObservation
 
       inline Orientation inverse() const;
 
-      ///Rotate a vector
 
+
+      ///use the vector dt_x_omega as the increment of rotation expressed in the
+      /// world frame. Which gives R_{k+1}=\exp(S(dtxomega))R_k
+      inline Orientation integrate(Vector3 dt_x_omega);
+
+      ///gives the log (rotation vector) of the difference of orientation
+      /// gives log of (*this).inverse()*R_k1
+      inline Vector3 differentiate(Orientation R_k1) const;
+
+      ///Rotate a vector
       inline Vector3 operator*( const Vector3& v) const;
 
       inline Vector3 operator*( const Vector3& v);
@@ -320,8 +329,6 @@ namespace stateObservation
       inline Quaternion & matrixToQuaternion_();
 
       CheckedQuaternion q_;
-
-
       CheckedMatrix3 m_;
     };
 
