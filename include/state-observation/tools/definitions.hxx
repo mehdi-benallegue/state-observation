@@ -121,13 +121,13 @@ inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::set(boo
 
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_setAssertMessage(std::string s)
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::setAssertMessage(std::string s)
 {
   assertMsg_.set(s);
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_setExceptionPtr(std::exception* e)
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::setExceptionPtr(std::exception* e)
 {
   exceptionPtr_.set(e);
 }
