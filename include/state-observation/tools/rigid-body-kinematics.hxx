@@ -930,8 +930,14 @@ namespace stateObservation
       if (!isMatrixSet())
       {
         quaternionToMatrix_();
+        return m_()*v;
+
       }
-      return m_()*v;
+      else
+      {
+        return m_()*v;
+      }
+
     }
 
     inline Vector3 Orientation::operator*( const Vector3& v) const
