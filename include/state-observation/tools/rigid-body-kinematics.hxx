@@ -721,6 +721,18 @@ namespace stateObservation
       return q_;
     }
 
+    inline const Matrix3& Orientation::getMatrixRef() const
+    {
+      BOOST_ASSERT (isMatrixSet() && "The matrix is not set");
+      return m_;
+    }
+
+    inline const Quaternion& Orientation::getQuaternionRef() const
+    {
+      BOOST_ASSERT (isQuaternionSet() && "The quaternion is not set");
+      return q_;
+    }
+
     inline Orientation Orientation::operator*( Orientation& R2)
     {
       check_();
