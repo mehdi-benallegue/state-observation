@@ -450,7 +450,6 @@ namespace stateObservation
       timespec time1, time2, time3;
     };
 
-
     std::string matrixToString(const Matrix& mat);
 
     std::string vectorToString(const Vector& v);
