@@ -183,6 +183,8 @@ int test()
         return 1;
     }
     std::cout << "computation time: " << duration << std::endl;
+
+    return 0;
 }
 
 int main()
