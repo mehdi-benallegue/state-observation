@@ -296,7 +296,7 @@ namespace stateObservation
 
       ///use the vector dt_x_omega as the increment of rotation expressed in the
       /// world frame. Which gives R_{k+1}=\exp(S(dtxomega))R_k
-      inline Orientation integrate(Vector3 dt_x_omega);
+      inline const Orientation & integrate(Vector3 dt_x_omega);
 
       ///gives the log (rotation vector) of the difference of orientation
       /// gives log of (*this).inverse()*R_k1
@@ -348,9 +348,9 @@ namespace stateObservation
         static const byte all= position | orientation | linVel | angVel | linAcc | angAcc;
       };
 
-      inline Kinematics integrate(double dt, Flags::byte=Flags::all);
+      inline const Kinematics & integrate(double dt, Flags::byte=Flags::all);
 
-      inline Kinematics update(const Kinematics & newValue, double dt=0, Flags::byte=Flags::all);
+      inline const Kinematics & update(const Kinematics & newValue, double dt=0, Flags::byte=Flags::all);
 
       inline Kinematics inverse() const;
 
