@@ -69,6 +69,12 @@ inline  CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator T(
   return (*this)();
 }
 
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator const T&() const
+{
+  return (*this)();
+}
+
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline  T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_getValue() const

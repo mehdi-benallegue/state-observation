@@ -179,6 +179,7 @@ namespace stateObservation
     inline CheckedItem& operator=(const CheckedItem & );
     inline T& operator=(const T&);
     inline operator T() const ;
+    inline operator const T&() const ;
 
     inline T chckitm_getValue() const;
 
