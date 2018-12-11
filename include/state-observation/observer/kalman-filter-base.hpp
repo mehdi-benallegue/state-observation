@@ -271,6 +271,7 @@ namespace stateObservation
         /// (used for the case of multiplicative Kalman filter)
         void setSumFunction(void (* sum)(const  Vector& stateVector, const Vector& tangentVector, Vector& result));
         void setDifferenceFunction(void (* difference)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference));
+        void setMeasurementDifferenceFunction(void (* measurementDifference)(const  Vector& measuementVector1, const Vector& measurementVector2, Vector& difference));
 
     protected:
 
@@ -330,6 +331,7 @@ namespace stateObservation
 
         void (* sum_)(const  Vector& stateVector, const Vector& tangentVector, Vector& result);
         void (* difference_)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        void (* measurementDifference_)(const  Vector& measurementVector1, const Vector& measurementVector2, Vector& difference);
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };

@@ -23,7 +23,8 @@ namespace stateObservation
             :ZeroDelayObserver(n,m,p),
             nt_(n),
             sum_(detail::defaultSum),
-            difference_(detail::defaultDifference)
+            difference_(detail::defaultDifference),
+            measurementDifference_(detail::defaultDifference)
     {
     }
 
@@ -31,7 +32,8 @@ namespace stateObservation
             :ZeroDelayObserver(n,m,p),
             nt_(nt),
             sum_(detail::defaultSum),
-            difference_(detail::defaultDifference)
+            difference_(detail::defaultDifference),
+            measurementDifference_(detail::defaultDifference)
     {
     }
 
@@ -129,7 +131,7 @@ namespace stateObservation
 
 
         //innovation Measurements
-        oc_.inoMeas.noalias() = this->y_[k+1] - ybar_();
+        measurementDifference_(this->y_[k+1], ybar_(),oc_.inoMeas);
         oc_.inoMeasCov.noalias() = r_ +  c_ * (oc_.pbar * c_.transpose());
 
         unsigned &  measurementSize =m_;
