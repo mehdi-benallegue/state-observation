@@ -376,8 +376,8 @@ namespace stateObservation
       template<typename thistype,typename kine>
       static inline Kinematics multiply_(thistype* self, kine& multiplier);
     };
-  }
-}
+  }///namespace kine
+}///namespace stateObservation
 
 #include <state-observation/tools/rigid-body-kinematics.hxx>
 
