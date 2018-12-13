@@ -22,15 +22,17 @@ namespace stateObservation
     KalmanFilterBase::KalmanFilterBase(unsigned n,unsigned m,unsigned p)
             :ZeroDelayObserver(n,m,p),
             nt_(n),
+            mt_(m),
             sum_(detail::defaultSum),
             difference_(detail::defaultDifference),
             measurementDifference_(detail::defaultDifference)
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(unsigned n, unsigned nt, unsigned m,unsigned p)
+    KalmanFilterBase::KalmanFilterBase(unsigned n, unsigned nt, unsigned m, unsigned mt, unsigned p)
             :ZeroDelayObserver(n,m,p),
             nt_(nt),
+            mt_(mt),
             sum_(detail::defaultSum),
             difference_(detail::defaultDifference),
             measurementDifference_(detail::defaultDifference)
@@ -134,10 +136,10 @@ namespace stateObservation
         measurementDifference_(this->y_[k+1], ybar_(),oc_.inoMeas);
         oc_.inoMeasCov.noalias() = r_ +  c_ * (oc_.pbar * c_.transpose());
 
-        unsigned &  measurementSize =m_;
+        unsigned &  measurementTangentSize =mt_;
         //inversing innovation measurement covariance matrix
         oc_.inoMeasCovLLT.compute(oc_.inoMeasCov);
-        oc_.inoMeasCovInverse.resize(measurementSize,measurementSize);
+        oc_.inoMeasCovInverse.resize(measurementTangentSize,measurementTangentSize);
         oc_.inoMeasCovInverse.setIdentity();
         oc_.inoMeasCovLLT.matrixL().solveInPlace(oc_.inoMeasCovInverse);
         oc_.inoMeasCovLLT.matrixL().transpose().solveInPlace(oc_.inoMeasCovInverse);
@@ -221,22 +223,22 @@ namespace stateObservation
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(m_,nt_,c);
+        return Cmatrix::Constant(mt_,nt_,c);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixRandom() const
     {
-        return Cmatrix::Random(m_,nt_);
+        return Cmatrix::Random(mt_,nt_);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixZero() const
     {
-        return Cmatrix::Zero(m_,nt_);
+        return Cmatrix::Zero(mt_,nt_);
     }
 
     bool KalmanFilterBase::checkCmatrix(const Cmatrix & a) const
     {
-        return (unsigned(a.rows())==m_ && unsigned(a.cols())==nt_);
+        return (unsigned(a.rows())==mt_ && unsigned(a.cols())==nt_);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixConstant(double c) const
@@ -266,27 +268,27 @@ namespace stateObservation
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(m_,m_,c);
+        return Cmatrix::Constant(mt_,mt_,c);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixRandom() const
     {
-        return Cmatrix::Random(m_,m_);
+        return Cmatrix::Random(mt_,mt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixZero() const
     {
-        return Rmatrix::Zero(m_,m_);
+        return Rmatrix::Zero(mt_,mt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixIdentity() const
     {
-        return Rmatrix::Identity(m_,m_);
+        return Rmatrix::Identity(mt_,mt_);
     }
 
     bool KalmanFilterBase::checkRmatrix(const Rmatrix & a) const
     {
-        return (unsigned(a.rows())==m_ && (unsigned(a.cols()))==m_);
+        return (unsigned(a.rows())==mt_ && (unsigned(a.cols()))==mt_);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixConstant(double c) const
@@ -316,18 +318,7 @@ namespace stateObservation
 
     void KalmanFilterBase::setStateSize(unsigned n)
     {
-        if ((n!=n_) || (nt_ !=n))
-        {
-            ZeroDelayObserver::setStateSize(n);
-
-            nt_=n;
-
-            clearA();
-            clearC();
-            clearQ();
-            clearStateCovariance();
-
-        }
+        setStateSize(n,n);
     }
 
     void KalmanFilterBase::setStateSize(unsigned n, unsigned nt)
@@ -348,8 +339,14 @@ namespace stateObservation
 
     void KalmanFilterBase::setMeasureSize(unsigned m)
     {
-        if (m!=m_)
+        setMeasureSize(m,m);
+    }
+
+    void KalmanFilterBase::setMeasureSize(unsigned m, unsigned mt)
+    {
+        if ((m!=m_) || mt!=mt_)
         {
+            mt_=mt;
             ZeroDelayObserver::setMeasureSize(m);
             clearC();
             clearR();

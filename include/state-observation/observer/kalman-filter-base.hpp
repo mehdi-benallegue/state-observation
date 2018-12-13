@@ -89,10 +89,11 @@ namespace stateObservation
         ///
         /// The update can then be done using exponential maps.
         ///  \li n : size of the state vector representation
-        ///  \li nt : size of the tangent vector
+        ///  \li nt : dimension of the tangent space to the state space
         ///  \li m : size of the measurements vector
+        ///  \li mt : dimension of the tangent space to the measurement space
         ///  \li p : size of the input vector
-        KalmanFilterBase(unsigned n, unsigned nt, unsigned m, unsigned p);
+        KalmanFilterBase(unsigned n, unsigned nt, unsigned m, unsigned mt, unsigned p);
 
         /// Set the value of the jacobian df/dx
         virtual void setA(const Amatrix& A);
@@ -240,6 +241,13 @@ namespace stateObservation
         ///the containers for the matrices C, R
         virtual void setMeasureSize(unsigned m);
 
+        /// Changes the dimension of the measurement vector:
+        /// m is the size of the measurementVector
+        /// mt is the dimension of the measurement tangent space 
+        ///resets the internal container for the measurement vectors and
+        ///the containers for the matrices C, R
+        virtual void setMeasureSize(unsigned m, unsigned mt);
+
         /// Get simulation of the measurement y_k using the state estimation
         virtual MeasureVector getSimulatedMeasurement(TimeIndex k);
 
@@ -275,7 +283,11 @@ namespace stateObservation
 
     protected:
 
+        /// the size of tangent space of the state space
         unsigned nt_;
+
+        /// the size of tangent space of the measurement space
+        unsigned mt_;
 
         /// The type of Kalman gain matrix
         typedef Matrix Kmatrix;
