@@ -77,7 +77,6 @@ SET(${PROJECT_NAME}_HEADERS
   include/state-observation/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp
   include/state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp
   include/state-observation/dynamics-estimators/kinetics-observer.hpp
-  include/state-observation/dynamics-estimators/kinetics-dynamical-system.hpp
   include/state-observation/examples/imu-attitude-trajectory-reconstruction.hpp
   include/state-observation/examples/imu-attitude-trajectory-reconstruction.hxx
   include/state-observation/examples/imu-multiplicative-attitude-reconstruction.hpp
