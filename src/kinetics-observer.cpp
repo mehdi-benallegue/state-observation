@@ -42,14 +42,14 @@ namespace stateObservation
 
   void KineticsObserver::onSetMeasurement_()
   {
-    if (k_input!=k_est)
+    if (k_input!=k_est) ///This is a new iteration
     {
-      resetMeasurement();
+      resetIteration();
       k_input = k_est;
     }
   }
 
-  void KineticsObserver::clearInputs_()
+  void KineticsObserver::resetIteration()
   {
     mapIMU_.clear();
     mapFT_.clear();

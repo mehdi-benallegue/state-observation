@@ -131,8 +131,6 @@ namespace stateObservation
 
         void setWithAccelerationEstimation(bool b = true);
 
-        void setWithFilteringMeasurements(bool b = true);
-
         /// ///////////////////////////////////////////////
         /// Getting and setting input data and measurements
         /// /////////////////////////////////////////////
@@ -182,9 +180,8 @@ namespace stateObservation
         ///if only force of torque is available, set the unavailable value to zero 
         virtual void setExternalForceTorqueMeasurement(const Vector3 force = Vector3::Zero(), const Vector3 torque = Vector3::Zero());
 
-        ///removes all the measurements
-        virtual void resetMeasurement();
 
+        ////////////// Contact management ///////////////////////////////
         /// Set a new contact
         /// -pose is the initial guess on the position of the contact. Only position 
         /// and orientation are enough
@@ -209,13 +206,12 @@ namespace stateObservation
                             int contactNumner=-1);
         virtual int removeContact(int contactnbr);
 
+        virtual void clearContacts();
+
         virtual int getNumberOfContact() const;
 
         std::vector<int> getListOfContact() const;
 
-        ///this function allows to compute the filtered sensors even if
-        /// WithFilteringMeasurements is not set
-        virtual void getFilterdeMeasurements();
 
         ///Sets the covariance matrix of the flexibility Guess
         virtual void setStateCovariance(const Matrix & P);
@@ -227,46 +223,22 @@ namespace stateObservation
         /// \li Q process noise
         virtual void setProcessNoiseCovariance(const Matrix & Q);
 
-        ///Sets the covariance matrices for the sensor noises
-        /// \li R sensor noise
-        virtual void setMeasurementNoiseCovariance(const Matrix & R);
-
-        ///gets the covariance matrices for the process noises
-        virtual Matrix getProcessNoiseCovariance() const ;
-
         ///gets the covariance matrices
         virtual Vector getMeasurementVector();
-
-        /// Sets the value of the next input for the state process dynamics
-        /// i.e. : gives u_k such that x_{k+1} = f(x_k,u_k)
-        virtual void setInput(const Vector & u);
 
         /// Gets a const reference on the extended Kalman filter
         virtual const stateObservation::ExtendedKalmanFilter & getEKF() const;
 
         /// Gets a reference on the extended Kalman filter
+        /// modifying this object may lead to instabilities
         virtual stateObservation::ExtendedKalmanFilter & getEKF();
 
-        /// Gets a simulation of the
-        virtual Vector getSimulatedMeasurement();
-
         ///Resets the covariance matrices to their original values
-        virtual void resetCovarianceMatrices()=0;
+        virtual void resetCovarianceMatrices();
 
-        ///Get the last vector of inovation of the Kalman filter
-        virtual Vector getInovation();
-
-        ///Get the simulated measurement of the predicted state
-        virtual Vector getPredictedMeasurement();
-
-        ///Get the predicted state
-        virtual Vector getPrediction();
-
-        ///Get the last simulated measurement
-        virtual Vector getLastPredictedMeasurement();
-
-        ///Get the last predicted state
-        virtual Vector getLastPrediction();
+        ///to reset all the sensor inputs and provided contact positions
+        ///does NOT reset the presence of contacts - call clearContacts for that instead
+        void resetIteration();
 
 
 protected:
@@ -310,8 +282,8 @@ protected:
         virtual void useFiniteDifferencesJacobians(bool b=true);
 
     protected:
-        ///clears the inputs of the functor
-        void clearInputs_();
+        
+               
 
         Matrix3 acceleroDefaultCovMat_;
         Matrix3 gyroCovDefaultMat_;
@@ -321,9 +293,8 @@ protected:
 
 
         ///function to call before all the measurements
-        ///if called just after the update 
-        ///this function removes all the measurements 
-        ///and the inputs to
+        ///detects if there is a new estimation beginning and then
+        ///calls the reset of the iteration
         virtual void onSetMeasurement_();
         
         stateObservation::ExtendedKalmanFilter ekf_;
