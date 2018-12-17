@@ -13,11 +13,10 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   const unsigned measurementSize=6;
   const unsigned inputSize=6;
 
-  typedef kine::indexes<kine::quaternion> indexes;
   typedef kine::indexes<kine::rotationVector> indexesTangent;
 
   ///initialization of the extended Kalman filter
-  ExtendedKalmanFilter filter(stateSize, indexesTangent::size, measurementSize, measurementSize, inputSize, false);
+  ExtendedKalmanFilter filter(stateSize, indexesTangent::size, measurementSize, measurementSize, inputSize, false,false );
 
 
   ///initalization of the functor
