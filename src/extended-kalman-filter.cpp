@@ -2,6 +2,56 @@
 
 namespace stateObservation
 {
+    ExtendedKalmanFilter::ExtendedKalmanFilter(unsigned n,unsigned m)
+        :KalmanFilterBase(n,m,0),
+        directInputOutputFeedthrough_(false),
+        directInputStateProcessFeedthrough_(false), f_(0x0)
+
+    {
+#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+            std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
+#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
+
+    }
+
+    
+    ExtendedKalmanFilter::ExtendedKalmanFilter(unsigned n,unsigned m,unsigned p,
+            bool directInputOutputFeedthrough,
+            bool directInputStateProcessFeedthrough)
+        :KalmanFilterBase(n,m,p),
+        directInputOutputFeedthrough_(directInputOutputFeedthrough),
+        directInputStateProcessFeedthrough_(directInputStateProcessFeedthrough), f_(0x0)
+    {
+#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+        std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
+#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
+
+        if (p==0)
+        {
+            directInputOutputFeedthrough_=false;
+            directInputStateProcessFeedthrough_=false;
+        }
+    }
+
+    ExtendedKalmanFilter::ExtendedKalmanFilter(unsigned n, unsigned nt, unsigned  m, unsigned mt, unsigned p,
+            bool directInputOutputFeedthrough,
+            bool directInputStateProcessFeedthrough):
+        KalmanFilterBase(n,nt,m,mt,p),
+        directInputOutputFeedthrough_(directInputOutputFeedthrough),
+        directInputStateProcessFeedthrough_(directInputStateProcessFeedthrough), f_(0x0)
+    {
+#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+        std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
+#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
+
+        if (p==0)
+        {
+            directInputOutputFeedthrough_=false;
+            directInputStateProcessFeedthrough_=false;
+        }
+    }
+
+
     void ExtendedKalmanFilter::setFunctor(DynamicalSystemFunctorBase* f)
     {
         f_=f;
