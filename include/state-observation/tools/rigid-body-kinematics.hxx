@@ -1337,6 +1337,135 @@ namespace stateObservation
       return multiply_(this,multiplier);
     }
 
+    inline Vector Kinematics::toVector(Flags::byte flags) const
+    {
+      int size =0;
+
+      if (flags & Flags::position)
+      {
+        size +=3;
+      }
+      if (flags & Flags::orientation)
+      {
+        size +=4;
+      }
+      if (flags & Flags::linVel)
+      {
+        size +=3;
+      }
+      if (flags & Flags::angVel)
+      {
+        size +=3;
+      }
+      if (flags & Flags::linAcc)
+      {
+        size +=3;
+      }
+      if (flags & Flags::angAcc)
+      {
+        size +=3;
+      }
+
+      Vector output(size);
+      
+      int curIndex = 0;
+      if ((flags & Flags::position))
+      {
+        output.segment<3>(curIndex)=position();
+        curIndex+=3;
+      }
+      if ((flags & Flags::orientation))
+      {
+        output.segment<4>(curIndex)=Quaternion(orientation).coeffs();
+        curIndex+=4;
+      }
+      if ((flags & Flags::linVel))
+      {
+        output.segment<3>(curIndex)=linVel();
+        curIndex+=3;
+      }
+      if ((flags & Flags::angVel))
+      {
+        output.segment<3>(curIndex)=angVel();
+        curIndex+=3;
+      }      
+      if ((flags & Flags::linAcc))
+      {
+        output.segment<3>(curIndex)=linAcc();
+        curIndex+=3;
+      }      
+      if ((flags & Flags::angAcc))
+      {
+        output.segment<3>(curIndex)=angAcc();
+      }      
+
+      return output;
+    }
+
+    inline Vector Kinematics::toVector() const
+    {
+      int size = 0;
+      if (position.isSet())
+      {
+       size+=3;
+      }
+      if (orientation.isSet())
+      {
+        size+=4;
+      }
+      if (linVel.isSet())
+      {
+        size+=3;
+      }
+      if (angVel.isSet())
+      {
+        size+=3;
+      }
+      if (linAcc.isSet())
+      {
+        size+=3;
+      }
+      if (angAcc.isSet())
+      {
+        size+=3;
+      }      
+
+      Vector output(size);
+     
+      int curIndex = 0;
+      if (position.isSet())
+      {
+        output.segment<3>(curIndex)=position();
+        curIndex+=3;
+      }
+      if (orientation.isSet())
+      {
+        output.segment<4>(curIndex)=Quaternion(orientation).coeffs();
+        curIndex+=4;
+      }
+      if (linVel.isSet())
+      {
+        output.segment<3>(curIndex)=linVel();
+        curIndex+=3;
+      }
+      if (angVel.isSet())
+      {
+        output.segment<3>(curIndex)=angVel();
+        curIndex+=3;
+      }      
+      if (linAcc.isSet())
+      {
+        output.segment<3>(curIndex)=linAcc();
+        curIndex+=3;
+      }      
+      if (angAcc.isSet())
+      {
+        output.segment<3>(curIndex)=angAcc();
+      }      
+
+      return output;
+    }
+
     template<typename thistype,typename kine>
     inline Kinematics Kinematics::multiply_(thistype* self, kine& multiplier)
     {
