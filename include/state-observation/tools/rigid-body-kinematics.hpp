@@ -354,6 +354,13 @@ namespace stateObservation
 
       inline Kinematics inverse() const;
 
+      ///converts the object to a vector
+      /// the order of the vector is 
+      /// position orientation (quaternion) linevel angvel linAcc angAcc
+      /// use the flags to define the structure of the vector
+      inline Vector toVector(Flags::byte) const;
+      inline Vector toVector() const;
+
       ///composition of transformation
       inline Kinematics operator* (const Kinematics & ) const;
       inline Kinematics operator* (const Kinematics & ) ;
