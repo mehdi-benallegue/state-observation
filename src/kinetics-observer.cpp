@@ -35,6 +35,45 @@ namespace stateObservation
   KineticsObserver::~KineticsObserver()
   {}
 
+  
+  unsigned KineticsObserver::getStateSize() const
+  {
+    return stateSize_;
+  }
+
+  unsigned KineticsObserver::getMeasurementSize() const
+  {
+    int size = 0;
+  /// Synchronizing the sensors
+    MapIMUConstIterator i = imuSensors_.begin();
+    while (i != imuSensors_.end()) 
+    {
+      if (i->second.time==k_data) 
+      {
+        size += sizeIMUSignal;
+      } 
+    }
+    
+    for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
+    {
+      if (i->second.index == k_data && i->second.withRealSensor)
+      {
+        size += sizeFTSignal;
+      }
+    }
+
+    if (absPoseSensor_.isSet && absPoseSensor_.time == k_data)
+    {
+      size += sizePoseSignal;
+    }
+
+    return size;
+    
+  }
+
+
+
+
   void KineticsObserver::update()
   {
 

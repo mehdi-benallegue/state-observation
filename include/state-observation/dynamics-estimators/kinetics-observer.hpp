@@ -319,6 +319,7 @@ protected:
         typedef std::map<int, IMU, std::less<int>, 
              Eigen::aligned_allocator<std::pair<const int, IMU> > > MapIMU;
         typedef MapIMU::iterator MapIMUIterator;
+        typedef MapIMU::const_iterator MapIMUConstIterator;
         typedef std::pair<int, IMU> PairIMU;
 
         
@@ -350,6 +351,7 @@ protected:
         typedef std::map<int, Contact, std::less<int>, 
              Eigen::aligned_allocator<std::pair<const int, Contact> > > MapContact;
         typedef MapContact::iterator MapContactIterator;
+        typedef MapContact::const_iterator MapContactConstIterator;
         typedef std::pair<int, Contact> PairContact;
 
         struct AbsolutePoseSensor:
