@@ -12,7 +12,7 @@ namespace stateObservation
   stateTangentSize_(stateTangentSizeBase + stateTangentSizePerContact* maxContacts),
   measurementSize_(0),
   stateVector_(stateSize_),
-  stateVectorDx_(Vector::Constant(stateSizeBase + maxContacts*stateSizePerContact,defaultdx)),
+  stateVectorDx_(stateTangentSize_),
   oldStateVector_(stateSize_),
   acceleroDefaultCovMat_(Matrix3::Identity()*acceleroVariance),
   gyroCovDefaultMat_(Matrix3::Identity()*gyroVariance),
@@ -20,7 +20,7 @@ namespace stateObservation
   poseSensorCovMat_(Matrix6::Identity()),
   ekf_(stateSize_, stateTangentSize_, sizeIMUSignal, sizeIMUSignal,  0,false,false),
   finiteDifferencesJacobians_(true),
-  k_est(0),k_data(0)
+  k_est(0),k_data(0), dt(0.005)
   {
     contactFTSensorDefaultCovMat_.block<3,3>(0,0) *= forceSensorVariance;
     contactFTSensorDefaultCovMat_.block<3,3>(3,3) *= torqueSensorVariance;
@@ -28,12 +28,18 @@ namespace stateObservation
     poseSensorCovMat_.block<3,3>(3,3) *= orientationSensorVariance;
 
     ekf_.setFunctor(this);
+
+    ekf_.setState(stateVector_,k_est);
+
+    
+
     
     Contact::numberOfRealSensors = 0;
   }
 
   KineticsObserver::~KineticsObserver()
-  {}
+  {
+  }
 
   
   unsigned KineticsObserver::getStateSize() const
@@ -71,9 +77,17 @@ namespace stateObservation
     
   }
 
+  double KineticsObserver::getSamplingTime() const
+  {
+    return dt_;
+  }
 
+  void KineticsObserver::setSamplingTime( double dt) 
+  {
+    dt_ = dt;
+  }
 
-
+  
   void KineticsObserver::update()
   {
 
@@ -107,7 +121,7 @@ namespace stateObservation
         }
       }
 
-      if (absPoseSensor_.time != k_data)
+      if (absPoseSensor_.isSet && absPoseSensor_.time != k_data)
       {
         absPoseSensor_.isSet=false;
       }
@@ -153,22 +167,21 @@ namespace stateObservation
       {
         absPoseSensor_.index= localIndex;
         BOOST_ASSERT(absPoseSensor_.pose.position.isSet() && absPoseSensor_.pose.orientation.isSet() \
-                    && "The absolute pose needs to contain the position and the orientation")
+                    && "The absolute pose needs to contain the position and the orientation");
         measurementVector_.segment<sizePoseSignal>(localIndex) = absPoseSensor_.pose.toVector(Kinematics::Flags::position | Kinematics::Flags::orientation);
         measurementCovMatrix_.block<sizePoseSignalTangent,sizePoseSignalTangent>(localIndex,localIndex)=absPoseSensor_.covMatrix;
       }
 
       ekf_.setMeasureSize(measurementSize_,measurementTangentSize);
-      ekf_.setMeasurement(measurementVector_);
+      ekf_.setMeasurement(measurementVector_,k_data);
       ekf_.setR(measurementCovMatrix_);
-      if (useFiniteDifferencesJacobians)
+      if (finiteDifferencesJacobians_)
       {
-        ekf_.setA(ekf_.getAMatrixFD(dx_));
-        ekf_.setC(ekf_.getCMatrixFD(dx_));
+        ekf_.setA(ekf_.getAMatrixFD(stateVectorDx_));
+        ekf_.setC(ekf_.getCMatrixFD(stateVectorDx_));
       }
       
       stateVector_ = ekf_.getEstimatedState(k_data);
-
 
       if (stateVector_.hasNaN())
       {
@@ -185,6 +198,8 @@ namespace stateObservation
 
     }
   }
+
+
 
   int KineticsObserver::setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Kinematics &localKine, int num)
   {
@@ -211,8 +226,16 @@ namespace stateObservation
   void KineticsObserver::resetIteration()
   {
     imuSensors_.clear();
-    contacts_.clear();
     absPoseSensor_.isSet=false;
+
+    for (MapContactIterator i=contacts_.begin(), ie = contacts_.end();i!=ie;++i) 
+    {
+      if (i->second.withRealSensor)
+      {
+        i->second.withRealSensor=false;
+      }
+    }
+
   }
 
   void KineticsObserver::startNewIteration_()
@@ -220,9 +243,6 @@ namespace stateObservation
     if (k_est==k_data)
     {
       ++k_data;
-    }
-    
-  }
-
-  
+    }    
+  }  
 }

@@ -26,18 +26,11 @@
 #include <state-observation/noise/noise-base.hpp>
 
 
-static const double acceleroVariance = 1e-4;
-static const double gyroVariance = 1e-8;
-static const double forceSensorVariance = 1e-8;
-static const double torqueSensorVariance = 1e-10;
-static const double positionSensorVariance = 1e-4;
-static const double orientationSensorVariance = 1e-3;
+///////////SIZE OF VECTORS
 static const int stateSizeBase = 3+4+3+3+3+3+3;
 static const int stateSizePerContact = 3+4+3+3;
 static const int stateTangentSizeBase = 3+3+3+3+3+3+3;
 static const int stateTangentSizePerContact = 3+3+3+3;
-
-static const double defaultdx=1e-6;///default derivation steps
 
 static const int sizeAcceleroSignal = 3;
 static const int sizeGyroSignal = 3;
@@ -46,6 +39,36 @@ static const int sizeIMUSignal = sizeAcceleroSignal+sizeGyroSignal;
 static const int sizeFTSignal = 6;
 static const int sizePoseSignal = 7;
 static const int sizePoseSignalTangent = 6;
+
+
+////////////DEFAULT VALUES FOR COVARIANCE //////
+static const double positionInitVariance = !e-4;
+static const double orientationInitVariance = 1e-4;
+static const double linVelInitVariance = 1e-6;
+static const double angVelInitVariance = 1e-6;
+static const double forceInitVariance = 1e100;
+static const double torqueInitVariance = 1e100;
+
+static const double positionProcessVariance = 1e-8;
+static const double orientationProcessVariance = 1e-8;
+static const double linVelProcessVariance = 1e-8;
+static const double angVelProcessVariance = 1e-8;
+static const double forceProcessVariance = 1e-8;
+static const double TorqueProcessVariance = 1e-8;
+static const double TorqueProcessVarianceYaw = 1e-8;
+
+static const double acceleroVariance = 1e-4;
+static const double gyroVariance = 1e-8;
+static const double forceSensorVariance = 1e-8;
+static const double torqueSensorVariance = 1e-10;
+static const double positionSensorVariance = 1e-4;
+static const double orientationSensorVariance = 1e-3;
+
+///default derivation steps
+static const double defaultdx=1e-6;
+
+
+
 
 
 
@@ -86,11 +109,11 @@ namespace stateObservation
         /// Getting, setting the current time and running the estimation
         /// //////////////////////////////////////////////////////////
 
-        /// gets the time
-        double getTime() const;
+        /// gets the sampling time
+        virtual double getSamplingTime() const;
 
-        /// sets the time
-        void setTime(double) ;
+        /// sets the sampling time
+        virtual void setSamplingTime(double) ;
 
         /// this function triggers the estimation itself
         void update();
@@ -291,8 +314,10 @@ protected:
         virtual void setFiniteDifferenceStep(const Vector & dx);
         virtual void useFiniteDifferencesJacobians(bool b=true);
 
+
+
     protected:
-        
+
         struct Sensor
         {
             Sensor(int signalSize):size(signalSize), time(0) {}
@@ -339,17 +364,15 @@ protected:
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
         };
 
-        struct dynamicsContainers
+        struct stateContainer
         {
-            Kinematics state;
+            Kinematics kine;
 
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        }
+        };
 
-
-    
-        typedef std::map<int, Contact, std::less<int>, 
-             Eigen::aligned_allocator<std::pair<const int, Contact> > > MapContact;
+        typedef std::map <int, Contact, std::less<int>, 
+                Eigen::aligned_allocator<std::pair<const int, Contact> > > MapContact;
         typedef MapContact::iterator MapContactIterator;
         typedef MapContact::const_iterator MapContactConstIterator;
         typedef std::pair<int, Contact> PairContact;
@@ -372,6 +395,8 @@ protected:
         int stateTangentSize_;
         int measurementSize_; 
 
+        double dt_;
+
         Vector stateVector_;
         Vector stateVectorDx_;
         Vector oldStateVector_; 
@@ -383,6 +408,13 @@ protected:
         Matrix3 gyroCovDefaultMat_;
         Matrix6 contactFTSensorDefaultCovMat_;
         Matrix6 poseSensorCovMat_;
+        
+        Matrix3 estPositionCovMat;
+        Matrix3 estOrientationCovMat;
+        Matrix3 estLinVelCovMat;
+        Matrix3 estAngVelCovMat;
+        
+
         bool finiteDifferencesJacobians_;
 
         stateObservation::ExtendedKalmanFilter ekf_;
