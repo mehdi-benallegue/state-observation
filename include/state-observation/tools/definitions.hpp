@@ -65,9 +65,6 @@ namespace stateObservation
   ///3x3 Scalar Matrix Unaligned
   typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix3Unaligned;
 
-  ///3x3 Scalar Matrix
-  typedef Eigen::Matrix3d Matrix3;
-
   ///4x4 Scalar Matrix
   typedef Eigen::Matrix4d Matrix4;
 
