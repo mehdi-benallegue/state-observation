@@ -1109,7 +1109,7 @@ namespace stateObservation
 
     }
 
-    inline const Kinematics & Kinematics::update(const Kinematics & newValue, double dt, Flags::byte flags)
+    inline const Kinematics & Kinematics::update(const Kinematics & newValue, double dt, Flags::Byte flags)
     {
 
 
@@ -1416,7 +1416,7 @@ namespace stateObservation
       return multiply_(this,multiplier);
     }
 
-    inline Vector Kinematics::toVector(Flags::byte flags) const
+    inline Vector Kinematics::toVector(Flags::Byte flags) const
     {
       int size =0;
 
