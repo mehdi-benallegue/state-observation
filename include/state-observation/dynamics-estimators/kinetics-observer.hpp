@@ -34,8 +34,7 @@ namespace stateObservation
 
 
 
-    ///default derivation steps
-    static const double defaultdx=1e-6;
+
 
    /**
     * \class  EKFFlexibilityEstimatorBase
@@ -75,6 +74,7 @@ namespace stateObservation
         /// sets the sampling time
         void setSamplingTime(double) ;
 
+        /// sets the mass of the robot
         void setMass(double);
 
         /// this function triggers the estimation itself
@@ -104,7 +104,6 @@ namespace stateObservation
 
         ///This function allows to estimate the acceleration 
         /// it returns a Kinemactis
-
         Kinematics estimateAccelerations();
 
         ///Sets a value for the kinematics part of the state
@@ -116,7 +115,6 @@ namespace stateObservation
         void setGyroBias(const Vector3 &,  bool resetCovariance=true);
 
         void setStateUnmodeledWrench(const Vector6 &, bool resetCovariance=true);
-
         
         ///Sets a value of the state x_k provided from another source
         /// can be used for initialization of the estimator 
@@ -141,8 +139,7 @@ namespace stateObservation
         inline unsigned contactOriIndex(int contactNbr) const;
         inline unsigned contactForceIndex(int contactNbr) const;
         inline unsigned contactTorqueIndex(int contactNbr) const;
-        inline unsigned contactWrenchIndex(int contactNbr) const;
-        
+        inline unsigned contactWrenchIndex(int contactNbr) const;        
 
         /// /////////////////////////////////////////////////////
         /// Setting and getting the state of the estimation
@@ -152,7 +149,6 @@ namespace stateObservation
         void setWithAccelerationEstimation(bool b = true);
 
         void setWithGyroBias(bool b = true);
-
 
         /// ///////////////////////////////////////////////
         /// Getting and setting input data and measurements
@@ -171,7 +167,6 @@ namespace stateObservation
                                                         const Matrix3 gyroCov, const Kinematics &localKine, int num=-1);
                 
         void setIMUDefaultCovarianceMatrix(const Matrix3& acceleroCov, const Matrix3 gyroCov);
-
 
         ////////// Contact stters, these are MANDATORY for every contact at every iteration ///
         /// if the contact is equipped with wrench sensor call setContactWrenchSensor 
@@ -198,7 +193,6 @@ namespace stateObservation
  
         void setPoseSensorDefaultCovarianceMatrix(const Matrix & , int contactNumber);
 
-
         ///if only force of torque is available, set the unavailable value to zero 
         virtual void setUnmodeledForceTorqueMeasurement(const Vector3 force = Vector3::Zero(), const Vector3 torque = Vector3::Zero());
 
@@ -217,11 +211,21 @@ namespace stateObservation
         /// returns the number of this contact
         int addContact(const Kinematics & pose, 
                             const Matrix6 & initialCovarianceMatrix, const Matrix6 & processCovarianceMatrix, 
-                            const Matrix3 & linearStiffness=linearStiffnessDefault,
-                            const Matrix3 & linearDamping=linearDampingDefault, 
-                            const Matrix3 & angularStiffness=angularStiffnessDefault, 
-                            const Matrix3 & angularDamping=angularDampingDefault, 
+                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping, 
+                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping, 
                             int contactNumner=-1);
+        /// version with default stiffness and damping
+        /// use when the contact parameters are known
+        int addContact(const Kinematics & pose, 
+                            const Matrix6 & initialCovarianceMatrix, const Matrix6 & processCovarianceMatrix, 
+                            int contactNumner=-1);
+        /// version when the contact position is perfectly known
+        int addContact(const Kinematics & pose, 
+                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping, 
+                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping, 
+                            int contactNumner=-1);
+        /// version when the position is perfectly known but not the stiffness and damping
+        int addContact(const Kinematics & pose, int contactNumner=-1);
 
         int removeContact(int contactnbr);
 
@@ -229,7 +233,7 @@ namespace stateObservation
 
         int getNumberOfContact() const;
 
-        std::vector<int> getListOfContact() const;
+        std::vector<int> getListOfContacts() const;
 
         ///Sets the covariance matrix of the flexibility Guess
         void setStateCovariance(const Matrix & P);
@@ -259,15 +263,12 @@ namespace stateObservation
         void resetStateCovarianceMat();
         void resetStateKinematicsCovMat();
         void resetStateGyroBiasCovMat();
-        void resetStateUnmodeledWrenchCovMat();
-        
-        
+        void resetStateUnmodeledWrenchCovMat();       
 
         void resetProcessCovarianceMat();
         void resetProcessKinematicsCovMat();
         void resetProcessGyroBiasCovMat();
         void resetProcessUnmodeledWrenchCovMat();
-
 
         void resetSensorsCovMat();
 
@@ -278,7 +279,6 @@ namespace stateObservation
 
         ///to reset all the sensor inputs and provided contact positions but 
         void resetInputs();
-
 
 protected:
         ///////////// DYNAMICAL SYSTEM IMPLEMENTATION
@@ -339,9 +339,7 @@ protected:
             int time;
             
             inline Vector extractFromVector(const Vector & v){return v.segment(size,index);}
-        };
-
-        
+        };        
 
         struct IMU:
         public Sensor
@@ -360,7 +358,6 @@ protected:
         typedef MapIMU::iterator MapIMUIterator;
         typedef MapIMU::const_iterator MapIMUConstIterator;
         typedef std::pair<int, IMU> PairIMU;
-
         
         struct Contact:
         public Sensor
@@ -373,9 +370,7 @@ protected:
             bool withRealSensor;
             int stateIndex;
 
-
             static int numberOfRealSensors;
-
 
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
         };
@@ -403,8 +398,6 @@ protected:
             bool isSet;
         };
 
-
-
         AbsolutePoseSensor absPoseSensor_;
         MapIMU imuSensors_;
         MapContact contacts_;
@@ -424,11 +417,6 @@ protected:
         Vector measurementVector_;
         Matrix measurementCovMatrix_;    
 
-        Matrix3 acceleroDefaultCovMat_;
-        Matrix3 gyroCovDefaultMat_;
-        Matrix6 contactWrenchSensorDefaultCovMat_;
-        Matrix6 poseSensorCovMat_;
-        
         Matrix3 estPositionCovMat;
         Matrix3 estOrientationCovMat;
         Matrix3 estLinVelCovMat;
@@ -438,7 +426,6 @@ protected:
         bool finiteDifferencesJacobians_;
         bool withGyroBias_;
         bool withUnmodeledWrench_;
-        bool withOdometry_;
 
         TimeIndex k_est;
         TimeIndex k_data;
@@ -447,24 +434,27 @@ protected:
 
         double dt_;
 
+        /// resets one block on the diagonal of the state Covariance Matrix
+        /// i.e. sets value of a square block on the diagonal of the covMat
+        /// and sets to zero all the values related to their lines and columns
+        template <int blockSize>
+        static void setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, 
+        int blockIndex, int matrixSize);
+
         ///function to call before all the measurements
         ///detects if there is a new estimation beginning and then
         ///calls the reset of the iteration
-        virtual void startNewIteration_();
-
+        void startNewIteration_();
 
     private:
 
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-
         ///////////SIZE OF VECTORS
         static const unsigned sizeAcceleroSignal = 3;
         static const unsigned sizeGyroSignal = 3;
         static const unsigned sizeIMUSignal = sizeAcceleroSignal+sizeGyroSignal;
-
-
 
         static const unsigned sizePos = 3;
         static const unsigned sizeOri = 4;
@@ -526,36 +516,71 @@ protected:
     ////////////DEFAULT VALUES //////
         static const double defaultMass;
 
-        static const double positionInitVariance;
-        static const double orientationInitVariance;
-        static const double linVelInitVariance;
-        static const double angVelInitVariance ;
-        static const double forceInitVariance ;
-        static const double torqueInitVariance ;
+        static const double statePoseInitVarianceDefault ;
+        static const double stateOriInitVarianceDefault ;
+        static const double stateLinVelInitVarianceDefault ;
+        static const double stateAngVelInitVarianceDefault ;
+        static const double gyroBiasInitVarianceDefault ;
+        static const double unmodeledWrenchInitVarianceDefault ;
+        static const double contactForceInitVarianceDefault ;
+        static const double contactTorqueInitVarianceDefault ;
 
-        static const double positionProcessVariance ;
-        static const double orientationProcessVariance ;
-        static const double linVelProcessVariance ;
-        static const double angVelProcessVariance ;
-        static const double gyroBiasProcessVariance ;
-        static const double unmodeledWrenchProcessVariance ;
-        static const double contactForceProcessVariance ;
-        static const double contactTorqueProcessVariance ;
-        static const double contactTorqueProcessVarianceYaw ;
+        static const double statePoseProcessVarianceDefault ;
+        static const double stateOriProcessVarianceDefault ;
+        static const double stateLinVelProcessVarianceDefault ;
+        static const double stateAngVelProcessVarianceDefault ;
+        static const double gyroBiasProcessVarianceDefault ;
+        static const double unmodeledWrenchProcessVarianceDefault ;
+        static const double contactForceProcessVarianceDefault ;
+        static const double contactTorqueProcessVarianceDefault ;
+        
+        static const double acceleroVarianceDefault ;
+        static const double gyroVarianceDefault ;
+        static const double forceSensorVarianceDefault ;
+        static const double torqueSensorVarianceDefault ;
+        static const double positionSensorVarianceDefault ;
+        static const double orientationSensorVarianceDefault;
 
+        static const double linearStiffnessDefault;
+        static const double angularStiffnessDefault;
+        static const double linearDampingDefault;
+        static const double angularDampingDefault;
+        
 
-        static const double acceleroVariance ;
-        static const double gyroVariance ;
-        static const double forceSensorVariance ;
-        static const double torqueSensorVariance ;
-        static const double positionSensorVariance ;
-        static const double orientationSensorVariance ;
+    protected:
+        /// Default Stiffness and damping
+        Matrix3 linearStiffnessMatDefault_;
+        Matrix3 angularStiffnessMatDefault_;
+        Matrix3 linearDampingMatDefault_;
+        Matrix3 angularDampingMatDefault_;
 
+        ////////////Sensor Covariance mnatrices
+        Matrix3 acceleroCovMatDefault_;
+        Matrix3 gyroCovMatDefault_;
+        Matrix6 contactWrenchSensorCovMatDefault_;
+        Matrix6 poseSensorCovMatDefault_;
 
-        static const Matrix3 linearStiffnessDefault;
-        static const Matrix3 angularStiffnessDefault;
-        static const Matrix3 linearDampingDefault;
-        static const Matrix3 angularDampingDefault;
+        Matrix3 statePosInitCovMat_;
+        Matrix3 stateOriInitCovMat_;
+        Matrix3 stateLinVelInitCovMat_;
+        Matrix3 stateAngVelInitCovMat_;
+        Matrix3 gyroBiasInitCovMat_;
+        Matrix6 unmodeledWrenchInitCovMat_;
+        Matrix6 contactWrenchInitCovMat_;
+
+        Matrix3 statePosProcessCovMat_;
+        Matrix3 stateOriProcessCovMat_;
+        Matrix3 stateLinVelProcessCovMat_;
+        Matrix3 stateAngVelProcessCovMat_;
+        Matrix3 gyroBiasProcessCovMat_;
+        Matrix6 unmodeledWrenchProcessCovMat_;
+        Matrix6 contactWrenchProcessCovMat_;
+
+        Matrix12 stateKineMatricsInitCovMat_;
+        Matrix12 stateKineMatricsProcessCovMat_;
+
+        ///default derivation steps
+        static const double defaultdx;
 
     };
 
