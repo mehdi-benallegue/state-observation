@@ -337,20 +337,37 @@ namespace stateObservation
     {
       struct Flags
       {
-        typedef unsigned char byte;
-        static const byte position=     BOOST_BINARY(000001);
-        static const byte orientation=  BOOST_BINARY(000010);
-        static const byte linVel=       BOOST_BINARY(000100);
-        static const byte angVel=       BOOST_BINARY(001000);
-        static const byte linAcc=       BOOST_BINARY(010000);
-        static const byte angAcc=       BOOST_BINARY(100000);
+        typedef unsigned char Byte;
 
-        static const byte all= position | orientation | linVel | angVel | linAcc | angAcc;
+        static const Byte position=     BOOST_BINARY(000001);
+        static const Byte orientation=  BOOST_BINARY(000010);
+        static const Byte linVel=       BOOST_BINARY(000100);
+        static const Byte angVel=       BOOST_BINARY(001000);
+        static const Byte linAcc=       BOOST_BINARY(010000);
+        static const Byte angAcc=       BOOST_BINARY(100000);
+
+        static const Byte all= position | orientation | linVel | angVel | linAcc | angAcc;
       };
 
-      inline const Kinematics & integrate(double dt, Flags::byte=Flags::all);
+      Kinematics(){}
 
-      inline const Kinematics & update(const Kinematics & newValue, double dt=0, Flags::byte=Flags::all);
+      ///Constructor from a vector
+      /// the flags show which parts of the kinematics to be loaded from the vector
+      /// the order of the vector is 
+      /// position orientation (quaternion) linevel angvel linAcc angAcc
+      /// use the flags to define the structure of the vector
+      Kinematics(const Vector & v, Flags::Byte=Flags::all);
+
+      /// Fills from vector 
+      /// the flags show which parts of the kinematics to be loaded from the vector
+      /// the order of the vector is 
+      /// position orientation (quaternion) linevel angvel linAcc angAcc
+      /// use the flags to define the structure of the vector
+      Kinematics fromVector(const Vector & v, Flags::Byte=Flags::all);
+      
+      inline const Kinematics & integrate(double dt);
+
+      inline const Kinematics & update(const Kinematics & newValue, double dt=0, Flags::Byte=Flags::all);
 
       inline Kinematics inverse() const;
 
@@ -358,7 +375,7 @@ namespace stateObservation
       /// the order of the vector is 
       /// position orientation (quaternion) linevel angvel linAcc angAcc
       /// use the flags to define the structure of the vector
-      inline Vector toVector(Flags::byte) const;
+      inline Vector toVector(Flags::Byte) const;
       inline Vector toVector() const;
 
       ///composition of transformation
@@ -366,6 +383,8 @@ namespace stateObservation
       inline Kinematics operator* (const Kinematics & ) ;
       inline Kinematics operator* ( Kinematics & ) const;
       inline Kinematics operator* (Kinematics & ) ;
+
+      inline void reset();
 
       CheckedVector3 position;
       Orientation orientation;
