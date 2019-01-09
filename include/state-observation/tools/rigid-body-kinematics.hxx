@@ -1113,12 +1113,12 @@ namespace stateObservation
     {
 
 
-      bool flagPos = flags|Flags::position;
-      bool flagLinVel = flags|Flags::linVel;
-      bool flagLinAcc = flags|Flags::linAcc;
-      bool flagOri = flags|Flags::orientation;
-      bool flagAngVel = flags|Flags::angVel;
-      bool flagAngAcc = flags|Flags::angAcc;
+      bool flagPos = flags & Flags::position;
+      bool flagLinVel = flags & Flags::linVel;
+      bool flagLinAcc = flags & Flags::linAcc;
+      bool flagOri = flags & Flags::orientation;
+      bool flagAngVel = flags & Flags::angVel;
+      bool flagAngAcc = flags & Flags::angAcc;
 
       {
         CheckedVector3 curPos,curLinVel;
