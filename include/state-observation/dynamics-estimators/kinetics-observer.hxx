@@ -59,3 +59,19 @@ inline unsigned KineticsObserver::contactTorqueIndex(int contactNbr) const
   return contactForceIndex(contactNbr)+sizeForce;
 }
 
+template <int blockSize>
+void KineticsObserver::setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, int blockIndex,int matrixSize)
+{
+  covMat.block<blockSize,blockSize>(blockIndex,blockIndex)=covBlock;
+  covMat.block(blockIndex,0,blockSize,blockIndex).setZero();
+  covMat.block(0,blockIndex,blockIndex,blockSize).setZero();
+  covMat.block(blockIndex+blockSize,blockIndex,matrixSize-blockIndex-blockSize,blockSize).setZero();
+  covMat.block(blockIndex,blockIndex+blockSize,blockSize,matrixSize-blockIndex-blockSize).setZero();
+}
+
+
+
+
+
+
+

@@ -6,38 +6,48 @@
 
 namespace stateObservation
 {
+  inline Matrix6 blockMat6(const Matrix3 & m1, const Matrix3 & m2, const Matrix3 & m3, const Matrix3 & m4)
+  {
+    Matrix6 m;
+    m<< m1,m2,
+        m3,m4;
+    
+    return m;
+  }
 
   const double KineticsObserver::defaultMass = 50;
 
-  const double KineticsObserver::positionInitVariance = 1e-4;
-  const double KineticsObserver::orientationInitVariance = 1e-4;
-  const double KineticsObserver::linVelInitVariance = 1e-6;
-  const double KineticsObserver::angVelInitVariance = 1e-6;
-  const double KineticsObserver::forceInitVariance = 1e100;
-  const double KineticsObserver::torqueInitVariance = 1e100;
+  const double KineticsObserver::statePoseInitVarianceDefault = 1e-4;
+  const double KineticsObserver::stateOriInitVarianceDefault = 1e-4;
+  const double KineticsObserver::stateLinVelInitVarianceDefault = 1e-6;
+  const double KineticsObserver::stateAngVelInitVarianceDefault = 1e-6;
+  const double KineticsObserver::gyroBiasInitVarianceDefault = 1e-10;
+  const double KineticsObserver::unmodeledWrenchInitVarianceDefault = 1e100;
+  const double KineticsObserver::contactForceInitVarianceDefault = 1e100;
+  const double KineticsObserver::contactTorqueInitVarianceDefault = 1e100;
 
-  const double KineticsObserver::positionProcessVariance = 1e-8;
-  const double KineticsObserver::orientationProcessVariance = 1e-8;
-  const double KineticsObserver::linVelProcessVariance = 1e-8;
-  const double KineticsObserver::angVelProcessVariance = 1e-8;
-  const double KineticsObserver::gyroBiasProcessVariance = 1e-12;
-  const double KineticsObserver::unmodeledWrenchProcessVariance = 1e-8;
-  const double KineticsObserver::contactForceProcessVariance = 1e-8;
-  const double KineticsObserver::contactTorqueProcessVariance = 1e-8;
-  const double KineticsObserver::contactTorqueProcessVarianceYaw = 1e-8;
+  const double KineticsObserver::statePoseProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::stateOriProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::stateLinVelProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::stateAngVelProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::gyroBiasProcessVarianceDefault = 1e-12;
+  const double KineticsObserver::unmodeledWrenchProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::contactForceProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::contactTorqueProcessVarianceDefault = 1e-8;
 
+  const double KineticsObserver::acceleroVarianceDefault = 1e-4;
+  const double KineticsObserver::gyroVarianceDefault = 1e-8;
+  const double KineticsObserver::forceSensorVarianceDefault = 1e-8;
+  const double KineticsObserver::torqueSensorVarianceDefault = 1e-10;
+  const double KineticsObserver::positionSensorVarianceDefault = 1e-4;
+  const double KineticsObserver::orientationSensorVarianceDefault = 1e-3;
 
-  const double KineticsObserver::acceleroVariance = 1e-4;
-  const double KineticsObserver::gyroVariance = 1e-8;
-  const double KineticsObserver::forceSensorVariance = 1e-8;
-  const double KineticsObserver::torqueSensorVariance = 1e-10;
-  const double KineticsObserver::positionSensorVariance = 1e-4;
-  const double KineticsObserver::orientationSensorVariance = 1e-3;
+  const double linearStiffnessDefault = 40000;
+  const double angularStiffnessDefault = 400;
+  const double linearDampingDefault = 120;
+  const double angularDampingDefault = 12;
 
-  const Matrix3 linearStiffnessDefault=Matrix3::Identity()*40000;
-  const Matrix3 angularStiffnessDefault=Matrix3::Identity()*400;
-  const Matrix3 linearDampingDefault=Matrix3::Identity()*120;
-  const Matrix3 angularDampingDefault=Matrix3::Identity()*12;
+  const double KineticsObserver::defaultdx = 1e-6;
 
   KineticsObserver::KineticsObserver(int maxContacts):
     stateSize_(sizeStateBase + maxContacts*sizeStatePerContact),
@@ -46,28 +56,59 @@ namespace stateObservation
     stateVector_(stateSize_),
     stateVectorDx_(stateTangentSize_),
     oldStateVector_(stateSize_),
-    additionalWrench_(Vector6::Zero()),
-    acceleroDefaultCovMat_(Matrix3::Identity()*acceleroVariance),
-    gyroCovDefaultMat_(Matrix3::Identity()*gyroVariance),
-    contactWrenchSensorDefaultCovMat_(Matrix6::Identity()),
-    poseSensorCovMat_(Matrix6::Identity()),
+    additionalWrench_(Vector6::Zero()),    
     ekf_(stateSize_, stateTangentSize_, sizeIMUSignal, sizeIMUSignal,  0,false,false),
     finiteDifferencesJacobians_(true),
     withGyroBias_(true),
     withUnmodeledWrench_(false),
-    withOdometry_(false),
-    k_est(0),k_data(0), mass_(defaultMass), dt_(0.005)
+    k_est(0),k_data(0), mass_(defaultMass), dt_(defaultdx),
+    linearStiffnessMatDefault_(Matrix3::Identity()*linearStiffnessDefault),
+    angularStiffnessMatDefault_(Matrix3::Identity()*angularStiffnessDefault),
+    linearDampingMatDefault_(Matrix3::Identity()*linearDampingDefault),
+    angularDampingMatDefault_(Matrix3::Identity()*angularDampingDefault),
+    acceleroCovMatDefault_(Matrix3::Identity()*acceleroVarianceDefault),
+    gyroCovMatDefault_( Matrix3::Identity()*gyroVarianceDefault),
+    contactWrenchSensorCovMatDefault_(blockMat6( Matrix3::Identity()*forceSensorVarianceDefault, Matrix3::Zero(),
+                                Matrix3::Zero(), Matrix3::Identity()*torqueSensorVarianceDefault )),
+    poseSensorCovMatDefault_(blockMat6( Matrix3::Identity()*positionSensorVarianceDefault, Matrix3::Zero(),
+                                Matrix3::Zero(), Matrix3::Identity()*orientationSensorVarianceDefault )),
+    statePosInitCovMat_(Matrix3::Identity()*statePoseInitVarianceDefault),
+    stateOriInitCovMat_(Matrix3::Identity()*stateOriInitVarianceDefault),
+    stateLinVelInitCovMat_(Matrix3::Identity()*stateLinVelInitVarianceDefault),
+    stateAngVelInitCovMat_(Matrix3::Identity()*stateAngVelInitVarianceDefault),
+    gyroBiasInitCovMat_(Matrix3::Identity()*gyroBiasInitVarianceDefault),
+    unmodeledWrenchInitCovMat_(Matrix6::Identity()*unmodeledWrenchInitVarianceDefault),
+    contactWrenchInitCovMat_(blockMat6(Matrix3::Identity()*contactForceInitVarianceDefault, Matrix3::Zero(),
+                                Matrix3::Zero(), Matrix3::Identity()*contactTorqueInitVarianceDefault)),
+    statePosProcessCovMat_(Matrix3::Identity()*statePoseProcessVarianceDefault),
+    stateOriProcessCovMat_(Matrix3::Identity()*stateOriProcessVarianceDefault),
+    stateLinVelProcessCovMat_(Matrix3::Identity()*stateLinVelProcessVarianceDefault),
+    stateAngVelProcessCovMat_(Matrix3::Identity()*stateAngVelProcessVarianceDefault),
+    gyroBiasProcessCovMat_(Matrix3::Identity()*gyroBiasProcessVarianceDefault),
+    unmodeledWrenchProcessCovMat_(Matrix6::Identity()*unmodeledWrenchProcessVarianceDefault),
+    contactWrenchProcessCovMat_(blockMat6(Matrix3::Identity()*contactForceProcessVarianceDefault, Matrix3::Zero(),
+                                Matrix3::Zero(), Matrix3::Identity()*contactTorqueProcessVarianceDefault))
   {
-    contactWrenchSensorDefaultCovMat_.block<3,3>(0,0) *= forceSensorVariance;
-    contactWrenchSensorDefaultCovMat_.block<3,3>(3,3) *= torqueSensorVariance;
-    poseSensorCovMat_.block<3,3>(3,3) *= positionSensorVariance;
-    poseSensorCovMat_.block<3,3>(3,3) *= orientationSensorVariance;
-
     ekf_.setFunctor(this);
 
     stateVector_.setZero();
 
     ekf_.setState(stateVector_,k_est);
+
+    const Matrix3 & Zero3 = Matrix3::Zero();
+
+    stateKineMatricsInitCovMat_ << 
+        statePosInitCovMat_, Zero3	            , Zero3	                , Zero3,
+        Zero3              , stateOriInitCovMat_, Zero3	                , Zero3,
+        Zero3              , Zero3              , stateLinVelInitCovMat_, Zero3,
+        Zero3              , Zero3              , Zero3	                , stateAngVelInitCovMat_;
+
+
+    stateKineMatricsProcessCovMat_ << 
+        statePosProcessCovMat_, Zero3	                , Zero3	                   , Zero3,
+        Zero3                 , stateOriProcessCovMat_, Zero3	                   , Zero3,
+        Zero3                 , Zero3                 , stateLinVelProcessCovMat_, Zero3,
+        Zero3                 , Zero3                 , Zero3	                   , stateAngVelProcessCovMat_;
 
     resetStateCovarianceMat();
     resetProcessCovarianceMat();
@@ -291,24 +332,60 @@ namespace stateObservation
   {
     stateKinematics_ = kine;
     stateVector_.segment<sizeStateKine>(kineIndex()) = stateKinematics_.toVector(flagsStateKine);
+
+    if (resetForces)
+    {
+      for (MapContactIterator i = contacts_.begin(); i != contacts_.end(); ++i)
+      {
+        stateVector_.segment<sizeWrench>(contactWrenchIndex(i->first)).setZero();
+      }
+    }
+
     ekf_.setState(stateVector_,k_est);
-    
+
     if (resetCovariance)
     {
-      resetStateCovarianceMat();
+      Matrix stateCovariance = ekf_.getStateCovariance();
+      setBlockStateCovariance<sizeStateKine>(stateCovariance,stateKineMatricsInitCovMat_,kineIndex(),stateSize_);
+
+      if (resetForces)
+      {
+        for (MapContactIterator i = contacts_.begin(); i != contacts_.end(); ++i)
+        {
+          setBlockStateCovariance<sizeStateKine>(stateCovariance,contactWrenchInitCovMat_,contactWrenchIndex(i->first),stateSize_);
+        }
+      }
+      ekf_.setStateCovariance(stateCovariance);
     }
+
   }
 
-  void KineticsObserver::setGyroBias(const Vector3 &,  bool resetCovariance=true)
+  void KineticsObserver::setGyroBias(const Vector3 &,  bool resetCovariance)
   {
     stateVector_.segment<sizeGyroBias>(gyroBiasIndex());
     ekf_.setState(stateVector_,k_est);
+
+    if (resetCovariance)
+    {
+      Matrix stateCovariance = ekf_.getStateCovariance();
+      setBlockStateCovariance<sizeGyroBias>(stateCovariance,gyroBiasInitCovMat_,gyroBiasIndex(),stateSize_);
+      
+      ekf_.setStateCovariance(stateCovariance);
+    }
   }
 
   void KineticsObserver::setStateUnmodeledWrench(const Vector6 &, bool resetCovariance)
   {
     stateVector_.segment<sizeWrench>(unmodeledWrenchIndex());
     ekf_.setState(stateVector_,k_est);
+
+    if (resetCovariance)
+    {
+      Matrix stateCovariance = ekf_.getStateCovariance();
+      setBlockStateCovariance<sizeWrench>(stateCovariance,unmodeledWrenchInitCovMat_,unmodeledWrenchIndex(),stateSize_);
+      
+      ekf_.setStateCovariance(stateCovariance);
+    }
   }
 
 
@@ -330,7 +407,9 @@ namespace stateObservation
     additionalWrench_=wrench;
   }
 
-
+///////////////////////
+//////////////////////////
+///////////////////////
 
 
   Vector KineticsObserver::stateNaNCorrection_()
