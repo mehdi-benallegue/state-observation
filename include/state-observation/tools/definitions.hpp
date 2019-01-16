@@ -219,6 +219,7 @@ namespace stateObservation
 
   typedef CheckedItem<Matrix3,false,false,true,true> CheckedMatrix3;
   typedef CheckedItem<Matrix6,false,false,true,true> CheckedMatrix6;
+  typedef CheckedItem<Matrix12,false,false,true,true> CheckedMatrix12;
   typedef CheckedItem<Vector3,false,false,true,true> CheckedVector3;
   typedef CheckedItem<Vector6,false,false,true,true> CheckedVector6;
   typedef CheckedItem<Quaternion,false,false,true,true> CheckedQuaternion;
