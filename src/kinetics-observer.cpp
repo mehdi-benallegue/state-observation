@@ -50,6 +50,7 @@ namespace stateObservation
   const double KineticsObserver::defaultdx = 1e-6;
 
   KineticsObserver::KineticsObserver(int maxContacts):
+    maxContacts_(maxContacts),
     stateSize_(sizeStateBase + maxContacts*sizeStatePerContact),
     stateTangentSize_(sizeStateTangentBase + sizeStateTangentPerContact* maxContacts),
     measurementSize_(0),
@@ -59,8 +60,7 @@ namespace stateObservation
     additionalWrench_(Vector6::Zero()),    
     ekf_(stateSize_, stateTangentSize_, sizeIMUSignal, sizeIMUSignal,  0,false,false),
     finiteDifferencesJacobians_(true),
-    withGyroBias_(true),
-    withUnmodeledWrench_(false),
+    withGyroBias_(true), withUnmodeledWrench_(false), withAccelerationEstimation_(false),
     k_est(0),k_data(0), mass_(defaultMass), dt_(defaultdx),
     linearStiffnessMatDefault_(Matrix3::Identity()*linearStiffnessDefault),
     angularStiffnessMatDefault_(Matrix3::Identity()*angularStiffnessDefault),
@@ -70,7 +70,7 @@ namespace stateObservation
     gyroCovMatDefault_( Matrix3::Identity()*gyroVarianceDefault),
     contactWrenchSensorCovMatDefault_(blockMat6( Matrix3::Identity()*forceSensorVarianceDefault, Matrix3::Zero(),
                                 Matrix3::Zero(), Matrix3::Identity()*torqueSensorVarianceDefault )),
-    poseSensorCovMatDefault_(blockMat6( Matrix3::Identity()*positionSensorVarianceDefault, Matrix3::Zero(),
+    absPoseSensorCovMatDefault_(blockMat6( Matrix3::Identity()*positionSensorVarianceDefault, Matrix3::Zero(),
                                 Matrix3::Zero(), Matrix3::Identity()*orientationSensorVarianceDefault )),
     statePosInitCovMat_(Matrix3::Identity()*statePoseInitVarianceDefault),
     stateOriInitCovMat_(Matrix3::Identity()*stateOriInitVarianceDefault),
@@ -78,16 +78,12 @@ namespace stateObservation
     stateAngVelInitCovMat_(Matrix3::Identity()*stateAngVelInitVarianceDefault),
     gyroBiasInitCovMat_(Matrix3::Identity()*gyroBiasInitVarianceDefault),
     unmodeledWrenchInitCovMat_(Matrix6::Identity()*unmodeledWrenchInitVarianceDefault),
-    contactWrenchInitCovMat_(blockMat6(Matrix3::Identity()*contactForceInitVarianceDefault, Matrix3::Zero(),
-                                Matrix3::Zero(), Matrix3::Identity()*contactTorqueInitVarianceDefault)),
     statePosProcessCovMat_(Matrix3::Identity()*statePoseProcessVarianceDefault),
     stateOriProcessCovMat_(Matrix3::Identity()*stateOriProcessVarianceDefault),
     stateLinVelProcessCovMat_(Matrix3::Identity()*stateLinVelProcessVarianceDefault),
     stateAngVelProcessCovMat_(Matrix3::Identity()*stateAngVelProcessVarianceDefault),
     gyroBiasProcessCovMat_(Matrix3::Identity()*gyroBiasProcessVarianceDefault),
-    unmodeledWrenchProcessCovMat_(Matrix6::Identity()*unmodeledWrenchProcessVarianceDefault),
-    contactWrenchProcessCovMat_(blockMat6(Matrix3::Identity()*contactForceProcessVarianceDefault, Matrix3::Zero(),
-                                Matrix3::Zero(), Matrix3::Identity()*contactTorqueProcessVarianceDefault))
+    unmodeledWrenchProcessCovMat_(Matrix6::Identity()*unmodeledWrenchProcessVarianceDefault)
   {
     ekf_.setFunctor(this);
 
@@ -105,10 +101,19 @@ namespace stateObservation
 
 
     stateKineMatricsProcessCovMat_ << 
-        statePosProcessCovMat_, Zero3	                , Zero3	                   , Zero3,
-        Zero3                 , stateOriProcessCovMat_, Zero3	                   , Zero3,
-        Zero3                 , Zero3                 , stateLinVelProcessCovMat_, Zero3,
-        Zero3                 , Zero3                 , Zero3	                   , stateAngVelProcessCovMat_;
+        Zero3, Zero3, Zero3	                         , Zero3,
+        Zero3, Zero3, Zero3	                         , Zero3,
+        Zero3, Zero3, contactForceInitVarianceDefault, Zero3,
+        Zero3, Zero3, Zero3	                         , contactTorqueInitVarianceDefault;
+
+    
+    contactProcessCovMat_ << 
+        Zero3, Zero3, Zero3	                         , Zero3,
+        Zero3, Zero3, Zero3	                         , Zero3,
+        Zero3, Zero3, contactForceProcessVarianceDefault, Zero3,
+        Zero3, Zero3, Zero3	                         , contactTorqueProcessVarianceDefault;
+
+    
 
     resetStateCovarianceMat();
     resetProcessCovarianceMat();
@@ -143,13 +148,13 @@ namespace stateObservation
     
     for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
     {
-      if (i->second.index == k_data && i->second.withRealSensor)
+      if (i->second.time == k_data && i->second.withRealSensor)
       {
         size += sizeWrench;
       }
     }
 
-    if (absPoseSensor_.isSet && absPoseSensor_.time == k_data)
+    if (absPoseSensor_.time == k_data)
     {
       size += sizePose;
     }
@@ -173,7 +178,6 @@ namespace stateObservation
   
   Vector KineticsObserver::update()
   {
-
     if (k_est!=k_data)
     {
       /// Synchronizing the sensors
@@ -192,31 +196,27 @@ namespace stateObservation
       
       for (MapContactIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
       {
-        BOOST_ASSERT((i->second.index == k_data) && "Exception in Kinetics Observer: the contacts have not all been updated. \
+        BOOST_ASSERT((i->second.time == k_data) && "The contacts have not all been updated. \
               Either remove lost contacts using removeContact \
-              or Run setContactFTSensor or setContactWithNoSensor on every added contact");
+              or Run setContactFTSensor or setContactWithNoSensor on every existing contact");
 
         /// the following code is only an attempt to maintain a coherent state of the state observer
-        if (i->second.index != k_data && i->second.withRealSensor)
+        if (i->second.time != k_data && i->second.withRealSensor)
         {
           i->second.withRealSensor=false;
+          i->second.localKine.integrate(dt_);
           Contact::numberOfRealSensors--;
         }
-      }
-
-      if (absPoseSensor_.isSet && absPoseSensor_.time != k_data)
-      {
-        absPoseSensor_.isSet=false;
       }
 
       ///////////// initialize the measurement Vector and matrix //////////////
 
       measurementSize_ = sizeIMUSignal*int(imuSensors_.size()) + sizeWrench*Contact::numberOfRealSensors;
       int measurementTangentSize = measurementSize_;
-      if (absPoseSensor_.isSet)
+      if (absPoseSensor_.time == k_data)
       {
-        measurementSize_ +=sizePose;
-        measurementTangentSize+=sizePoseTangent;
+        measurementSize_ += sizePose;
+        measurementTangentSize += sizePoseTangent;
       }
       
       measurementVector_.resize(measurementSize_);
@@ -240,19 +240,19 @@ namespace stateObservation
         if (i->second.withRealSensor)
         {
           i->second.index = localIndex;
-          measurementVector_.segment<sizeWrench>(localIndex) = i->second.forceTorque;
-          measurementCovMatrix_.block<sizeWrench,sizeWrench>(localIndex,localIndex)=i->second.covMatrix;
+          measurementVector_.segment<sizeWrench>(localIndex) = i->second.wrench;
+          measurementCovMatrix_.block<sizeWrench,sizeWrench>(localIndex,localIndex)=i->second.sensorCovMatrix();
           localIndex+=sizeWrench;
         }
       }
 
-      if (absPoseSensor_.isSet)
+      if (absPoseSensor_.time == k_data)
       {
         absPoseSensor_.index= localIndex;
         BOOST_ASSERT(absPoseSensor_.pose.position.isSet() && absPoseSensor_.pose.orientation.isSet() \
                     && "The absolute pose needs to contain the position and the orientation");
         measurementVector_.segment<sizePose>(localIndex) = absPoseSensor_.pose.toVector(flagsKineSensor);
-        measurementCovMatrix_.block<sizePoseTangent,sizePoseTangent>(localIndex,localIndex)=absPoseSensor_.covMatrix;
+        measurementCovMatrix_.block<sizePoseTangent,sizePoseTangent>(localIndex,localIndex)=absPoseSensor_.covMatrix();
       }
 
       ekf_.setMeasureSize(measurementSize_,measurementTangentSize);
@@ -280,8 +280,18 @@ namespace stateObservation
 
       ++k_est; //the timestamp of the state we estimated
 
-      return stateVector_;
+      stateKinematics_.reset();
+
+      updateKine_();
+
+      if (withAccelerationEstimation_)
+      {
+        estimateAccelerations();
+      }
+
     }
+    
+    return stateVector_;
   }
 
   Vector KineticsObserver::getStateVector() const
@@ -317,12 +327,10 @@ namespace stateObservation
 
   kine::Kinematics KineticsObserver::estimateAccelerations()
   {
-    if (!stateKinematics_.linAcc.isSet())
-    {
-      stateKinematics_.fromVector(computeAccelerations_(),
-                                  Kinematics::Flags::linAcc|
-                                  Kinematics::Flags::angAcc);
-    }
+    stateKinematics_.fromVector(computeAccelerations_(),
+                                Kinematics::Flags::linAcc|
+                                Kinematics::Flags::angAcc);
+
 
     return stateKinematics_;
   }
@@ -352,7 +360,7 @@ namespace stateObservation
       {
         for (MapContactIterator i = contacts_.begin(); i != contacts_.end(); ++i)
         {
-          setBlockStateCovariance<sizeStateKine>(stateCovariance,contactWrenchInitCovMat_,contactWrenchIndex(i->first),stateSize_);
+          setBlockStateCovariance<sizeContact>(stateCovariance,contactInitCovMat_,contactIndex(i->first),stateSize_);
         }
       }
       ekf_.setStateCovariance(stateCovariance);
@@ -399,6 +407,7 @@ namespace stateObservation
     {
       resetStateCovarianceMat();
     }
+
   }
 
   void KineticsObserver::setAdditionalWrench(const Vector6& wrench)
@@ -406,10 +415,584 @@ namespace stateObservation
     
     additionalWrench_=wrench;
   }
+  
+  void KineticsObserver::setWithUnmodeledWrench(bool b)
+  {
+    withUnmodeledWrench_ = b;
+  }
 
+  void KineticsObserver::setWithAccelerationEstimation(bool b)
+  {
+    withAccelerationEstimation_=b;    
+  }
+
+  void KineticsObserver::setWithGyroBias(bool b)
+  {
+    withAccelerationEstimation_=b;
+  }
+
+  int KineticsObserver::setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Kinematics &localKine, int num)
+  {
+    ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+    
+   
+    if (num==-1)
+    {
+      num=0;
+
+      for(MapIMUIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i)
+      {
+        if (i->first >= num)
+          num = i->first+1;
+      }      
+    }
+    
+    std::pair<MapIMUIterator,bool> inserted = imuSensors_.insert(PairIMU(num,IMU()));
+
+    bool & isNew = inserted.second;
+
+    IMU & imu = inserted.first->second;
+
+
+    imu.acceleroGyro.head<3>()=accelero;
+    imu.acceleroGyro.tail<3>()=gyrometer;
+    if (isNew)
+    {
+      imu.covMatrixAccelero = acceleroCovMatDefault_;
+      imu.covMatrixGyro = gyroCovMatDefault_;
+    }    
+    
+    imu.kinematics.update(localKine, dt_,flagsIMUKine);
+    imu.time = k_data;
+    
+    return num;
+  }
+
+  int KineticsObserver::setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Matrix3& acceleroCov, 
+                                                        const Matrix3 gyroCov, const Kinematics &localKine, int num)
+  {
+    ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+    if (num==-1)
+    {
+      num=0;
+      
+      for(MapIMUIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i)
+      {
+        if (i->first >= num)
+          num = i->first+1;
+      }
+    }
+
+    std::pair<MapIMUIterator,bool> inserted = imuSensors_.insert(PairIMU(num,IMU()));
+
+    IMU & imu = inserted.first->second;
+
+    imu.acceleroGyro.head<3>()=accelero;
+    imu.acceleroGyro.tail<3>()=gyrometer;
+    imu.covMatrixAccelero  = acceleroCov;
+    imu.covMatrixGyro = gyroCov;
+    imu.kinematics.update(localKine, dt_,flagsIMUKine);
+    imu.time = k_data;
+    
+    return num;
+  }
+
+  void KineticsObserver::setIMUDefaultCovarianceMatrix(const Matrix3& acceleroCov, const Matrix3 &gyroCov)
+  {
+    acceleroCovMatDefault_=acceleroCov;
+    gyroCovMatDefault_=gyroCov;
+  }
+
+  void KineticsObserver::setContactWrenchSensor(const Vector6 & wrench, const Kinematics &localKine, int contactNumber)
+  {
+    ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+
+    MapContactIterator i = contacts_.find(contactNumber);
+    BOOST_ASSERT((i != contacts_.end()) && "Tried to set the wrench of non-existing contact. \
+                                            The contact must be added BEFORE setting a contact wrench Sensor");
+
+    i->second.localKine = localKine;
+    i->second.wrench=wrench;
+    i->second.time = k_data;
+
+    if (!i->second.sensorCovMatrix.isSet())
+    {
+      i->second.sensorCovMatrix = contactWrenchSensorCovMatDefault_;
+    }    
+
+    if (!(i->second.withRealSensor))
+    {
+      i->second.withRealSensor=true;
+      Contact::numberOfRealSensors++;
+    }
+  }
+
+   void KineticsObserver::setContactWrenchSensor(const Vector6 & wrench, const Matrix6 & wrenchCovMatrix, 
+                                                                                    const Kinematics &localKine, int contactNumber)
+  {
+    ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+    MapContactIterator i = contacts_.find(contactNumber);
+    BOOST_ASSERT((i != contacts_.end()) && "Tried to set the wrench of non-existing contact. \
+                                            The contact must be added BEFORE setting a contact wrench Sensor");
+
+    i->second.localKine = localKine;
+    i->second.wrench=wrench;
+    i->second.time = k_data;
+    i->second.sensorCovMatrix = wrenchCovMatrix;
+    if (!(i->second.withRealSensor))
+    {
+      i->second.withRealSensor=true;
+      Contact::numberOfRealSensors++;
+    }
+              
+  }
+
+  void KineticsObserver::setContactWrenchSensorDefaultCovarianceMatrix(const Matrix6 & wrenchSensorCovMat)
+  {
+    contactWrenchSensorCovMatDefault_=wrenchSensorCovMat;
+  }
+
+  void KineticsObserver::setContactWithNoSensor(const Kinematics &localKine, int contactNumber)
+  {
+     ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+    MapContactIterator i = contacts_.find(contactNumber);
+    BOOST_ASSERT((i != contacts_.end()) && "Tried to set the kinematics of non existibng contact. \
+                                            The contact must be added BEFORE setting a contact kinmatics");
+
+    i->second.localKine = localKine;
+    i->second.time = k_data;
+    
+    if (i->second.withRealSensor)
+    {
+      i->second.withRealSensor=false;
+      Contact::numberOfRealSensors--;
+    }
+
+  }
+
+  void KineticsObserver::setAbsolutePoseSensor(const Kinematics & pose)
+  {
+    ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+    absPoseSensor_.time = k_data;
+    absPoseSensor_.pose = pose;
+        
+    if (!(absPoseSensor_.covMatrix.isSet()))
+    {
+      absPoseSensor_.covMatrix = absPoseSensorCovMatDefault_;
+    }      
+  }
+
+  void KineticsObserver::setAbsolutePoseSensor(const Kinematics & pose, const Matrix6 & CovarianceMatrix)
+  {
+    ///ensure the measuements are labeled with the good time stamp
+    startNewIteration_();
+
+    absPoseSensor_.time = k_data;
+    absPoseSensor_.pose = pose;
+        
+    absPoseSensor_.covMatrix = CovarianceMatrix;      
+  }
 ///////////////////////
 //////////////////////////
 ///////////////////////
+  int KineticsObserver::addContact(const Kinematics & pose, 
+                            const Matrix12 & initialCovarianceMatrix, const Matrix12 & processCovarianceMatrix, 
+                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping, 
+                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping, 
+                            int contactNumber)
+  {
+    if (contactNumber == -1)
+    {
+      contactNumber=0;
+
+      while (contactNumber< maxContacts_ && (contacts_.find(contactNumber)!=contacts_.end()))
+      {
+        ++contactNumber;
+      }
+    }
+
+    BOOST_ASSERT (contactNumber<maxContacts_ && "Contact number bigger than maxContacts_, please increase the maximum number of contacts");
+    std::pair<MapContactIterator,bool> inserted = contacts_.insert(PairContact(contactNumber,Contact()));
+    Contact & contact = inserted.first->second;
+    bool & isNewContact = inserted.second;
+    BOOST_ASSERT ( isNewContact && "The contact already exists, please remove it before adding it again");
+
+    contact.stateIndex = contactsIndex()+contactNumber*sizeContact;
+
+    contact.absPose = pose;
+
+    contact.linearStiffness = linearStiffness;
+    contact.linearDamping = linearDamping;
+    contact.angularStiffness = angularStiffness;
+    contact.angularDamping = angularDamping;
+
+    stateVector_.segment<sizeContact> (contact.stateIndex) << pose.toVector(flagsContactKine) , Vector6::Zero();
+
+    /// sets the initial covariance matrix
+    Matrix stateCovMat= ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeContact>(stateCovMat,initialCovarianceMatrix,contact.stateIndex,stateSize_);
+    ekf_.setStateCovariance(stateCovMat);
+
+    ///Sets the process cov mat
+    Matrix processCovMat= ekf_.getQ();
+    setBlockStateCovariance<sizeContact>(processCovMat,processCovarianceMatrix,contact.stateIndex,stateSize_);
+    ekf_.setQ(processCovarianceMatrix);
+
+    return contactNumber;
+   
+  }
+
+  /// version with default stiffness and damping
+  /// use when the contact parameters are known
+  int KineticsObserver::addContact(const Kinematics & pose, 
+                            const Matrix12 & initialCovarianceMatrix, const Matrix12 & processCovarianceMatrix, 
+                            int contactNumber)
+  {
+    return addContact(pose,initialCovarianceMatrix,processCovarianceMatrix,
+                      linearStiffnessMatDefault_,linearDampingMatDefault_,
+                      angularDampingMatDefault_,angularDampingMatDefault_,contactNumber);
+
+  }
+
+  /// version when the contact position is perfectly known
+  int KineticsObserver::addContact(const Kinematics & pose, 
+                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping, 
+                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping, 
+                            int contactNumber)
+  {
+    return addContact(pose,contactInitCovMat_,contactProcessCovMat_,linearStiffness,linearDamping,
+                      angularStiffness,angularDamping,contactNumber);
+
+
+  }
+
+  /// version when the position is perfectly known but not the stiffness and damping
+  int KineticsObserver::addContact(const Kinematics & pose, int contactNumber)
+  {
+    return addContact(pose,contactInitCovMat_,contactProcessCovMat_,
+                      linearStiffnessMatDefault_,linearDampingMatDefault_,
+                      angularDampingMatDefault_,angularDampingMatDefault_,contactNumber);
+  }
+
+  void KineticsObserver::removeContact(int contactNbr)
+  {
+    MapContactIterator i = contacts_.find(contactNbr);
+    BOOST_ASSERT(i!=contacts_.end() && "Tried to remove a non-existing contact.");
+    if (i != contacts_.end()) 
+    {
+      contacts_.erase(i);
+    }
+  }
+
+  void KineticsObserver::clearContacts()
+  {
+    contacts_.clear();
+  }
+
+  size_t KineticsObserver::getNumberOfContacts() const
+  {
+    return contacts_.size();
+  }
+
+  std::vector<int> KineticsObserver::getListOfContacts() const
+  {
+    std::vector<int> v;
+
+    for (MapContactConstIterator i = contacts_.begin(); i!=contacts_.end();++i)
+    {
+      v.push_back(i->first);
+    }
+    return v;
+  }
+
+  void KineticsObserver::setStateCovariance(const Matrix & P)
+  {
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::setKinematicsStateCovariance(const Matrix & P_kine)
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeStateKineTangent>(P,P_kine,kineIndex(),stateSize_);
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::setKinematicsInitCovarianceDefault(const Matrix & P_kine)
+  {
+    stateKineMatricsInitCovMat_=P_kine;
+  }
+
+  void KineticsObserver::setGyroBiasStateCovariance(const Matrix3 & covMat)
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeGyroBias>(P,covMat,gyroBiasIndex(),stateSize_);
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::setGyroBiasInitCovarianceDefault(const Matrix3 & covMat)
+  {
+    gyroBiasInitCovMat_ = covMat;
+  }
+  
+  void KineticsObserver::setGyroBiasProcessCovariance(const Matrix3 & covMat)
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeGyroBias>(P,covMat,gyroBiasIndex(),stateSize_);
+    ekf_.setProcessCovariance(P);
+  }
+
+  void KineticsObserver::setUnmodeledWrenchStateCovMat(const Matrix6 & currentCovMat)
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeWrench>(P,currentCovMat,unmodeledWrenchIndex(),stateSize_);
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::setUnmodeledWrenchIniCovMatDefault(const Matrix6 & initCovMat)
+  {
+    unmodeledWrenchInitCovMat_=initCovMat;
+  }
+
+  void KineticsObserver::setUnmodeledWrenchProcessCovMat(const Matrix6 & processCovMat)
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeWrench>(P,processCovMat,unmodeledWrenchIndex(),stateSize_);
+    ekf_.setProcessCovariance(P);
+  }
+
+  void KineticsObserver::setContactStateCovMat(int contactNbr, const Matrix12 & contactCovMat)
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeContactTangent>(P,contactCovMat,contactIndex(contactNbr),stateSize_);
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::setContactInitCovMatDefault(const Matrix12 & contactCovMat)
+  {
+    contactInitCovMat_ = contactCovMat;
+  }
+
+  void KineticsObserver::setContactProcessCovMat(int contactNbr, const Matrix12 & contactCovMat)
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeContactTangent>(P,contactCovMat,contactIndex(contactNbr),stateSize_);
+    ekf_.setProcessCovariance(P);
+  }
+
+  Matrix KineticsObserver::getStateCovariance() const 
+  {
+    return ekf_.getStateCovariance();
+  }
+
+  void KineticsObserver::setProcessNoiseCovariance(const Matrix & Q)
+  {
+    ekf_.setProcessCovariance(Q);
+  }
+
+  size_t KineticsObserver::getMeasurementSize()
+  {
+    size_t size = 0;
+    if (k_est!=k_data)
+    {
+      for (MapIMUIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i) 
+      {
+        if (i->second.time==k_data) 
+        {
+          size+=sizeIMUSignal;
+        } 
+      }
+
+      for (MapContactIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
+      {
+        if (i->second.time == k_data && i->second.withRealSensor)
+        {
+          size+=sizeWrench;
+        }
+      }
+
+      if (absPoseSensor_.time == k_data)
+      {
+        size+=sizePose;
+      }  
+
+    }
+    
+    return size;
+  }
+
+
+  Vector KineticsObserver::getMeasurementVector()
+  {
+    Vector measurement(getMeasurementSize());
+    size_t currIndex = 0;
+    if (k_est!=k_data)
+    {
+      for (MapIMUIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i) 
+      {
+        if (i->second.time==k_data) 
+        {
+          measurement.segment<sizeIMUSignal>(currIndex) = i->second.acceleroGyro;
+          currIndex+=sizeIMUSignal;
+        } 
+      }
+
+      for (MapContactIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
+      {
+        if (i->second.time == k_data && i->second.withRealSensor)
+        {
+          measurement.segment<sizeWrench>(currIndex) = i->second.wrench;
+          currIndex+=sizeWrench;
+        }
+      }
+
+      if (absPoseSensor_.time == k_data)
+      {
+        measurement.segment<sizePose>(currIndex) = absPoseSensor_.pose.toVector(flagsKineSensor);
+        currIndex+=sizePose;
+      }
+    }    
+    return measurement;
+  }
+
+  const ExtendedKalmanFilter & KineticsObserver::getEKF() const
+  {
+    return ekf_;
+  }
+
+  ExtendedKalmanFilter & KineticsObserver::getEKF()
+  {
+    return ekf_;
+  }
+
+  void KineticsObserver::resetStateCovarianceMat()
+  {
+    resetStateKinematicsCovMat();
+    resetStateGyroBiasCovMat();
+    resetStateUnmodeledWrenchCovMat();  
+    resetStateContactsCovMat();
+  }
+
+  void KineticsObserver::resetStateKinematicsCovMat()
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeContactTangent>(P,stateKineMatricsInitCovMat_,kineIndex(),stateSize_);
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::resetStateGyroBiasCovMat()
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeGyroBias>(P,gyroBiasInitCovMat_,gyroBiasIndex(),stateSize_);
+    ekf_.setStateCovariance(P);    
+  }
+
+
+  void KineticsObserver::resetStateUnmodeledWrenchCovMat()
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeWrench>(P,unmodeledWrenchInitCovMat_,unmodeledForceIndex(),stateSize_);
+    ekf_.setStateCovariance(P);    
+  }
+
+  void KineticsObserver::resetStateContactsCovMat()
+  {
+    for (MapContactIterator i = contacts_.begin(); i!=contacts_.end();++i)
+    {
+      resetStateContactCovMat_(i);
+    }
+  }
+
+  void KineticsObserver::resetStateContactCovMat_(MapContactIterator i)
+  {
+    Matrix P = ekf_.getStateCovariance();
+    setBlockStateCovariance<sizeContactTangent>(P,contactInitCovMat_,i->second.stateIndex,stateSize_);
+    ekf_.setStateCovariance(P);
+  }
+
+  void KineticsObserver::resetStateContactCovMat(int contactNbr)
+  {
+    MapContactIterator i = contacts_.find(contactNbr);
+
+    BOOST_ASSERT(i!=contacts_.end() && "Tried to set the covariance of a non existant contact");
+    
+    if (i!=contacts_.end())
+    {
+      resetStateContactCovMat_(i);
+    }
+  }
+
+  void KineticsObserver::resetProcessCovarianceMat()
+  {
+    resetProcessKinematicsCovMat();
+    resetProcessGyroBiasCovMat();
+    resetProcessUnmodeledWrenchCovMat();  
+    resetProcessContactsCovMat();
+  }
+
+  void KineticsObserver::resetProcessKinematicsCovMat()
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeContactTangent>(P,stateKineMatricsProcessCovMat_,kineIndex(),stateSize_);
+    ekf_.setProcessCovariance(P);
+  }
+
+  void KineticsObserver::resetProcessGyroBiasCovMat()
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeGyroBias>(P,gyroBiasProcessCovMat_,gyroBiasIndex(),stateSize_);
+    ekf_.setProcessCovariance(P);   
+  }
+
+  void KineticsObserver::resetProcessUnmodeledWrenchCovMat()
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeWrench>(P,unmodeledWrenchProcessCovMat_,unmodeledForceIndex(),stateSize_);
+    ekf_.setProcessCovariance(P);   
+  }
+
+  void KineticsObserver::resetProcessContactsCovMat()
+  {
+    for (MapContactIterator i = contacts_.begin(); i!=contacts_.end();++i)
+    {
+      resetProcessContactCovMat_(i);
+    }
+  }
+
+  void KineticsObserver::resetProcessContactCovMat(int contactNbr)
+  {
+    MapContactIterator i = contacts_.find(contactNbr);
+
+    BOOST_ASSERT(i!=contacts_.end() && "Tried to set the covariance of a non existant contact");
+    
+    if (i!=contacts_.end())
+    {
+      resetProcessContactCovMat_(i);
+    }
+  }
+
+  void KineticsObserver::resetProcessContactCovMat_(MapContactIterator i)
+  {
+    Matrix P = ekf_.getProcessCovariance();
+    setBlockStateCovariance<sizeContactTangent>(P,contactProcessCovMat_,i->second.stateIndex,stateSize_);
+    ekf_.setProcessCovariance(P);
+  }
+
+
+
+
+
 
 
   Vector KineticsObserver::stateNaNCorrection_()
@@ -420,32 +1003,12 @@ namespace stateObservation
   }
 
 
-  int KineticsObserver::setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Kinematics &localKine, int num)
-  {
-    ///ensure the measuements are labeled with the good time stamp
-    startNewIteration_();    
-  }
-
-  void KineticsObserver::setContactWrenchSensor(const Vector3& force, const Vector3& torque, const Matrix6 ForcetorqueCovMatrix, 
-                                                                                    const Kinematics &localKine, int contactNumber)
-  {
-    startNewIteration_();
-  }
    
-  void KineticsObserver::setContactWithNoSensor(const Kinematics &localKine, int contactNumber)
-  {
-    startNewIteration_();
-  }
-
-  void KineticsObserver::setPoseSensor(const Kinematics &, const Matrix6 CovarianceMatrix)
-  {
-    startNewIteration_();
-  }
 
   void KineticsObserver::resetInputs()
   {
     imuSensors_.clear();
-    absPoseSensor_.isSet=false;
+    absPoseSensor_.time = 0;
 
     for (MapContactIterator i=contacts_.begin(), ie = contacts_.end();i!=ie;++i) 
     {
@@ -465,5 +1028,7 @@ namespace stateObservation
   {
     stateKinematics_.fromVector(stateVector_.segment<sizeStateKine>(kineIndex()), 
                                 flagsStateKine);
-  } 
+  }
+
+
 }

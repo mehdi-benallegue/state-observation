@@ -30,12 +30,22 @@ inline unsigned KineticsObserver::unmodeledForceIndex() const
 {
   return unmodeledWrenchIndex();
 }
+inline unsigned KineticsObserver::contactsIndex() const
+{
+  return unmodeledWrenchIndex()+sizeWrench;
+}
 inline unsigned KineticsObserver::unmodeledTorqueIndex() const
 {
   return unmodeledForceIndex()+sizeForce;
 }
+inline unsigned KineticsObserver::contactIndex(int contactNbr) const
+{
+  return contactKineIndex(contactNbr);
+}
 inline unsigned KineticsObserver::contactKineIndex(int contactNbr) const
 {
+  BOOST_ASSERT(contacts_.find(contactNbr)!=contacts_.end() && \
+                  "The requested contact is not set yet, please add it before");
   return contacts_.find(contactNbr)->second.stateIndex;
 }
 inline unsigned KineticsObserver::contactPosIndex(int contactNbr) const
