@@ -1061,6 +1061,8 @@ namespace stateObservation
         }
       }
 
+      return *this;
+
     }
 
     inline const Kinematics & Kinematics::integrate(double dt)
@@ -1111,8 +1113,6 @@ namespace stateObservation
 
     inline const Kinematics & Kinematics::update(const Kinematics & newValue, double dt, Flags::Byte flags)
     {
-
-
       bool flagPos = flags & Flags::position;
       bool flagLinVel = flags & Flags::linVel;
       bool flagLinAcc = flags & Flags::linAcc;
@@ -1125,7 +1125,7 @@ namespace stateObservation
 
         if (flagPos)
         {
-          if (flagLinVel  && !newValue.linVel.isSet() &&  position.isSet() && newValue.position.isSet())
+          if (flagLinVel && !newValue.linVel.isSet() && position.isSet() && newValue.position.isSet())
           {
             curPos=position;
           }
@@ -1589,9 +1589,7 @@ namespace stateObservation
                           + self->linAcc();
 
           }
-
         }
-
       }
 
       if (multiplier.orientation.isSet())
@@ -1610,11 +1608,9 @@ namespace stateObservation
                                       + self->angAcc();
           }
         }
-
       }
 
       return result;
-
     }
 
   }
