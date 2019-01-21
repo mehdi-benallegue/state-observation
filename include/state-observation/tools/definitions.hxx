@@ -181,6 +181,13 @@ inline MatrixType IndexedMatrixT<MatrixType,lazy>::set(const MatrixType& v,TimeI
   return(v);
 }
 
+///Switch the matrix to set
+template <typename MatrixType, bool lazy>
+inline void IndexedMatrixT<MatrixType,lazy>::set(bool b)
+{
+  IsSet::set(b);
+}
+
 ///Set the value of the matrix and the time sample
 template <typename MatrixType, bool lazy>
 inline void IndexedMatrixT<MatrixType,lazy>::reset()
