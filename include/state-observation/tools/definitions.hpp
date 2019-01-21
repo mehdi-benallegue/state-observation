@@ -281,6 +281,8 @@ namespace stateObservation
 
   typedef IndexedMatrixT<Matrix> IndexedMatrix;
   typedef IndexedMatrixT<Vector> IndexedVector;
+  typedef IndexedMatrixT<Vector3> IndexedVector3;
+  typedef IndexedMatrixT<Matrix3> IndexedMatrix3;
 
   /**
    * \class    IndexedMatrixArray
