@@ -15,6 +15,27 @@ namespace stateObservation
     return m;
   }
 
+  /// resets one block on the diagonal of the state Covariance Matrix
+        /// i.e. sets value of a square block on the diagonal of the covMat
+        /// and sets to zero all the values related to their lines and columns
+  template <int blockSize>
+  void setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, int blockIndex,int matrixSize)
+  {
+    covMat.block<blockSize,blockSize>(blockIndex,blockIndex)=covBlock;
+    covMat.block(blockIndex,0,blockSize,blockIndex).setZero();
+    covMat.block(0,blockIndex,blockIndex,blockSize).setZero();
+    covMat.block(blockIndex+blockSize,blockIndex,matrixSize-blockIndex-blockSize,blockSize).setZero();
+    covMat.block(blockIndex,blockIndex+blockSize,blockSize,matrixSize-blockIndex-blockSize).setZero();
+  }
+
+  inline void fillSymmetricMatrix(Matrix3 & m,const Vector3 &vdiag, double e1, double e2, double e3)
+  {
+    m.diagonal() = vdiag;
+    m(1,0)=m(0,1)=e1;
+    m(2,0)=m(0,2)=e2;
+    m(2,1)=m(1,2)=e3; 
+  }
+
   const double KineticsObserver::defaultMass = 50;
 
   const double KineticsObserver::statePoseInitVarianceDefault = 1e-4;
