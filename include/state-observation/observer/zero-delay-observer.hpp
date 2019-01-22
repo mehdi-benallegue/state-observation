@@ -86,12 +86,12 @@ namespace stateObservation
 
         ///Run the observer loop and gets the state estimation of the state at
         ///instant k.
-        ///In order to estimate the state k, two conditions hqve to be met:
+        ///In order to estimate the state k, two conditions have to be met:
         /// \li the time index k must be superior to the current time k_0, the
         ///     does *not* record past values of the state and cannot observe
         ///     past states.
         /// \li the observer has to be able to reconstruct all the state
-        ///     values from k_0 to k. Thqt means all the measurements or input
+        ///     values from k_0 to k. That means all the measurements or input
         ///     values reauired have to be provided before.
         ///
         ///That means generally (for most zero delay observers) that when

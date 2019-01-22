@@ -37,6 +37,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
 
 ADD_LIBRARY(${LIBRARY_NAME}
   SHARED
+  tilt-estimator.cpp
   kalman-filter-base.cpp
   observer-base.cpp
   extended-kalman-filter.cpp
