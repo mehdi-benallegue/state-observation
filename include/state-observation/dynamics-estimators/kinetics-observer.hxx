@@ -40,13 +40,13 @@ inline unsigned KineticsObserver::unmodeledTorqueIndex() const
 }
 inline unsigned KineticsObserver::contactIndex(int contactNbr) const
 {
-  return contactKineIndex(contactNbr);
+    BOOST_ASSERT(contacts_.find(contactNbr)!=contacts_.end() && \
+                  "The requested contact is not set yet, please add it before");
+  return contacts_.find(contactNbr)->second.stateIndex;
 }
 inline unsigned KineticsObserver::contactKineIndex(int contactNbr) const
 {
-  BOOST_ASSERT(contacts_.find(contactNbr)!=contacts_.end() && \
-                  "The requested contact is not set yet, please add it before");
-  return contacts_.find(contactNbr)->second.stateIndex;
+  return contactIndex(contactNbr);
 }
 inline unsigned KineticsObserver::contactPosIndex(int contactNbr) const
 {
@@ -69,15 +69,35 @@ inline unsigned KineticsObserver::contactTorqueIndex(int contactNbr) const
   return contactForceIndex(contactNbr)+sizeForce;
 }
 
-template <int blockSize>
-void KineticsObserver::setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, int blockIndex,int matrixSize)
-{
-  covMat.block<blockSize,blockSize>(blockIndex,blockIndex)=covBlock;
-  covMat.block(blockIndex,0,blockSize,blockIndex).setZero();
-  covMat.block(0,blockIndex,blockIndex,blockSize).setZero();
-  covMat.block(blockIndex+blockSize,blockIndex,matrixSize-blockIndex-blockSize,blockSize).setZero();
-  covMat.block(blockIndex,blockIndex+blockSize,blockSize,matrixSize-blockIndex-blockSize).setZero();
+inline unsigned KineticsObserver::contactIndex(MapContactIterator i) const
+{  
+  return i->second.stateIndex;
 }
+inline unsigned KineticsObserver::contactKineIndex(MapContactIterator i) const
+{
+  return contactIndex(i);
+}
+inline unsigned KineticsObserver::contactPosIndex(MapContactIterator i) const
+{
+  return contactKineIndex(i);
+}
+inline unsigned KineticsObserver::contactOriIndex(MapContactIterator i) const
+{
+  return contactPosIndex(i)+sizePos;
+}
+inline unsigned KineticsObserver::contactWrenchIndex(MapContactIterator i) const
+{
+  return contactKineIndex(i)+sizeContactKine;
+}
+inline unsigned KineticsObserver::contactForceIndex(MapContactIterator i) const
+{
+  return contactWrenchIndex(i);
+}
+inline unsigned KineticsObserver::contactTorqueIndex(MapContactIterator i) const
+{
+  return contactForceIndex(i)+sizeForce;
+}
+
 
 
 

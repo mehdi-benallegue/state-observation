@@ -69,10 +69,7 @@ namespace stateObservation
         /// sets the sampling time
         void setSamplingTime(double) ;
 
-        /// sets the mass of the robot
-        void setMass(double);
-
-        /// this function triggers the estimation itself
+         /// this function triggers the estimation itself
         Vector update();
 
         /// ////////////////////////////////
@@ -116,9 +113,7 @@ namespace stateObservation
         /// can be used for initialization of the estimator 
         void setStateVector(const Vector &,bool resetCovariance=true);
 
-        /// Add known external forces and moments which are not due to contact
-        /// they must be expressed in the same frame as the kinematic root
-        void setAdditionalWrench(const Vector6& );
+
 
         /// Getters for the indexes of the state Vector
         inline unsigned kineIndex() const;
@@ -138,6 +133,8 @@ namespace stateObservation
         inline unsigned contactForceIndex(int contactNbr) const;
         inline unsigned contactTorqueIndex(int contactNbr) const;
         inline unsigned contactWrenchIndex(int contactNbr) const;        
+        
+      
 
         /// /////////////////////////////////////////////////////
         /// Setting and getting the state of the estimation
@@ -197,7 +194,44 @@ namespace stateObservation
  
         void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix & , int contactNumber);
 
-        ////////////// Contact management ///////////////////////////////
+        ///////////////////////////////////////////////
+        /// Setting inputs to the dynamical system
+        //////////////////////////////////////////////////
+        /// Add known external forces and moments which are not due to contact
+        /// they must be expressed in the same frame as the kinematic root
+        void setAdditionalWrench(const Vector3& force, const Vector3& torque );
+
+        /// sets the mass of the robot
+        void setMass(double);
+        
+        ///Sets the 3x3 inertia matrix expressed in the local frame and  optionally
+        ///  its time derivative (computed with finite differences otherwise)
+        ///the Vector6 version is a vector containing the diagonal and the three non
+        /// diagonal values concatenated
+        /// it is highly recommended to update these values at every iteration
+        void setInertiaMatrix(const Matrix3& I, const Matrix3& I_dot);
+        void setInertiaMatrix(const Matrix3& I);
+        void setInertiaMatrix(const Vector6& I, const Vector6& I_dot);
+        void setInertiaMatrix(const Vector6& I);
+
+        ///Sets the center of mass position expressed in the local frame 
+        /// and optionally its first and second order time derivarives
+        /// computed through finite differences otherwise.
+        /// it is highly recommended to update these values at every iteration
+        void setCenterOfMass(const Vector3& com, const Vector3& com_dot, const Vector3& com_dot_dot);
+        void setCenterOfMass(const Vector3& com, const Vector3& com_dot);
+        void setCenterOfMass(const Vector3& com);
+
+        ///Sets the angular momentum expressed in the local frame 
+        /// and optionally its time derivarive
+        /// computed through finite differences otherwise.
+        /// it is highly recommended to update these values at every iteration
+        void setAngularMomentum (const Vector3& sigma, const Vector3& sigma_dot);
+        void setAngularMomentum (const Vector3& sigma);
+
+        ///////////////////////////////
+        /// Contact management
+        ///////////////////////////////
         /// Set a new contact
         /// -pose is the initial guess on the position of the contact. Only position 
         /// and orientation are enough
@@ -286,66 +320,13 @@ namespace stateObservation
         void resetProcessGyroBiasCovMat();
         void resetProcessUnmodeledWrenchCovMat();
         void resetProcessContactsCovMat();
-        void resetProcessContactCovMat(int contactNbr);  
+        void resetProcessContactCovMat(int contactNbr); 
 
-        void resetSensorsCovMat();
-
-        void resetAllCovarianceMatrices();
+        ///Reset the default values for the covariance matrix
+        void resetSensorsDefaultCovMat();
 
         ///to reset all the sensor inputs and provided contact positions but keeps the contacts
         void resetInputs();
-
-protected:
-        ///////////// DYNAMICAL SYSTEM IMPLEMENTATION
-        virtual Vector stateDynamics(const Vector &x, const Vector &u, TimeIndex k);
-
-        virtual Vector measureDynamics(const Vector &x, const Vector &u, TimeIndex k);
-
-        ///Sets a noise which disturbs the state dynamics
-        virtual void setProcessNoise(NoiseBase *);
-
-        ///Removes the process noise
-        virtual void resetProcessNoise();
-        ///Gets the process noise
-        virtual NoiseBase *getProcessNoise() const;
-
-        ///Sets a noise which disturbs the measurements
-        virtual void setMeasurementNoise(NoiseBase *);
-        ///Removes the measurement noise
-        virtual void resetMeasurementNoise();
-        ///Gets a pointer on the measurement noise
-        virtual NoiseBase *getMeasurementNoise() const;
-
-        ///Set the period of the time discretization
-        virtual void setSamplingPeriod(double dt);
-
-        virtual Matrix getAMatrix(const Vector &xh);
-        virtual Matrix getCMatrix(const Vector &xp);
-
-        ///Gets the input size
-        virtual unsigned getInputSize() const;
-
-        static void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
-
-        static void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
-
-        static void measureDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
-        /////////////////////////////////////// 
-
-        ////////////////////////////
-        virtual void setFiniteDifferenceStep(const Vector & dx);
-        virtual void useFiniteDifferencesJacobians(bool b=true);
-
-        Vector stateNaNCorrection_();
-
-        Vector6 computeAccelerations_();
-
-        ///updates stateKine_ from the stateVector            
-        void updateKine_();
-
-        
-        
-
     protected:
 
         struct Sensor
@@ -421,6 +402,73 @@ protected:
             Kinematics pose;
             CheckedMatrix6 covMatrix;
         };
+        
+protected:
+        ///////////// DYNAMICAL SYSTEM IMPLEMENTATION
+        virtual Vector stateDynamics(const Vector &x, const Vector &u, TimeIndex k);
+
+        virtual Vector measureDynamics(const Vector &x, const Vector &u, TimeIndex k);
+
+
+        void addContactAndUnmodeledWrench(const Vector &stateVector, Vector3 & force, Vector3 & torque);
+
+        void computeAccelerations( Kinematics & stateKine, const Vector3& totalForceLocal,
+                                const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc);
+
+        ///the kinematics is not const to allow more optimized non const operators to work
+        void contactForces( MapContactIterator i, Kinematics &stateKine, 
+                                            Kinematics &contactPose , Vector3 & Force, Vector3 torque) ;
+
+
+
+        
+
+        ///Sets a noise which disturbs the state dynamics
+        virtual void setProcessNoise(NoiseBase *);
+
+        ///Removes the process noise
+        virtual void resetProcessNoise();
+        ///Gets the process noise
+        virtual NoiseBase *getProcessNoise() const;
+
+        ///Sets a noise which disturbs the measurements
+        virtual void setMeasurementNoise(NoiseBase *);
+        ///Removes the measurement noise
+        virtual void resetMeasurementNoise();
+        ///Gets a pointer on the measurement noise
+        virtual NoiseBase *getMeasurementNoise() const;
+
+        ///Set the period of the time discretization
+        virtual void setSamplingPeriod(double dt);
+
+        virtual Matrix getAMatrix(const Vector &xh);
+        virtual Matrix getCMatrix(const Vector &xp);
+
+        ///Gets the input size
+        virtual unsigned getInputSize() const;
+
+        static void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+
+        static void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+
+        static void measureDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
+        /////////////////////////////////////// 
+
+        ////////////////////////////
+        virtual void setFiniteDifferenceStep(const Vector & dx);
+        virtual void useFiniteDifferencesJacobians(bool b=true);
+
+        Vector stateNaNCorrection_();
+
+        Vector6 computeAccelerations_();
+
+        ///updates stateKine_ from the stateVector            
+        void updateKine_();
+
+        
+        
+
+protected:
 
         AbsolutePoseSensor absPoseSensor_;
         MapIMU imuSensors_;
@@ -438,21 +486,21 @@ protected:
         Vector stateVectorDx_;
         Vector oldStateVector_; 
 
-        Vector6 additionalWrench_;
+        Vector3 additionalForce_;
+        Vector3 additionalTorque_;
 
         Vector measurementVector_;
         Matrix measurementCovMatrix_;    
 
-        Matrix3 estPositionCovMat;
-        Matrix3 estOrientationCovMat;
-        Matrix3 estLinVelCovMat;
-        Matrix3 estAngVelCovMat;
-        
         stateObservation::ExtendedKalmanFilter ekf_;
         bool finiteDifferencesJacobians_;
         bool withGyroBias_;
         bool withUnmodeledWrench_;
         bool withAccelerationEstimation_;
+
+        IndexedVector3 com_, comd_, comdd_;
+        IndexedVector3 sigma_,sigmad_;
+        IndexedMatrix3 I_, Id_;
 
         TimeIndex k_est;
         TimeIndex k_data;
@@ -461,12 +509,7 @@ protected:
 
         double dt_;
 
-        /// resets one block on the diagonal of the state Covariance Matrix
-        /// i.e. sets value of a square block on the diagonal of the covMat
-        /// and sets to zero all the values related to their lines and columns
-        template <int blockSize>
-        static void setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, 
-        int blockIndex, int matrixSize);
+        
 
         ///function to call before all the measurements
         ///detects if there is a new estimation beginning and then
@@ -475,13 +518,21 @@ protected:
 
 
         void resetStateContactCovMat_(MapContactIterator );  
-        void resetProcessContactCovMat_(MapContactIterator );  
+        void resetProcessContactCovMat_(MapContactIterator ); 
+
+        inline unsigned contactIndex(MapContactIterator i) const;
+        inline unsigned contactKineIndex(MapContactIterator i) const;
+        inline unsigned contactPosIndex(MapContactIterator i) const;
+        inline unsigned contactOriIndex(MapContactIterator i) const;
+        inline unsigned contactForceIndex(MapContactIterator i) const;
+        inline unsigned contactTorqueIndex(MapContactIterator i) const;
+        inline unsigned contactWrenchIndex(MapContactIterator i) const;   
 
 
     private:
 
     public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        
 
         ///////////SIZE OF VECTORS
         static const unsigned sizeAcceleroSignal = 3;
@@ -588,7 +639,10 @@ protected:
         static const double angularStiffnessDefault;
         static const double linearDampingDefault;
         static const double angularDampingDefault;
-        
+
+
+        ////////////
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
 
     protected:
         /// Default Stiffness and damping
