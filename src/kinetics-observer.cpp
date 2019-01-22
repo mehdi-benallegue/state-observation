@@ -1206,7 +1206,7 @@ namespace stateObservation
   }
 
   void KineticsObserver::contactForces( MapContactIterator i, Kinematics &stateKine, 
-                                            Kinematics &contactPose , Vector3 & Force, Vector3 torque) 
+                                            Kinematics &contactPose , Vector3 & force, Vector3 torque) 
   {
     Contact & contact = i->second;
 
@@ -1214,10 +1214,10 @@ namespace stateObservation
 
     Kinematics globalKine = stateKine*localKine;
 
-    Force = globalKine.orientation.inverse() * (
+    force = globalKine.orientation.inverse() * (
             (contact.linearStiffness* (contactPose.position()-globalKine.position())
             -  contact.linearDamping * (globalKine.linVel())));
-    Force = globalKine.orientation.inverse() * (
+    torque = globalKine.orientation.inverse() * ( -0.5 * (Quaternion::)
             (contact.linearStiffness* (contactPose.position()-globalKine.position())
             -  contact.linearDamping * (globalKine.linVel())));
 
