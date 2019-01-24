@@ -224,7 +224,12 @@ namespace stateObservation
     }
 
 
-
+    ///Projects the Matrix to so(3)
+    inline Matrix3 orthogonalizeRotationMatrix(const Matrix3 &M)
+    {
+      Eigen::JacobiSVD<Matrix3> svd(M, Eigen::ComputeFullU |  Eigen::ComputeFullV);
+      return svd.matrixU()*svd.matrixV().transpose();
+    }
 
 
     ///transform a 3d vector into a skew symmetric 3x3 matrix
@@ -578,6 +583,30 @@ namespace stateObservation
     {
     }
 
+    inline Orientation::Orientation(const Orientation & operand1, const Orientation & operand2, op operation ):
+    q_(false),m_(false)
+    {
+      performOperationNoAlias_(operand1,operand2,operation);
+    }
+
+    inline Orientation::Orientation(Orientation & operand1, const Orientation & operand2, op operation ):
+    q_(false),m_(false)
+    {
+      performOperationNoAlias_(operand1,operand2,operation);
+    }
+
+    inline Orientation::Orientation(const Orientation & operand1, Orientation & operand2, op operation ):
+    q_(false),m_(false)
+    {
+      performOperationNoAlias_(operand1,operand2,operation);
+    }
+
+    inline Orientation::Orientation(Orientation & operand1, Orientation & operand2, op operation ):
+    q_(false),m_(false)
+    {
+      performOperationNoAlias_(operand1,operand2,operation);
+    }
+
     inline Orientation & Orientation::operator=(const Vector3& v)
     {
       m_.reset();
@@ -733,105 +762,45 @@ namespace stateObservation
       return q_;
     }
 
+    inline Orientation Orientation::setToProductNoAlias( Orientation& R1, Orientation& R2)
+    {
+      return setToProductNoAlias_(R1,R2);
+    }
+
+    inline Orientation Orientation::setToProductNoAlias( Orientation& R1, const Orientation& R2)
+    {
+      return setToProductNoAlias_(R1,R2);
+    }
+
+    inline Orientation Orientation::setToProductNoAlias(  const Orientation& R1, Orientation& R2) 
+    {
+      return setToProductNoAlias_(R1,R2);
+    }
+
+
+    inline Orientation Orientation::setToProductNoAlias( const Orientation& R1, const Orientation& R2)
+    {
+      return setToProductNoAlias_(R1,R2);
+    }
+
     inline Orientation Orientation::operator*( Orientation& R2)
     {
-      check_();
-      R2.check_();
-      if (isQuaternionSet()  && R2.isQuaternionSet() )
-      {
-        if (isMatrixSet() && R2.isMatrixSet())
-        {
-          return Orientation(Matrix3(m_()*R2.m_()));
-        }
-        else
-        {
-          return Orientation(q_()*R2.q_(),m_()*R2.m_());
-        }
-      }
-      else if (isQuaternionSet() )
-      {
-        return Orientation(Matrix3(quaternionToMatrix_()*R2.m_()));
-      }
-      else
-      {
-        return (Matrix3(m_()*R2.quaternionToMatrix_()));
-      }
+      return Orientation(*this,R2,multiply);     
     }
 
     inline Orientation Orientation::operator*(const Orientation& R2)
     {
-      check_();
-      R2.check_();
-      if (isQuaternionSet()  && R2.isQuaternionSet() )
-      {
-        if (isMatrixSet() && R2.isMatrixSet())
-        {
-          return Orientation(Matrix3(m_()*R2.m_()));
-        }
-        else
-        {
-          return Orientation(q_()*R2.q_(),m_()*R2.m_());
-        }
-      }
-      else if (isQuaternionSet() )
-      {
-        return Orientation(Matrix3(quaternionToMatrix_()*R2.m_()));
-      }
-      else
-      {
-        return (Matrix3(m_()*R2.q_().toRotationMatrix()));
-      }
+      return Orientation(*this,R2,multiply);
     }
 
     inline Orientation Orientation::operator*( Orientation& R2) const
     {
-      check_();
-      R2.check_();
-      if (isQuaternionSet()  && R2.isQuaternionSet() )
-      {
-        if (isMatrixSet() && R2.isMatrixSet())
-        {
-          return Orientation(Matrix3(m_()*R2.m_()));
-        }
-        else
-        {
-          return Orientation(q_()*R2.q_(),m_()*R2.m_());
-        }
-      }
-      else if (isQuaternionSet() )
-      {
-        return Orientation(Matrix3(q_().toRotationMatrix()*R2.m_()));
-      }
-      else
-      {
-        return (Matrix3(m_()*R2.quaternionToMatrix_()));
-      }
+      return Orientation(*this,R2,multiply); 
     }
-
 
     inline Orientation Orientation::operator*(const Orientation& R2) const
     {
-      check_();
-      R2.check_();
-      if (isQuaternionSet()  && R2.isQuaternionSet() )
-      {
-        if (isMatrixSet() && R2.isMatrixSet())
-        {
-          return Orientation(Matrix3(m_()*R2.m_()));
-        }
-        else
-        {
-          return Orientation(q_()*R2.q_(),m_()*R2.m_());
-        }
-      }
-      else if (q_.isSet())
-      {
-        return Orientation(Matrix3(q_().toRotationMatrix()*R2.m_()));
-      }
-      else
-      {
-        return (Matrix3(m_()*R2.q_().toRotationMatrix()));
-      }
+      return Orientation(*this,R2,multiply);   
     }
 
     inline Orientation Orientation::inverse() const
@@ -979,8 +948,73 @@ namespace stateObservation
       return q_=Quaternion(m_());
     }
 
+    inline Matrix3  Orientation::quaternionToMatrix_() const
+    {
+      return q_().toRotationMatrix();
+    }
 
+    inline Quaternion  Orientation::matrixToQuaternion_() const
+    {
+      return Quaternion(m_());
+    }
 
+    template<typename Ori1, typename Ori2>
+    inline Orientation Orientation::setToProductNoAlias_(Ori1& R1, Ori2& R2)
+    {
+      R1.check_();
+      R2.check_();
+      if (R1.isQuaternionSet()  && R2.isQuaternionSet() )
+      {
+        if (R1.isMatrixSet() && R2.isMatrixSet())
+        {
+          m_.set();
+          m_().noalias() = R1.m_()*R2.m_();
+        }
+        else
+        {
+          m_.reset();
+        }
+        q_.set();
+        q_() = R1.q_()*R2.q_();
+      }
+      else 
+      {
+        m_.set();
+        if (!R1.isMatrixSet() )
+        {
+          m_().noalias() = R1.quaternionToMatrix_()*R2.m_();
+        }
+        else if (!R2.isMatrixSet() )
+        {
+          m_().noalias() = R1.m_()*R2.quaternionToMatrix_();
+        }
+        else
+        {
+          m_().noalias() = R1.m_()*R2.m_();
+        }
+        q_.reset();
+      }
+
+      return *this;
+    }
+
+    ///this is a helper function to avoid code duplication
+    template<typename Ori1, typename Ori2>
+    inline Orientation Orientation::performOperationNoAlias_(Ori1 & operand1, Ori2 & operand2, op operation )
+    {
+      if (operation == multiply)
+      {
+        return setToProductNoAlias(operand1,operand2);
+      }
+      else if (operation == error)
+      {
+        return setToProductNoAlias(operand1,operand2.inverse());
+      } 
+      else if (operation == errorInverse)
+      {
+        return setToProductNoAlias(operand1.inverse(),operand2);
+      }
+    }
 
     /// -------------------Kinematics structure implementation--------------
     inline Kinematics::Kinematics(const Vector & v, Kinematics::Flags::Byte flags)

@@ -171,7 +171,8 @@ namespace stateObservation
   {
   public:
 
-    CheckedItem();
+    /// The parameter initialize sets whether the isSet() parameter is initialized to false
+    CheckedItem( bool initialize = true);
     explicit CheckedItem(const T&);
     CheckedItem( const CheckedItem &);
     virtual ~CheckedItem() {}
