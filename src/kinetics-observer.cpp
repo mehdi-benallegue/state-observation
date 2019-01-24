@@ -1214,12 +1214,15 @@ namespace stateObservation
 
     Kinematics globalKine = stateKine*localKine;
 
-    force = globalKine.orientation.inverse() * (
+    Matrix3 globKineOriInverse = globalKine.orientation.inverse();
+
+    force = globKineOriInverse * 
             (contact.linearStiffness* (contactPose.position()-globalKine.position())
-            -  contact.linearDamping * (globalKine.linVel())));
-    torque = globalKine.orientation.inverse() * ( -0.5 * (Quaternion::)
-            (contact.linearStiffness* (contactPose.position()-globalKine.position())
-            -  contact.linearDamping * (globalKine.linVel())));
+            -  contact.linearDamping * globalKine.linVel());
+    torque = globKineOriInverse * 
+            (-0.5 * contact.angularStiffness *
+            ( Quaternion(globalKine.orientation) * Quaternion(contactPose.orientation).inverse() ).vec()
+           -contact.angularDamping * globalKine.angVel()) ;
 
   }
 

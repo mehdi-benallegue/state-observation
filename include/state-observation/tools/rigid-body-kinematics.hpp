@@ -14,6 +14,8 @@
 #ifndef StATEOBSERVATIONRIGIDBODYKINEMATICS_H
 #define StATEOBSERVATIONRIGIDBODYKINEMATICS_H
 
+#include <Eigen/SVD>
+
 #include <state-observation/tools/definitions.hpp>
 #include <state-observation/tools/miscellaneous-algorithms.hpp>
 
@@ -88,6 +90,8 @@ namespace stateObservation
     /// Tranbsform a quaternion into rotation vector
     inline Vector3 quaternionToRotationVector(const Vector4 &v);
 
+
+
     /// Transform the rotation matrix into roll pitch yaw
     ///(decompose R into Ry*Rp*Rr)
     inline Vector3 rotationMatrixToRollPitchYaw(const Matrix3 & R, Vector3 & v );
@@ -106,6 +110,10 @@ namespace stateObservation
     inline Quaternion rollPitchYawToQuaternion(double roll, double pitch, double yaw);
 
     inline Quaternion rollPitchYawToQuaternion(Vector3 rpy);
+
+
+    ///Projects the Matrix to so(3)
+    inline Matrix3 orthogonalizeRotationMatrix(const Matrix3 &M);
 
 
     ///transform a 3d vector into a skew symmetric 3x3 matrix
@@ -233,6 +241,13 @@ namespace stateObservation
     class Orientation
     {
     public:
+      enum op
+      {
+        multiply,
+        error,
+        errorInverse
+      };
+
       Orientation();
 
       ///this is the rotation vector and NOT Euler angles
@@ -247,6 +262,13 @@ namespace stateObservation
       Orientation(const Quaternion& q, const Matrix3& m);
 
       Orientation(const double& roll, const double & pitch, const double & yaw);
+
+      Orientation(const Orientation & operand1, const Orientation & operand2, op operation );
+      Orientation(Orientation & operand1, const Orientation & operand2, op operation );
+      Orientation(const Orientation & operand1, Orientation & operand2, op operation );
+      Orientation(Orientation & operand1, Orientation & operand2, op operation );
+      
+      Orientation(const Orientation & operand1, op operation );
 
       inline Orientation & operator=(const Vector3& v);
 
@@ -279,7 +301,7 @@ namespace stateObservation
       inline const Quaternion& getQuaternionRef() const;
 
 
-      ///Multiply the orientation by a rotation
+      ///Multiply the rotation (orientation) by another rotation R2
       ///the non const versions allow to use more optimized methods
 
       inline Orientation operator*( Orientation& R2);
@@ -290,9 +312,19 @@ namespace stateObservation
 
       inline Orientation operator*( const Orientation& R2) const;
 
+
+      ///Noalias versions of the operator * 
+      
+      inline  Orientation setToProductNoAlias ( Orientation& R1, Orientation& R2);
+
+      inline  Orientation setToProductNoAlias ( Orientation& R1, const Orientation& R2);
+
+      inline  Orientation setToProductNoAlias ( const Orientation& R1, Orientation& R2);
+
+      inline  Orientation setToProductNoAlias ( const Orientation& R1, const Orientation& R2);
+
+
       inline Orientation inverse() const;
-
-
 
       ///use the vector dt_x_omega as the increment of rotation expressed in the
       /// world frame. Which gives R_{k+1}=\exp(S(dtxomega))R_k
@@ -327,6 +359,17 @@ namespace stateObservation
 
       inline Matrix3 & quaternionToMatrix_();
       inline Quaternion & matrixToQuaternion_();
+      inline Matrix3  quaternionToMatrix_() const;
+      inline Quaternion  matrixToQuaternion_() const;
+         
+      ///this is a helper function to avoid code duplication
+      template<typename Ori1, typename Ori2>
+      inline Orientation setToProductNoAlias_(Ori1& multiplier1, Ori2& multiplier2);
+
+      ///this is a helper function to avoid code duplication
+      template<typename Ori1, typename Ori2>
+      inline Orientation performOperationNoAlias_(Ori1 & operand1, Ori2 & operand2, op operation );
+
 
       CheckedQuaternion q_;
       CheckedMatrix3 m_;

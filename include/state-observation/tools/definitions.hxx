@@ -1,7 +1,8 @@
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem():
-  isSet_(false)
+inline CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem(bool initialize)
 {
+  if (initialize)
+    isSet_=false;
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
