@@ -334,7 +334,7 @@ namespace stateObservation
 
   kine::Kinematics KineticsObserver::getKinematics( const Kinematics & local) const
   {
-    return getKinematics()*local;
+    return Kinematics(stateKinematics_,local);///product of the kinematics
   }
 
   Vector6 KineticsObserver::getContactWrench(int contactNbr) const
@@ -1193,9 +1193,7 @@ namespace stateObservation
     Matrix3 Rt =  stateKine.orientation.getMatrixRef().inverse();
     Vector3 Rtw = Rt * stateKine.angVel();
     Vector3 corioCentri = 2* Rtw.cross(comd_()+Rtw.cross(com_()));
-
-
-       
+  
     angAcc = stateKine.orientation *( ( I_() + mass_ * kine::skewSymmetric2(com_())).inverse()
            * (totalMomentLocal - Id_()* Rtw -sigmad_() - Rtw.cross(I_()*Rtw+sigma_()) 
            - com_().cross(totalForceLocal - mass_*(comdd_() + corioCentri ))));
@@ -1212,7 +1210,7 @@ namespace stateObservation
 
     Kinematics & localKine = contact.localKine;
 
-    Kinematics globalKine = stateKine*localKine;
+    Kinematics globalKine(stateKine,localKine); /// product of kinematics
 
     Matrix3 globKineOriInverse = globalKine.orientation.inverse();
 
@@ -1226,7 +1224,7 @@ namespace stateObservation
 
   }
 
-  Vector KineticsObserver::stateDynamics(const Vector &xInput, const Vector &u, TimeIndex k)
+  Vector KineticsObserver::stateDynamics(const Vector &xInput, const Vector &u, TimeIndex)
   {
     Vector x = xInput;
     Vector3 forceLocal = additionalForce_;
