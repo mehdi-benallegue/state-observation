@@ -241,14 +241,10 @@ namespace stateObservation
     class Orientation
     {
     public:
-      enum op
-      {
-        multiply,
-        error,
-        errorInverse
-      };
-
-      Orientation();
+      ///The parameter initialize should be set to true except when it is
+      /// certain that the initial value will not be used 
+      /// And that the first operation would be to set its value
+      Orientation(bool initialize=true);
 
       ///this is the rotation vector and NOT Euler angles
       Orientation(const Vector3& v);
@@ -263,13 +259,11 @@ namespace stateObservation
 
       Orientation(const double& roll, const double & pitch, const double & yaw);
 
-      Orientation(const Orientation & operand1, const Orientation & operand2, op operation );
-      Orientation(Orientation & operand1, const Orientation & operand2, op operation );
-      Orientation(const Orientation & operand1, Orientation & operand2, op operation );
-      Orientation(Orientation & operand1, Orientation & operand2, op operation );
+      Orientation(const Orientation & multiplier1, const Orientation & multiplier2 );
+      Orientation(Orientation & multiplier1, const Orientation & multiplier2 );
+      Orientation(const Orientation & multiplier1, Orientation & multiplier2 );
+      Orientation(Orientation & multiplier1, Orientation & multiplier2 );
       
-      Orientation(const Orientation & operand1, op operation );
-
       inline Orientation & operator=(const Vector3& v);
 
       inline Orientation & operator=(const Quaternion& q);
@@ -300,7 +294,6 @@ namespace stateObservation
       inline const Matrix3& getMatrixRef() const;
       inline const Quaternion& getQuaternionRef() const;
 
-
       ///Multiply the rotation (orientation) by another rotation R2
       ///the non const versions allow to use more optimized methods
 
@@ -313,7 +306,7 @@ namespace stateObservation
       inline Orientation operator*( const Orientation& R2) const;
 
 
-      ///Noalias versions of the operator * 
+      ///Noalias versions of the operator* 
       
       inline  Orientation setToProductNoAlias ( Orientation& R1, Orientation& R2);
 
@@ -364,12 +357,7 @@ namespace stateObservation
          
       ///this is a helper function to avoid code duplication
       template<typename Ori1, typename Ori2>
-      inline Orientation setToProductNoAlias_(Ori1& multiplier1, Ori2& multiplier2);
-
-      ///this is a helper function to avoid code duplication
-      template<typename Ori1, typename Ori2>
-      inline Orientation performOperationNoAlias_(Ori1 & operand1, Ori2 & operand2, op operation );
-
+      inline Orientation templateSetToProductNoAlias_(Ori1& multiplier1, Ori2& multiplier2);
 
       CheckedQuaternion q_;
       CheckedMatrix3 m_;
@@ -401,6 +389,12 @@ namespace stateObservation
       /// use the flags to define the structure of the vector
       Kinematics(const Vector & v, Flags::Byte=Flags::all);
 
+
+      Kinematics(const Kinematics & multiplier1,const Kinematics & multiplier2);
+      Kinematics(Kinematics & multiplier1,const Kinematics & multiplier2);
+      Kinematics(const Kinematics & multiplier1,Kinematics & multiplier2);
+      Kinematics(Kinematics & multiplier1, Kinematics & multiplier2);
+
       /// Fills from vector 
       /// the flags show which parts of the kinematics to be loaded from the vector
       /// the order of the vector is 
@@ -427,6 +421,12 @@ namespace stateObservation
       inline Kinematics operator* ( Kinematics & ) const;
       inline Kinematics operator* (Kinematics & ) ;
 
+
+      inline Kinematics settoProductNoAlias(const Kinematics & operand1,const Kinematics & operand2);
+      inline Kinematics settoProductNoAlias(const Kinematics & operand1, Kinematics & operand2);
+      inline Kinematics settoProductNoAlias( Kinematics & operand1,const Kinematics & operand2);
+      inline Kinematics settoProductNoAlias( Kinematics & operand1, Kinematics & operand2);
+
       inline void reset();
 
       CheckedVector3 position;
@@ -442,8 +442,10 @@ namespace stateObservation
 
     private:
       ///this is a helper function to avoid code duplication
-      template<typename thistype,typename kine>
-      static inline Kinematics multiply_(thistype* self, kine& multiplier);
+      template<typename operand1,typename operand2>
+      inline Kinematics templateSetToProductNoAlias_(operand1& multilplier1, operand2& multiplier2);
+
+      Vector3 tempVec_;
     };
   }///namespace kine
 }///namespace stateObservation

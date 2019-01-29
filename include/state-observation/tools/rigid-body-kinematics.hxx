@@ -555,7 +555,8 @@ namespace stateObservation
       return m2;
     }
 
-    inline Orientation::Orientation()
+    inline Orientation::Orientation(bool b):
+    q_(b),m_(b)
     {}
 
     inline Orientation::Orientation(const Vector3& v):
@@ -583,28 +584,28 @@ namespace stateObservation
     {
     }
 
-    inline Orientation::Orientation(const Orientation & operand1, const Orientation & operand2, op operation ):
+    inline Orientation::Orientation(const Orientation & operand1, const Orientation & operand2):
     q_(false),m_(false)
     {
-      performOperationNoAlias_(operand1,operand2,operation);
+      templateSetToProductNoAlias_(operand1,operand2);
     }
 
-    inline Orientation::Orientation(Orientation & operand1, const Orientation & operand2, op operation ):
+    inline Orientation::Orientation(Orientation & operand1, const Orientation & operand2 ):
     q_(false),m_(false)
     {
-      performOperationNoAlias_(operand1,operand2,operation);
+      templateSetToProductNoAlias_(operand1,operand2);
     }
 
-    inline Orientation::Orientation(const Orientation & operand1, Orientation & operand2, op operation ):
+    inline Orientation::Orientation(const Orientation & operand1, Orientation & operand2 ):
     q_(false),m_(false)
     {
-      performOperationNoAlias_(operand1,operand2,operation);
+      templateSetToProductNoAlias_(operand1,operand2);
     }
 
-    inline Orientation::Orientation(Orientation & operand1, Orientation & operand2, op operation ):
+    inline Orientation::Orientation(Orientation & operand1, Orientation & operand2):
     q_(false),m_(false)
     {
-      performOperationNoAlias_(operand1,operand2,operation);
+      templateSetToProductNoAlias_(operand1,operand2);
     }
 
     inline Orientation & Orientation::operator=(const Vector3& v)
@@ -764,43 +765,42 @@ namespace stateObservation
 
     inline Orientation Orientation::setToProductNoAlias( Orientation& R1, Orientation& R2)
     {
-      return setToProductNoAlias_(R1,R2);
+      return templateSetToProductNoAlias_(R1,R2);
     }
 
     inline Orientation Orientation::setToProductNoAlias( Orientation& R1, const Orientation& R2)
     {
-      return setToProductNoAlias_(R1,R2);
+      return templateSetToProductNoAlias_(R1,R2);
     }
 
     inline Orientation Orientation::setToProductNoAlias(  const Orientation& R1, Orientation& R2) 
     {
-      return setToProductNoAlias_(R1,R2);
+      return templateSetToProductNoAlias_(R1,R2);
     }
-
 
     inline Orientation Orientation::setToProductNoAlias( const Orientation& R1, const Orientation& R2)
     {
-      return setToProductNoAlias_(R1,R2);
+      return templateSetToProductNoAlias_(R1,R2);
     }
 
     inline Orientation Orientation::operator*( Orientation& R2)
     {
-      return Orientation(*this,R2,multiply);     
+      return Orientation(*this,R2);     
     }
 
     inline Orientation Orientation::operator*(const Orientation& R2)
     {
-      return Orientation(*this,R2,multiply);
+      return Orientation(*this,R2);
     }
 
     inline Orientation Orientation::operator*( Orientation& R2) const
     {
-      return Orientation(*this,R2,multiply); 
+      return Orientation(*this,R2); 
     }
 
     inline Orientation Orientation::operator*(const Orientation& R2) const
     {
-      return Orientation(*this,R2,multiply);   
+      return Orientation(*this,R2);   
     }
 
     inline Orientation Orientation::inverse() const
@@ -849,7 +849,7 @@ namespace stateObservation
     inline Vector3 Orientation::differentiate(Orientation R_k1) const
     {
       check_();
-      return (inverse()*R_k1).toRotationVector();
+      return (Orientation(inverse(),R_k1)).toRotationVector();
     }
 
     inline bool Orientation::isSet() const
@@ -959,7 +959,7 @@ namespace stateObservation
     }
 
     template<typename Ori1, typename Ori2>
-    inline Orientation Orientation::setToProductNoAlias_(Ori1& R1, Ori2& R2)
+    inline Orientation Orientation::templateSetToProductNoAlias_(Ori1& R1, Ori2& R2)
     {
       R1.check_();
       R2.check_();
@@ -998,29 +998,44 @@ namespace stateObservation
       return *this;
     }
 
-    ///this is a helper function to avoid code duplication
-    template<typename Ori1, typename Ori2>
-    inline Orientation Orientation::performOperationNoAlias_(Ori1 & operand1, Ori2 & operand2, op operation )
-    {
-      if (operation == multiply)
-      {
-        return setToProductNoAlias(operand1,operand2);
-      }
-      else if (operation == error)
-      {
-        return setToProductNoAlias(operand1,operand2.inverse());
-      } 
-      else if (operation == errorInverse)
-      {
-        return setToProductNoAlias(operand1.inverse(),operand2);
-      }
-    }
+    ///////////////////////////////////////////////////////////////////////
+    /// -------------------Kinematics structure implementation-------------
+    ///////////////////////////////////////////////////////////////////////
 
-    /// -------------------Kinematics structure implementation--------------
     inline Kinematics::Kinematics(const Vector & v, Kinematics::Flags::Byte flags)
     {
       fromVector (v,flags);
     }
+
+
+    inline Kinematics::Kinematics(const Kinematics & multiplier1,const Kinematics & multiplier2):
+      position(false), orientation(false), linVel(false), angVel(false),
+      linAcc(false), angAcc(false)
+    {
+      templateSetToProductNoAlias_(multiplier1,multiplier2);
+    }
+
+    inline Kinematics::Kinematics(Kinematics & multiplier1,const Kinematics & multiplier2):
+      position(false), orientation(false), linVel(false), angVel(false),
+      linAcc(false), angAcc(false)
+    {
+      templateSetToProductNoAlias_(multiplier1,multiplier2);
+    }
+
+    inline Kinematics::Kinematics(const Kinematics & multiplier1,Kinematics & multiplier2):
+      position(false), orientation(false), linVel(false), angVel(false),
+      linAcc(false), angAcc(false)
+    {
+      templateSetToProductNoAlias_(multiplier1,multiplier2);
+    }
+
+    inline Kinematics::Kinematics(Kinematics & multiplier1, Kinematics & multiplier2):
+      position(false), orientation(false), linVel(false), angVel(false),
+      linAcc(false), angAcc(false)
+    {
+      templateSetToProductNoAlias_(multiplier1,multiplier2);
+    }
+
 
     inline Kinematics Kinematics::fromVector(const Vector & v, Kinematics::Flags::Byte flags)
     {
@@ -1430,24 +1445,42 @@ namespace stateObservation
     }
 
     ///composition of transformation
-    inline Kinematics Kinematics::operator* (const Kinematics & multiplier) const
+    inline Kinematics Kinematics::operator*(const Kinematics & multiplier) const
     {
-      return multiply_(this,multiplier);
+      return Kinematics(*this,multiplier);
     }
 
-    inline Kinematics Kinematics::operator* (const Kinematics & multiplier)
+    inline Kinematics Kinematics::operator*(const Kinematics & multiplier)
     {
-      return multiply_(this,multiplier);
+      return Kinematics(*this,multiplier);
     }
 
-    inline Kinematics Kinematics::operator* ( Kinematics & multiplier) const
+    inline Kinematics Kinematics::operator*( Kinematics & multiplier) const
     {
-      return multiply_(this,multiplier);
+      return Kinematics(*this,multiplier);
     }
 
-    inline Kinematics Kinematics::operator* (Kinematics & multiplier)
+    inline Kinematics Kinematics::operator*(Kinematics & multiplier)
     {
-      return multiply_(this,multiplier);
+      return Kinematics(*this,multiplier);
+    }
+
+
+    inline Kinematics Kinematics::settoProductNoAlias(const Kinematics & operand1,const Kinematics & operand2)
+    {
+      return templateSetToProductNoAlias_(operand1, operand2);
+    }
+    inline Kinematics Kinematics::settoProductNoAlias(const Kinematics & operand1, Kinematics & operand2)
+    {
+      return templateSetToProductNoAlias_(operand1, operand2);
+    }
+    inline Kinematics Kinematics::settoProductNoAlias( Kinematics & operand1,const Kinematics & operand2)
+    {
+      return templateSetToProductNoAlias_(operand1, operand2);
+    }
+    inline Kinematics Kinematics::settoProductNoAlias( Kinematics & operand1, Kinematics & operand2)
+    {
+      return templateSetToProductNoAlias_(operand1, operand2);
     }
 
     inline Vector Kinematics::toVector(Flags::Byte flags) const
@@ -1589,63 +1622,107 @@ namespace stateObservation
       angAcc.reset();
     }
 
-    template<typename thistype,typename kine>
-    inline Kinematics Kinematics::multiply_(thistype* self, kine& multiplier)
+    template<typename operand1,typename operand2>
+    inline Kinematics Kinematics::templateSetToProductNoAlias_(operand1& multiplier1, operand2& multiplier2)
     {
-      Kinematics result;
+      BOOST_ASSERT(multiplier1.orientation.isSet()
+       && "The multiplier 1 orientation is not initialized, the multiplication is not possible");
 
-      BOOST_ASSERT(self->orientation.isSet()
-       && "The multiplied orientation is not initialized, the multiplication is not possible");
-
-      BOOST_ASSERT((multiplier.position.isSet() || multiplier.orientation.isSet())
-        &&"The multiplier kinematics is not initialized, the multiplication is not possible");
+      BOOST_ASSERT((multiplier2.position.isSet() || multiplier2.orientation.isSet())
+        &&"The multiplier 2 kinematics is not initialized, the multiplication is not possible");
 
 
-      if (multiplier.position.isSet() && self->position.isSet())
+      if (multiplier2.position.isSet() && multiplier1.position.isSet())
       {
-        Vector3 R1p2 = self->orientation*multiplier.position();
+        position.set();
+        Vector3& R1p2 = position(); /// reference
+        R1p2.noalias() = multiplier1.orientation*multiplier2.position();
 
-        result.position = R1p2 + self->position();
-
-
-        if (multiplier.linVel.isSet() && self->linVel.isSet() && self->angVel.isSet())
+        if (multiplier2.linVel.isSet() && multiplier1.linVel.isSet() && multiplier1.angVel.isSet())
         {
-          Vector3 R1p2d = self->orientation*multiplier.linVel;
-          Vector3 w1xR1p2 = self->angVel().cross(R1p2);
+          linVel.set();
+          Vector3& R1p2d = tempVec_; /// reference
+          R1p2d.noalias() = multiplier1.orientation*multiplier2.linVel();       
+          
+          Vector3& w1xR1p2 = linVel(); /// reference
+          w1xR1p2.noalias() = multiplier1.angVel().cross(R1p2);
+          
+          Vector3& w1xR1p2_R1p2d = w1xR1p2; ///  reference ( =linVel() )
+          w1xR1p2_R1p2d += R1p2d;
 
-          result.linVel = R1p2d + w1xR1p2 + self->linVel();
-
-          if (multiplier.linAcc.isSet() && self->linAcc.isSet() && self->angAcc.isSet())
+          if (multiplier2.linAcc.isSet() && multiplier1.linAcc.isSet() && multiplier1.angAcc.isSet())
           {
-            result.linAcc = self->orientation*multiplier.linAcc()
-                          + self->angAcc().cross(R1p2)
-                          + self->angVel().cross(w1xR1p2+2*R1p2d)
-                          + self->linAcc();
-
+            linAcc.set();
+            linAcc().noalias()  = multiplier1.orientation*multiplier2.linAcc();
+            linAcc().noalias() += multiplier1.angAcc().cross(R1p2);
+            linAcc().noalias() += multiplier1.angVel().cross(w1xR1p2_R1p2d+R1p2d);
+            linAcc()           += multiplier1.linAcc();
           }
+          else
+          {
+            linAcc.reset();
+          }
+          
+
+
+          linVel() += multiplier1.linVel();
+        }
+        else
+        {
+          linVel.reset();
+          linAcc.reset();
+        }
+        
+        position() += multiplier1.position();
+      }
+      else
+      {
+        position.reset();
+        linVel.reset();
+        linAcc.reset();
+      }
+      
+
+      if (multiplier2.orientation.isSet())
+      {
+        orientation.setToProductNoAlias(multiplier1.orientation, multiplier2.orientation);
+
+        if (multiplier2.angVel.isSet() && multiplier1.angVel.isSet())
+        {
+          angVel.set();
+          Vector3& R1w2 = angVel();
+          R1w2.noalias() = multiplier1.orientation * multiplier2.angVel();          
+
+          if (multiplier2.angAcc.isSet() && multiplier1.angAcc.isSet())
+          {
+            angAcc.set();
+            angAcc().noalias()  = multiplier1.orientation * multiplier2.angAcc();
+            angAcc().noalias() += multiplier1.angVel().cross(R1w2);
+            angAcc()           += multiplier1.angAcc();
+          }
+          else
+          {
+            angAcc.reset();
+          }          
+          
+          angVel() +=  multiplier1.angVel();
+        }
+        else
+        {
+          angVel.reset();
+          angAcc.reset();
         }
       }
-
-      if (multiplier.orientation.isSet())
+      else
       {
-        result.orientation = self->orientation * multiplier.orientation;
-
-        if (multiplier.angVel.isSet() && self->angVel.isSet())
-        {
-          Vector3 R1w2 = self->orientation * multiplier.angVel;
-          result.angVel = R1w2 + self->angVel();
-
-          if (multiplier.angAcc.isSet() && self->angAcc.isSet())
-          {
-            result.angAcc = self->orientation * multiplier.angAcc()
-                                + self->angVel().cross(R1w2)
-                                      + self->angAcc();
-          }
-        }
+        orientation.reset();
+        angVel.reset();
+        angAcc.reset();
       }
 
-      return result;
+      return *this;
     }
+    
 
   }
 }
