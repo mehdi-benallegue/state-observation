@@ -48,6 +48,7 @@ namespace stateObservation
 
       IndexedMatrixArray & getRecord(const void *address);
 
+      ///saves the log in a file
       void save(bool clear = false, bool append = false);
 
       ///clears all the tracking lists and delete all the logs
