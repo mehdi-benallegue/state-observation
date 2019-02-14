@@ -15,6 +15,7 @@
 #define TILTESTIMATORHPP
 
 #include <state-observation/observer/zero-delay-observer.hpp>
+#include <state-observation/tools/logger.hpp>
 
 
 namespace stateObservation
@@ -80,6 +81,9 @@ namespace stateObservation
     /// sets ths measurement (accelero and gyro stacked in one vector)
     void setMeasurement(const Vector3 ya_k, const Vector3 yg_k, TimeIndex k);
 
+
+    void saveLog();
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     
   protected:
@@ -112,8 +116,12 @@ namespace stateObservation
     Vector3 x2_hat_prime_;
     Vector3 x2_hat_;
     Vector3 dx1_hat;
-    
-    
+
+
+
+
+      
+    tools::Logger logger_;
 
     
     /// The tilt estimator loop

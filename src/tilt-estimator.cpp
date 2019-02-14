@@ -15,6 +15,11 @@ namespace stateObservation
       w_S_C_(Vector3::Zero()), 
       v_C_(Vector3::Zero())
   {
+    logger_.record(x1_,"x1.dat");
+    logger_.record(x1_hat_,"x1_hat.dat");
+    logger_.record(x2_hat_prime_,"x2_hat_prime.dat");
+    logger_.record(x2_hat_,"x2_hat.dat");
+    logger_.setPath("/tmp/");
   }
   
   void TiltEstimator::setMeasurement(const Vector3 ya_k, const Vector3 yg_k, TimeIndex k)
@@ -51,8 +56,15 @@ namespace stateObservation
     x_hat.tail<3>() /= x_hat.tail<3>().norm();
     
     setState(x_hat, k+1);
+
+    logger_.push();
     
     return x_hat;
+  }
+
+  void TiltEstimator::saveLog()
+  {
+    logger_.save();
   }
 
   
