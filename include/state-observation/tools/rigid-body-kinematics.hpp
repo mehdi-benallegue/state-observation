@@ -120,6 +120,10 @@ namespace stateObservation
     ///transforms a 6d vector (position theta mu) into a homogeneous matrix
     inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 
+    ///Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation 
+    ///matrix (minimizes the deviation of the x axis)
+    inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2);
+
     ///Merge the roll pitch from R1 with yaw from R2
     inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2);
 

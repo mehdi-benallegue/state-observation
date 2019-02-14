@@ -290,9 +290,8 @@ namespace stateObservation
       return M;
     }
 
-    inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2)
+    inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2)
     {
-
       /*
       R&=\left(\begin{array}{ccc}
       \frac{m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & \frac{e_{z}\times m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & e_{z}\end{array}\right)\left(\begin{array}{ccc}
@@ -303,7 +302,7 @@ namespace stateObservation
 
       const Vector3 & ez = Vector3::UnitZ();
 
-      Vector3 v1 = R1.transpose()*ez;
+      const Vector3 & v1 = Rtez;
 
       Vector3 mlxv1 = (R2.transpose()*Vector3::UnitX()).cross(v1);
 
@@ -329,8 +328,6 @@ namespace stateObservation
         ///mxez = Vector3::UnitY().cross(ez);
         ///ezxmxez = ez.cross(mxez);
         ///R_temp1 << mxez, ezxmxez, ez;
-
-        
         
         mlxv1 = (R2.transpose()*Vector3::UnitY()).cross(v1).normalized();
 
@@ -339,10 +336,13 @@ namespace stateObservation
         ///R_temp1.setIdentity();
         ///return R_temp1*R_temp2.transpose();
         return R_temp2.transpose();
-      }    
-     
+      }          
       
-      
+    }
+
+    inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2)
+    {
+      return mergeTiltWithYaw(R1.transpose()*Vector3::UnitZ(),R2);     
     }
 
     ///transforms a rotation into translation given a constraint of a fixed point
