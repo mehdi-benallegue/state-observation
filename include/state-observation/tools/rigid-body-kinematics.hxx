@@ -290,6 +290,61 @@ namespace stateObservation
       return M;
     }
 
+    inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2)
+    {
+
+      /*
+      R&=\left(\begin{array}{ccc}
+      \frac{m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & \frac{e_{z}\times m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & e_{z}\end{array}\right)\left(\begin{array}{ccc}
+      \frac{m_{l}\times v_{1}}{\left\Vert m_{l}\times v_{1}\right\Vert } & \frac{v_{1}\times m_{l}\times v_{1}}{\left\Vert m_{l}\times v_{1}\right\Vert } & v_{1}\end{array}\right)^{T}\\&v_{1}=R_{1}^{T}e_{z}\qquad m_{l}=R_{2}^{T}m
+      */
+
+      Matrix3 R_temp1,R_temp2;
+
+      const Vector3 & ez = Vector3::UnitZ();
+
+      Vector3 v1 = R1.transpose()*ez;
+
+      Vector3 mlxv1 = (R2.transpose()*Vector3::UnitX()).cross(v1);
+
+      double n2 = mlxv1.squaredNorm();
+
+      if (n2 > cst::epsilonAngle * cst::epsilonAngle)
+      {
+        ///we take m = ex
+        ///mxez = Vector3::UnitX().cross(ez);
+        ///ezxmxez = ez.cross(mxez);
+        ///R_temp1 << mxez, ezxmxez, ez;
+        R_temp1 << -Vector3::UnitY(), Vector3::UnitX(), ez;
+
+        mlxv1 /= sqrt(n2);
+
+        R_temp2 << mlxv1.transpose(), v1.cross(mlxv1).transpose(), v1.transpose();
+
+        return R_temp1*R_temp2;
+      }
+      else
+      {
+        ///we take m = ey
+        ///mxez = Vector3::UnitY().cross(ez);
+        ///ezxmxez = ez.cross(mxez);
+        ///R_temp1 << mxez, ezxmxez, ez;
+
+        
+        
+        mlxv1 = (R2.transpose()*Vector3::UnitY()).cross(v1).normalized();
+
+        R_temp2 << mlxv1.transpose(), v1.cross(mlxv1).transpose(), v1.transpose();
+
+        ///R_temp1.setIdentity();
+        ///return R_temp1*R_temp2.transpose();
+        return R_temp2.transpose();
+      }    
+     
+      
+      
+    }
+
     ///transforms a rotation into translation given a constraint of a fixed point
     inline void fixedPointRotationToTranslation
     (const Matrix3 & R, const Vector3 & rotationVelocity,

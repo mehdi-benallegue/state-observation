@@ -120,6 +120,9 @@ namespace stateObservation
     ///transforms a 6d vector (position theta mu) into a homogeneous matrix
     inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 
+    ///Merge the roll pitch from R1 with yaw from R2
+    inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2);
+
     ///transforms a rotation into translation given a constraint of a fixed point
     inline void fixedPointRotationToTranslation
     (const Matrix3 & R, const Vector3 & rotationVelocity,
