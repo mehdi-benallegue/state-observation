@@ -90,6 +90,9 @@ namespace stateObservation
   static const bool isDebug=false;
 #endif // NDEBUG
 
+
+/// Debud item is an item that exists when the debug variable is true, 
+///otherwise it is empty and returns only the default value
   template <typename T, const T& defaultValue=T(), bool debug=true>
   class DebugItem
   {
