@@ -70,7 +70,7 @@ namespace stateObservation
 
     /// Puts the orientation vector norm between 0 and Pi if it
     /// gets close to 2pi
-    inline Vector regulateOrientationVector(const Vector3 & v );
+    inline Vector regulateRotationVector(const Vector3 & v );
 
     /// Transform the rotation vector into angle axis
     inline AngleAxis rotationVectorToAngleAxis(const Vector3 & v);
