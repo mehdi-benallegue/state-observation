@@ -196,7 +196,7 @@ namespace stateObservation
       return q.toRotationMatrix() ;
     }
 
-    inline Matrix3 rollPitchYawToRotationMatrix(Vector3 rpy)
+    inline Matrix3 rollPitchYawToRotationMatrix(const Vector3 & rpy)
     {
       return rollPitchYawToRotationMatrix(rpy[0],rpy[1],rpy[2]);
     }
@@ -218,7 +218,7 @@ namespace stateObservation
       return q;
     }
 
-    inline Quaternion rollPitchYawToQuaternion(Vector3 rpy)
+    inline Quaternion rollPitchYawToQuaternion( const Vector3 & rpy)
     {
       return rollPitchYawToQuaternion(rpy[0],rpy[1],rpy[2]);
     }
@@ -546,7 +546,7 @@ namespace stateObservation
 
     }
 
-    inline Matrix4 invertHomoMatrix (Matrix4 m)
+    inline Matrix4 invertHomoMatrix (const Matrix4 & m)
     {
       Matrix4 m2(Matrix4::Identity());
       Matrix3 rt = m.block(0,0,3,3).transpose();
