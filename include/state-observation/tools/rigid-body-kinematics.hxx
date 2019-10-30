@@ -223,6 +223,18 @@ namespace stateObservation
       return rollPitchYawToQuaternion(rpy[0],rpy[1],rpy[2]);
     }
 
+    /// scalar component of a quaternion
+    inline double scalarComponent(const Quaternion & q)
+    {
+      return q.coeffs()(3);
+    }
+    
+    /// vector part of the quaternion
+    inline Vector3 vectorComponent(const Quaternion & q)
+    {
+      return q.coeffs().segment<3>(0);
+    }
+
 
     ///Projects the Matrix to so(3)
     inline Matrix3 orthogonalizeRotationMatrix(const Matrix3 &M)
