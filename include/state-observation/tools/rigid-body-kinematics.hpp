@@ -289,7 +289,7 @@ namespace stateObservation
       inline Vector3 toRollPitchYaw() ;
       inline AngleAxis toAngleAxis() const;
 
-
+      ///get a const reference on the matrix or the quaternion 
       inline const Matrix3& getMatrixRef();
       inline const Quaternion& getQuaternionRef();
 
