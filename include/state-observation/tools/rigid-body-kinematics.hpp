@@ -246,16 +246,16 @@ namespace stateObservation
       ///The parameter initialize should be set to true except when it is
       /// certain that the initial value will not be used 
       /// And that the first operation would be to set its value
-      Orientation(bool initialize=true);
+      explicit Orientation(bool initialize=true);
 
       ///this is the rotation vector and NOT Euler angles
-      Orientation(const Vector3& v);
+      explicit Orientation(const Vector3& v);
 
-      Orientation(const Quaternion& q);
+      explicit Orientation(const Quaternion& q);
 
-      Orientation(const Matrix3& m);
+      explicit Orientation(const Matrix3& m);
 
-      Orientation(const AngleAxis& aa);
+      explicit Orientation(const AngleAxis& aa);
 
       Orientation(const Quaternion& q, const Matrix3& m);
 
