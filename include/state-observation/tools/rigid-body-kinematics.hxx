@@ -1466,19 +1466,19 @@ namespace stateObservation
     }
 
 
-    inline Kinematics Kinematics::settoProductNoAlias(const Kinematics & operand1,const Kinematics & operand2)
+    inline Kinematics Kinematics::setToProductNoAlias(const Kinematics & operand1,const Kinematics & operand2)
     {
       return templateSetToProductNoAlias_(operand1, operand2);
     }
-    inline Kinematics Kinematics::settoProductNoAlias(const Kinematics & operand1, Kinematics & operand2)
+    inline Kinematics Kinematics::setToProductNoAlias(const Kinematics & operand1, Kinematics & operand2)
     {
       return templateSetToProductNoAlias_(operand1, operand2);
     }
-    inline Kinematics Kinematics::settoProductNoAlias( Kinematics & operand1,const Kinematics & operand2)
+    inline Kinematics Kinematics::setToProductNoAlias( Kinematics & operand1,const Kinematics & operand2)
     {
       return templateSetToProductNoAlias_(operand1, operand2);
     }
-    inline Kinematics Kinematics::settoProductNoAlias( Kinematics & operand1, Kinematics & operand2)
+    inline Kinematics Kinematics::setToProductNoAlias( Kinematics & operand1, Kinematics & operand2)
     {
       return templateSetToProductNoAlias_(operand1, operand2);
     }
