@@ -584,6 +584,13 @@ namespace stateObservation
     {
     }
 
+    inline Orientation::Orientation(const Quaternion& q, const Matrix3& m):
+      q_(q),
+      m_(m)
+    {
+
+    }
+
     inline Orientation::Orientation(const Orientation & operand1, const Orientation & operand2):
     q_(false),m_(false)
     {
