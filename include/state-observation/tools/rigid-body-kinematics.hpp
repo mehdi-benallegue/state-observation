@@ -424,10 +424,10 @@ namespace stateObservation
       inline Kinematics operator* (Kinematics & ) ;
 
 
-      inline Kinematics settoProductNoAlias(const Kinematics & operand1,const Kinematics & operand2);
-      inline Kinematics settoProductNoAlias(const Kinematics & operand1, Kinematics & operand2);
-      inline Kinematics settoProductNoAlias( Kinematics & operand1,const Kinematics & operand2);
-      inline Kinematics settoProductNoAlias( Kinematics & operand1, Kinematics & operand2);
+      inline Kinematics setToProductNoAlias(const Kinematics & operand1,const Kinematics & operand2);
+      inline Kinematics setToProductNoAlias(const Kinematics & operand1, Kinematics & operand2);
+      inline Kinematics setToProductNoAlias( Kinematics & operand1,const Kinematics & operand2);
+      inline Kinematics setToProductNoAlias( Kinematics & operand1, Kinematics & operand2);
 
       inline void reset();
 
