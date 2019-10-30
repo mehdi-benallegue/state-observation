@@ -66,8 +66,6 @@ namespace stateObservation
     Quaternion & orientation, const Vector3 & rotationVelocity, double dt);
 
 
-
-
     /// Puts the orientation vector norm between 0 and Pi if it
     /// gets close to 2pi
     inline Vector regulateRotationVector(const Vector3 & v );
@@ -100,16 +98,16 @@ namespace stateObservation
 
     /// Transform the roll pitch yaw into rotation matrix
     ///( R = Ry*Rp*Rr)
-    inline Matrix3 rollPitchYawToRotationMatrix(double roll, double pitch, double yaw);
+    inline Matrix3 rollPitchYawToRotationMatrix( double roll, double pitch, double yaw );
 
-    inline Matrix3 rollPitchYawToRotationMatrix(Vector3 rpy);
+    inline Matrix3 rollPitchYawToRotationMatrix( const Vector3 & rpy);
 
 
     /// Transform the roll pitch yaw into rotation matrix
     ///( R = Ry*Rp*Rr)
-    inline Quaternion rollPitchYawToQuaternion(double roll, double pitch, double yaw);
+    inline Quaternion rollPitchYawToQuaternion( double roll, double pitch, double yaw);
 
-    inline Quaternion rollPitchYawToQuaternion(Vector3 rpy);
+    inline Quaternion rollPitchYawToQuaternion( const Vector3 & rpy);
 
 
     ///Projects the Matrix to so(3)
@@ -187,7 +185,7 @@ namespace stateObservation
 
     inline Vector invertState( const Vector & state);
 
-    inline Matrix4 invertHomoMatrix (Matrix4 m);
+    inline Matrix4 invertHomoMatrix (const Matrix4 & m);
 
 
     enum rotationType
