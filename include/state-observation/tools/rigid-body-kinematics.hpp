@@ -86,8 +86,13 @@ namespace stateObservation
     inline Vector3 quaternionToRotationVector(const Quaternion & q);
 
     /// Tranbsform a quaternion into rotation vector
-    inline Vector3 quaternionToRotationVector(const Vector4 &v);
+    inline Vector3 quaternionToRotationVector(const Vector4 & v);
 
+    /// scalar component of a quaternion
+    inline double scalarComponent(const Quaternion & q);
+    
+    /// vector part of the quaternion
+    inline Vector3 vectorComponent(const Quaternion & q);
 
 
     /// Transform the rotation matrix into roll pitch yaw
@@ -112,7 +117,6 @@ namespace stateObservation
 
     ///Projects the Matrix to so(3)
     inline Matrix3 orthogonalizeRotationMatrix(const Matrix3 &M);
-
 
     ///transform a 3d vector into a skew symmetric 3x3 matrix
     inline Matrix3 skewSymmetric(const Vector3 & v, Matrix3 & R);
