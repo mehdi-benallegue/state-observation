@@ -85,7 +85,7 @@ namespace stateObservation
     inline Vector3 rotationMatrixToRotationVector(const Matrix3 & R);
 
     /// Tranbsform a quaternion into rotation vector
-    inline Vector3 quaternionToRotationVector(const Quaternion &q);
+    inline Vector3 quaternionToRotationVector(const Quaternion & q);
 
     /// Tranbsform a quaternion into rotation vector
     inline Vector3 quaternionToRotationVector(const Vector4 &v);
