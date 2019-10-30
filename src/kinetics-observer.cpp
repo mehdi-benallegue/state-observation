@@ -1224,7 +1224,7 @@ namespace stateObservation
 
   }
 
-  Vector KineticsObserver::stateDynamics(const Vector &xInput, const Vector &u, TimeIndex)
+  Vector KineticsObserver::stateDynamics(const Vector &xInput, const Vector &/*unused*/ , TimeIndex)
   {
     Vector x = xInput;
     Vector3 forceLocal = additionalForce_;
