@@ -44,6 +44,7 @@ namespace stateObservation
     {
     public:
         typedef kine::Kinematics Kinematics;
+        typedef kine::Orientation Orientation;
 
         /// The constructor.
         ///  \li maxContacts : maximum number of contacts,
