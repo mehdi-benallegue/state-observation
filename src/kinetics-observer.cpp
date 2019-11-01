@@ -165,8 +165,7 @@ namespace stateObservation
   {
     int size = 0;
   /// Synchronizing the sensors
-    MapIMUConstIterator i = imuSensors_.begin();
-    while (i != imuSensors_.end()) 
+    for (MapIMUConstIterator i = imuSensors_.begin() ; i != imuSensors_.end():++i)
     {
       if (i->second.time==k_data) 
       {
@@ -1234,21 +1233,69 @@ namespace stateObservation
 
     Kinematics stateKine(x.segment<sizeStateKine>(kineIndex()), flagsStateKine);
 
-    Vector3 linacc, angacc;
+    /// The accelerations are about to be computed so we set them to "initialized"
+    stateKine.linAcc.set();
+    stateKine.angAcc.set();
+    
+    Vector3& linacc = (Vector3&)(stateKine.linAcc);
+    Vector3& angacc = (Vector3&)(stateKine.angAcc);
 
-    computeAccelerations(stateKine,forceLocal,torqueLocal,linacc,angacc);
-
-    stateKine.linAcc = linacc;
-    stateKine.angAcc = angacc;
-
+    computeAccelerations(stateKine,forceLocal,torqueLocal, linacc, angacc);
+    
     stateKine.integrate(dt_);
 
     x.segment<sizeStateKine>(kineIndex()) = stateKine.toVector(flagsStateKine);
 
-    
-    
+    for (MapContactIterator i = contacts_.begin(); i!= contacts_.end(); ++i)
+    {
+      Kinematics & localKine= i->second.localKine;
+      
+      Matrix3 & Kpt = i->second.linearStiffness;
+      Matrix3 & Kdt = i->second.linearDamping;
+      Matrix3 & Kpr = i->second.angularStiffness;
+      Matrix3 & Kdr = i->second.angularDamping;
 
-    
+      /// the posiiton of the contact in the global frame
+      Kinematics globalKine;
+      
+      globalKine.setToProductNoAlias( stateKine , localKine);
+
+      /// The error between the current kinematics and the rest kinematics 
+      /// of the flexibility
+      Kinematics errorKine;
+      errorKine.setToProductNoAlias(globalKine, localKine.inverse());
+
+      /// Inverse of the orientation of the foot in the global frame
+      Orientation Rcit(globalKine.orientation.inverse());
+      
+      x.segment<sizeForce>(contactForceIndex(i)) = 
+        -(Rcit*(Kpt*errorKine.position() + Kdt*errorKine.linVel()));
+
+      x.segment<sizeTorque>(contactTorqueIndex(i)) = 
+          -(Rcit*(Kpr*kine::vectorComponent(Quaternion(errorKine.orientation))*0.5
+          +Kdr*errorKine.angVel()));      
+    }
+
+    return x;    
+  }
+
+  Vector KineticsObserver::measureDynamics(const Vector &x, const Vector &/*unused*/, TimeIndex k)
+  {
+    Vector y(getMeasurementSize());
+
+    unsigned index = 0;
+
+    for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
+    {
+      if (i->second.time == k_data && i->second.withRealSensor)
+      {
+        
+      }
+    }
+
+
+
+    return y;
   }
 
 
