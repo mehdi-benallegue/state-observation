@@ -165,7 +165,7 @@ namespace stateObservation
   {
     int size = 0;
   /// Synchronizing the sensors
-    for (MapIMUConstIterator i = imuSensors_.begin() ; i != imuSensors_.end():++i)
+    for (MapIMUConstIterator i = imuSensors_.begin() ; i != imuSensors_.end();++i)
     {
       if (i->second.time==k_data) 
       {
