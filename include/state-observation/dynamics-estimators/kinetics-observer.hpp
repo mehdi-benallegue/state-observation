@@ -521,13 +521,14 @@ protected:
         void resetStateContactCovMat_(MapContactIterator );  
         void resetProcessContactCovMat_(MapContactIterator ); 
 
-        inline unsigned contactIndex(MapContactIterator i) const;
-        inline unsigned contactKineIndex(MapContactIterator i) const;
-        inline unsigned contactPosIndex(MapContactIterator i) const;
-        inline unsigned contactOriIndex(MapContactIterator i) const;
-        inline unsigned contactForceIndex(MapContactIterator i) const;
-        inline unsigned contactTorqueIndex(MapContactIterator i) const;
-        inline unsigned contactWrenchIndex(MapContactIterator i) const;   
+        /// Getters for the indexes of the state Vector using private types
+        inline unsigned contactIndex(MapContactConstIterator i) const;
+        inline unsigned contactKineIndex(MapContactConstIterator i) const;
+        inline unsigned contactPosIndex(MapContactConstIterator i) const;
+        inline unsigned contactOriIndex(MapContactConstIterator i) const;
+        inline unsigned contactForceIndex(MapContactConstIterator i) const;
+        inline unsigned contactTorqueIndex(MapContactConstIterator i) const;
+        inline unsigned contactWrenchIndex(MapContactConstIterator i) const;   
 
 
     private:
