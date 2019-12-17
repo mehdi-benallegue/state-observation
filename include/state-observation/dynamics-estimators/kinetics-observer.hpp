@@ -512,7 +512,7 @@ protected:
 
         
 
-        ///function to call before all the measurements
+        ///function to call before adding any measurement
         ///detects if there is a new estimation beginning and then
         ///calls the reset of the iteration
         void startNewIteration_();
