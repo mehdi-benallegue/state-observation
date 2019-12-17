@@ -334,11 +334,11 @@ namespace stateObservation
         {
             Sensor(int signalSize):size(signalSize), time(0) {}
             virtual ~Sensor(){}
-            int index;
+            int measIndex;
             int size;
             TimeIndex time;
             
-            inline Vector extractFromVector(const Vector & v){return v.segment(size,index);}
+            inline Vector extractFromVector(const Vector & v){return v.segment(size,measIndex);}
         };        
 
         struct IMU:
@@ -417,7 +417,7 @@ protected:
                                 const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc);
 
         ///the kinematics is not const to allow more optimized non const operators to work
-        void contactForces( MapContactIterator i, Kinematics &stateKine, 
+        void computeContactForces( MapContactIterator i, Kinematics &stateKine, 
                                             Kinematics &contactPose , Vector3 & Force, Vector3 torque) ;
 
 
@@ -600,7 +600,7 @@ protected:
         static const Kinematics::Flags::Byte flagsContactKine =  Kinematics::Flags::position |
                                                                  Kinematics::Flags::orientation;
 
-        static const Kinematics::Flags::Byte flagsKineSensor = Kinematics::Flags::position |
+        static const Kinematics::Flags::Byte flagsPoseKine = Kinematics::Flags::position |
                                                                 Kinematics::Flags::orientation;
 
         static const Kinematics::Flags::Byte flagsIMUKine =  Kinematics::Flags::position |
