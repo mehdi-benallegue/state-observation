@@ -759,7 +759,8 @@ namespace stateObservation
       }
     }
 
-    BOOST_ASSERT (contactNumber<maxContacts_ && "Contact number bigger than maxContacts_, please increase the maximum number of contacts");
+    BOOST_ASSERT (contactNumber<maxContacts_ && 
+        "The number of concurrent contacts is bigger than maxContacts_, please increase the maximum number of contacts");
     std::pair<MapContactIterator,bool> inserted = contacts_.insert(PairContact(contactNumber,Contact()));
     Contact & contact = inserted.first->second;
     bool & isNewContact = inserted.second;
