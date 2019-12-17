@@ -1284,17 +1284,35 @@ namespace stateObservation
   {
     Vector y(getMeasurementSize());
 
-    unsigned index = 0;
+    Kinematics stateKine(x.segment<sizeStateKine>(kineIndex()), flagsStateKine);
+    Kinematics localKine;
 
-    for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i) 
+    for (MapIMUConstIterator i = imuSensors_.begin(); i !=  imuSensors_.end() ; ++i)
+    {
+      const IMU & imu= i->second;
+      localKine = stateKine * imu.kinematics;
+      localKine.orientation.getMatrixRef();
+      ///accelerometer
+      y.segment<sizeAcceleroSignal>(imu.measIndex)  
+            = localKine.orientation.getMatrixRefUnsafe()().transpose()  * (localKine.linAcc() + cst::gravity);
+      ///gyrometer
+      y.segment<sizeGyroSignal>(imu.measIndex+sizeAcceleroSignal) 
+            = localKine.orientation.getMatrixRefUnsafe()().transpose() * localKine.angVel();
+    }
+    
+    for (MapContactConstIterator i = contacts_.begin(); i != contacts_.end() ; ++i) 
     {
       if (i->second.time == k_data && i->second.withRealSensor)
       {
-        
+        y.segment<sizeWrench>(i->second.measIndex) = x.segment<sizeWrench>(contactWrenchIndex(i));
+
       }
     }
 
-
+    if (absPoseSensor_.time == k)
+    {
+      y.segment<sizePose>(absPoseSensor_.measIndex) = stateKine.toVector(flagsPoseKine);
+    }
 
     return y;
   }
