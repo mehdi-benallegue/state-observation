@@ -69,31 +69,31 @@ inline unsigned KineticsObserver::contactTorqueIndex(int contactNbr) const
   return contactForceIndex(contactNbr)+sizeForce;
 }
 
-inline unsigned KineticsObserver::contactIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactIndex(MapContactConstIterator i) const
 {  
   return i->second.stateIndex;
 }
-inline unsigned KineticsObserver::contactKineIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactKineIndex(MapContactConstIterator i) const
 {
   return contactIndex(i);
 }
-inline unsigned KineticsObserver::contactPosIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactPosIndex(MapContactConstIterator i) const
 {
   return contactKineIndex(i);
 }
-inline unsigned KineticsObserver::contactOriIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactOriIndex(MapContactConstIterator i) const
 {
   return contactPosIndex(i)+sizePos;
 }
-inline unsigned KineticsObserver::contactWrenchIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactWrenchIndex(MapContactConstIterator i) const
 {
   return contactKineIndex(i)+sizeContactKine;
 }
-inline unsigned KineticsObserver::contactForceIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactForceIndex(MapContactConstIterator i) const
 {
   return contactWrenchIndex(i);
 }
-inline unsigned KineticsObserver::contactTorqueIndex(MapContactIterator i) const
+inline unsigned KineticsObserver::contactTorqueIndex(MapContactConstIterator i) const
 {
   return contactForceIndex(i)+sizeForce;
 }
