@@ -250,36 +250,36 @@ namespace stateObservation
       measurementCovMatrix_.resize(measurementTangentSize,measurementTangentSize);
       measurementCovMatrix_.setZero();
     
-      int localIndex = 0;
+      int curMeasIndex = 0;
       
       for (MapIMUIterator i= imuSensors_.begin(), ie = imuSensors_.end(); i!=ie ; ++i)
       {
-        i->second.index = localIndex;
-        measurementVector_.segment<sizeIMUSignal>(localIndex) = i->second.acceleroGyro;
-        measurementCovMatrix_.block<sizeAcceleroSignal,sizeAcceleroSignal>(localIndex,localIndex)=i->second.covMatrixAccelero;
-        localIndex+=sizeAcceleroSignal;
-        measurementCovMatrix_.block<sizeGyroSignal,sizeGyroSignal>(localIndex,localIndex)=i->second.covMatrixGyro;
-        localIndex+=sizeGyroSignal;
+        i->second.measIndex = curMeasIndex;
+        measurementVector_.segment<sizeIMUSignal>(curMeasIndex) = i->second.acceleroGyro;
+        measurementCovMatrix_.block<sizeAcceleroSignal,sizeAcceleroSignal>(curMeasIndex,curMeasIndex)=i->second.covMatrixAccelero;
+        curMeasIndex+=sizeAcceleroSignal;
+        measurementCovMatrix_.block<sizeGyroSignal,sizeGyroSignal>(curMeasIndex,curMeasIndex)=i->second.covMatrixGyro;
+        curMeasIndex+=sizeGyroSignal;
       }
 
       for (MapContactIterator i=contacts_.begin(), ie = contacts_.end();i!=ie;++i) 
       {
         if (i->second.withRealSensor)
         {
-          i->second.index = localIndex;
-          measurementVector_.segment<sizeWrench>(localIndex) = i->second.wrench;
-          measurementCovMatrix_.block<sizeWrench,sizeWrench>(localIndex,localIndex)=i->second.sensorCovMatrix();
-          localIndex+=sizeWrench;
+          i->second.measIndex = curMeasIndex;
+          measurementVector_.segment<sizeWrench>(curMeasIndex) = i->second.wrench;
+          measurementCovMatrix_.block<sizeWrench,sizeWrench>(curMeasIndex,curMeasIndex)=i->second.sensorCovMatrix();
+          curMeasIndex+=sizeWrench;
         }
       }
 
       if (absPoseSensor_.time == k_data)
       {
-        absPoseSensor_.index= localIndex;
+        absPoseSensor_.measIndex= curMeasIndex;
         BOOST_ASSERT(absPoseSensor_.pose.position.isSet() && absPoseSensor_.pose.orientation.isSet() \
                     && "The absolute pose needs to contain the position and the orientation");
-        measurementVector_.segment<sizePose>(localIndex) = absPoseSensor_.pose.toVector(flagsKineSensor);
-        measurementCovMatrix_.block<sizePoseTangent,sizePoseTangent>(localIndex,localIndex)=absPoseSensor_.covMatrix();
+        measurementVector_.segment<sizePose>(curMeasIndex) = absPoseSensor_.pose.toVector(flagsPoseKine);
+        measurementCovMatrix_.block<sizePoseTangent,sizePoseTangent>(curMeasIndex,curMeasIndex)=absPoseSensor_.covMatrix();
       }
 
       ekf_.setMeasureSize(measurementSize_,measurementTangentSize);
@@ -996,7 +996,7 @@ namespace stateObservation
 
       if (absPoseSensor_.time == k_data)
       {
-        measurement.segment<sizePose>(currIndex) = absPoseSensor_.pose.toVector(flagsKineSensor);
+        measurement.segment<sizePose>(currIndex) = absPoseSensor_.pose.toVector(flagsPoseKine);
         currIndex+=sizePose;
       }
     }    
@@ -1203,7 +1203,7 @@ namespace stateObservation
    
   }
 
-  void KineticsObserver::contactForces( MapContactIterator i, Kinematics &stateKine, 
+  void KineticsObserver::computeContactForces( MapContactIterator i, Kinematics &stateKine, 
                                             Kinematics &contactPose , Vector3 & force, Vector3 torque) 
   {
     Contact & contact = i->second;
