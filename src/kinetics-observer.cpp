@@ -63,12 +63,16 @@ namespace stateObservation
   const double KineticsObserver::positionSensorVarianceDefault = 1e-4;
   const double KineticsObserver::orientationSensorVarianceDefault = 1e-3;
 
-  const double linearStiffnessDefault = 40000;
-  const double angularStiffnessDefault = 400;
-  const double linearDampingDefault = 120;
-  const double angularDampingDefault = 12;
+  const double KineticsObserver::linearStiffnessDefault = 40000;
+  const double KineticsObserver::angularStiffnessDefault = 400;
+  const double KineticsObserver::linearDampingDefault = 120;
+  const double KineticsObserver::angularDampingDefault = 12;
 
   const double KineticsObserver::defaultdx = 1e-6;
+
+  const int inputSize = 0;
+
+  int KineticsObserver::Contact::numberOfRealSensors = 0;
 
   KineticsObserver::KineticsObserver(int maxContacts):
     maxContacts_(maxContacts),
@@ -80,10 +84,11 @@ namespace stateObservation
     oldStateVector_(stateSize_),
     additionalForce_(Vector3::Zero()),    
     additionalTorque_(Vector3::Zero()),    
-    ekf_(stateSize_, stateTangentSize_, sizeIMUSignal, sizeIMUSignal,  0,false,false),
+    ekf_(stateSize_, stateTangentSize_, sizeIMUSignal, sizeIMUSignal,  inputSize,false,false),
     finiteDifferencesJacobians_(true),
     withGyroBias_(true), withUnmodeledWrench_(false), withAccelerationEstimation_(false),
     k_est(0),k_data(0), mass_(defaultMass), dt_(defaultdx),
+    processNoise_(0x0), measurementNoise_(0x0),
     linearStiffnessMatDefault_(Matrix3::Identity()*linearStiffnessDefault),
     angularStiffnessMatDefault_(Matrix3::Identity()*angularStiffnessDefault),
     linearDampingMatDefault_(Matrix3::Identity()*linearDampingDefault),
@@ -149,6 +154,8 @@ namespace stateObservation
     updateKine_();
 
     Contact::numberOfRealSensors = 0;
+
+    stateVectorDx_.setConstant(1e-6);
   }
 
   KineticsObserver::~KineticsObserver()
@@ -290,6 +297,12 @@ namespace stateObservation
         ekf_.setA(ekf_.getAMatrixFD(stateVectorDx_));
         ekf_.setC(ekf_.getCMatrixFD(stateVectorDx_));
       }
+      else
+      {
+        ekf_.setA(computeAMatrix_());
+        ekf_.setC(computeCMatrix_());
+      }
+      
 
       stateVector_ = ekf_.getEstimatedState(k_data);
 
@@ -1099,6 +1112,15 @@ namespace stateObservation
     ekf_.setProcessCovariance(P);   
   }
 
+  unsigned KineticsObserver::getInputSize() const
+  {
+    return inputSize;
+  }
+
+  
+
+
+
   void KineticsObserver::resetProcessContactsCovMat()
   {
     for (MapContactIterator i = contacts_.begin(); i!=contacts_.end();++i)
@@ -1151,6 +1173,18 @@ namespace stateObservation
     absPoseSensor_.time = k_est;
   }
 
+  void KineticsObserver::setFiniteDifferenceStep(const Vector &v)
+  {
+    stateVectorDx_= v;
+  }
+
+  void KineticsObserver::useFiniteDifferencesJacobians(bool b)
+  {
+    finiteDifferencesJacobians_ = b;
+  }
+
+  
+
   Vector KineticsObserver::stateNaNCorrection_()
   {
     ///TODO implement this function
@@ -1164,7 +1198,47 @@ namespace stateObservation
     {
       ++k_data;
     }    
-  } 
+  }
+
+  void KineticsObserver::setProcessNoise(NoiseBase * noise)
+  {
+    processNoise_= noise;
+  }
+
+  void KineticsObserver::resetProcessNoise()
+  {
+    processNoise_ = 0x0;
+  }
+
+  NoiseBase* KineticsObserver::getProcessNoise() const
+  {
+    return processNoise_;
+  }
+
+  void KineticsObserver::setMeasurementNoise(NoiseBase * noise)
+  {
+    measurementNoise_ = noise;
+  }
+
+  void KineticsObserver::resetMeasurementNoise()
+  {
+    measurementNoise_ = 0x0;
+  }
+
+  NoiseBase * KineticsObserver::getMeasurementNoise() const 
+  {
+    return measurementNoise_;
+  }
+
+  Matrix KineticsObserver::computeAMatrix_()
+  {
+    return ekf_.getAMatrixFD(stateVectorDx_);
+  }
+
+  Matrix KineticsObserver::computeCMatrix_()
+  {
+    return ekf_.getCMatrixFD(stateVectorDx_);
+  }
 
   void KineticsObserver::updateKine_()
   {
@@ -1277,6 +1351,11 @@ namespace stateObservation
           +Kdr*errorKine.angVel()));      
     }
 
+    if (processNoise_!=0x0)
+    {
+      processNoise_->addNoise(x);
+    }
+
     return x;    
   }
 
@@ -1312,6 +1391,11 @@ namespace stateObservation
     if (absPoseSensor_.time == k)
     {
       y.segment<sizePose>(absPoseSensor_.measIndex) = stateKine.toVector(flagsPoseKine);
+    }
+
+    if (measurementNoise_ != 0x0)
+    {
+      measurementNoise_->addNoise(y);
     }
 
     return y;
