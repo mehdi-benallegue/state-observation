@@ -439,12 +439,6 @@ protected:
         ///Gets a pointer on the measurement noise
         virtual NoiseBase *getMeasurementNoise() const;
 
-        ///Set the period of the time discretization
-        virtual void setSamplingPeriod(double dt);
-
-        virtual Matrix getAMatrix(const Vector &xh);
-        virtual Matrix getCMatrix(const Vector &xp);
-
         ///Gets the input size
         virtual unsigned getInputSize() const;
 
@@ -510,12 +504,19 @@ protected:
 
         double dt_;
 
+        NoiseBase * processNoise_;
+        NoiseBase * measurementNoise_;
+
         
 
         ///function to call before adding any measurement
         ///detects if there is a new estimation beginning and then
         ///calls the reset of the iteration
         void startNewIteration_();
+
+                
+        virtual Matrix computeAMatrix_();
+        virtual Matrix computeCMatrix_();
 
 
         void resetStateContactCovMat_(MapContactIterator );  
