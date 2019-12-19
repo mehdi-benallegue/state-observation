@@ -1269,7 +1269,7 @@ namespace stateObservation
     }
   }
 
-  void  KineticsObserver::computeAccelerations(Kinematics & stateKine, const Vector3& totalForceLocal,
+  void  KineticsObserver::computeAccelerations_(Kinematics & stateKine, const Vector3& totalForceLocal,
                                 const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc)
   {
     Matrix3 Rt =  stateKine.orientation.getMatrixRef().inverse();
@@ -1285,7 +1285,7 @@ namespace stateObservation
    
   }
 
-  void KineticsObserver::computeContactForces( MapContactIterator i, Kinematics &stateKine, 
+  void KineticsObserver::computeContactForces_( MapContactIterator i, Kinematics &stateKine, 
                                             Kinematics &contactPose , Vector3 & force, Vector3 torque) 
   {
     Contact & contact = i->second;
@@ -1323,7 +1323,7 @@ namespace stateObservation
     Vector3& linacc = (Vector3&)(stateKine.linAcc);
     Vector3& angacc = (Vector3&)(stateKine.angAcc);
 
-    computeAccelerations(stateKine,forceLocal,torqueLocal, linacc, angacc);
+    computeAccelerations_(stateKine,forceLocal,torqueLocal, linacc, angacc);
     
     stateKine.integrate(dt_);
 
