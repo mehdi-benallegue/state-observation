@@ -413,11 +413,11 @@ protected:
 
         void addContactAndUnmodeledWrench(const Vector &stateVector, Vector3 & force, Vector3 & torque);
 
-        void computeAccelerations( Kinematics & stateKine, const Vector3& totalForceLocal,
+        void computeAccelerations_( Kinematics & stateKine, const Vector3& totalForceLocal,
                                 const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc);
 
         ///the kinematics is not const to allow more optimized non const operators to work
-        void computeContactForces( MapContactIterator i, Kinematics &stateKine, 
+        void computeContactForces_( MapContactIterator i, Kinematics &stateKine, 
                                             Kinematics &contactPose , Vector3 & Force, Vector3 torque) ;
 
         ///Sets a noise which disturbs the state dynamics
