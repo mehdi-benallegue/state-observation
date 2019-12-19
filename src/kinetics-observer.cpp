@@ -19,8 +19,9 @@ namespace stateObservation
         /// i.e. sets value of a square block on the diagonal of the covMat
         /// and sets to zero all the values related to their lines and columns
   template <int blockSize>
-  void setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, int blockIndex,int matrixSize)
+  void setBlockStateCovariance(Matrix & covMat, const Matrix & covBlock, int blockIndex)
   {
+    long int matrixSize = covMat.rows();
     covMat.block<blockSize,blockSize>(blockIndex,blockIndex)=covBlock;
     covMat.block(blockIndex,0,blockSize,blockIndex).setZero();
     covMat.block(0,blockIndex,blockIndex,blockSize).setZero();
@@ -53,6 +54,8 @@ namespace stateObservation
   const double KineticsObserver::stateAngVelProcessVarianceDefault = 1e-8;
   const double KineticsObserver::gyroBiasProcessVarianceDefault = 1e-12;
   const double KineticsObserver::unmodeledWrenchProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::contactPositionProcessVarianceDefault = 1e-8;
+  const double KineticsObserver::contactOrientationProcessVarianceDefault = 1e-8;
   const double KineticsObserver::contactForceProcessVarianceDefault = 1e-8;
   const double KineticsObserver::contactTorqueProcessVarianceDefault = 1e-8;
 
@@ -110,7 +113,11 @@ namespace stateObservation
     stateLinVelProcessCovMat_(Matrix3::Identity()*stateLinVelProcessVarianceDefault),
     stateAngVelProcessCovMat_(Matrix3::Identity()*stateAngVelProcessVarianceDefault),
     gyroBiasProcessCovMat_(Matrix3::Identity()*gyroBiasProcessVarianceDefault),
-    unmodeledWrenchProcessCovMat_(Matrix6::Identity()*unmodeledWrenchProcessVarianceDefault)
+    unmodeledWrenchProcessCovMat_(Matrix6::Identity()*unmodeledWrenchProcessVarianceDefault),
+    contactPositionProcessCovMat_(Matrix3::Identity()*contactPositionProcessVarianceDefault),
+    contactOrientationProcessCovMat_(Matrix3::Identity()*contactOrientationProcessVarianceDefault),
+    contactForceProcessCovMat_(Matrix3::Identity()*contactForceInitVarianceDefault),
+    contactTorqueProcessCovMat_(Matrix3::Identity()*contactTorqueInitVarianceDefault)
   {
     ekf_.setFunctor(this);
 
@@ -118,34 +125,40 @@ namespace stateObservation
 
     ekf_.setState(stateVector_,k_est);
 
-    const Matrix3 & Zero3 = Matrix3::Zero();
-
-    stateKineMatricsInitCovMat_ << 
-        statePosInitCovMat_, Zero3	            , Zero3	                , Zero3,
-        Zero3              , stateOriInitCovMat_, Zero3	                , Zero3,
-        Zero3              , Zero3              , stateLinVelInitCovMat_, Zero3,
-        Zero3              , Zero3              , Zero3	                , stateAngVelInitCovMat_;
+    stateKinematicsInitCovMat_.setZero();
+    stateKinematicsInitCovMat_.block<sizePos,sizePos>               (0,0)       = statePosInitCovMat_;
+    stateKinematicsInitCovMat_.block<sizeOriTangent,sizeOriTangent> (3,3)       = stateOriInitCovMat_;
+    stateKinematicsInitCovMat_.block<sizeLinVel,sizeLinVel>         (6,6) = stateLinVelInitCovMat_;
+    stateKinematicsInitCovMat_.block<sizeAngVel,sizeAngVel>         (9,9) = stateAngVelInitCovMat_;
 
 
-    stateKineMatricsProcessCovMat_ << 
-        Zero3, Zero3, Zero3	                         , Zero3,
-        Zero3, Zero3, Zero3	                         , Zero3,
-        Zero3, Zero3, contactForceInitVarianceDefault, Zero3,
-        Zero3, Zero3, Zero3	                         , contactTorqueInitVarianceDefault;
+    stateKinematicsProcessCovMat_.setZero();
+    stateKinematicsProcessCovMat_.block<sizePos,sizePos>               (0,0)       = statePosProcessCovMat_;
+    stateKinematicsProcessCovMat_.block<sizeOriTangent,sizeOriTangent> (3,3)       = stateOriProcessCovMat_;
+    stateKinematicsProcessCovMat_.block<sizeLinVel,sizeLinVel>         (6,6) = stateLinVelProcessCovMat_;
+    stateKinematicsProcessCovMat_.block<sizeAngVel,sizeAngVel>         (9,9) = stateAngVelProcessCovMat_;
 
     
-    contactProcessCovMat_ << 
-        Zero3, Zero3, Zero3	                         , Zero3,
-        Zero3, Zero3, Zero3	                         , Zero3,
-        Zero3, Zero3, contactForceProcessVarianceDefault, Zero3,
-        Zero3, Zero3, Zero3	                         , contactTorqueProcessVarianceDefault;
+    contactProcessCovMat_.setZero();
+    contactProcessCovMat_.block<sizePos,sizePos> (0,0)            
+                = contactPositionProcessCovMat_;
+    contactProcessCovMat_.block<sizeOriTangent,sizeOriTangent> (3,3)
+                =contactOrientationProcessCovMat_;
+    contactProcessCovMat_.block<sizeForce,sizeForce>  (6,6)        
+                =contactForceProcessCovMat_;
+    contactProcessCovMat_.block<sizeTorque,sizeTorque> (9,9)       
+                =contactTorqueProcessCovMat_;
 
     
     Id_.set(Matrix3::Zero(),k_data);
     comd_.set(Vector3::Zero(),k_data);
     comdd_.set(Vector3::Zero(),k_data);
     sigmad_.set(Vector3::Zero(),k_data);
-    
+
+
+    ekf_.setStateCovariance(ekf_.getPmatrixZero());
+    ekf_.setQ(ekf_.getQmatrixZero());
+    ekf_.setR(ekf_.getRmatrixZero());
     
 
     resetStateCovarianceMat();
@@ -402,13 +415,13 @@ namespace stateObservation
     if (resetCovariance)
     {
       Matrix stateCovariance = ekf_.getStateCovariance();
-      setBlockStateCovariance<sizeStateKine>(stateCovariance,stateKineMatricsInitCovMat_,kineIndex(),stateSize_);
+      setBlockStateCovariance<sizeStateKine>(stateCovariance,stateKinematicsInitCovMat_,kineIndex());
 
       if (resetForces)
       {
         for (MapContactIterator i = contacts_.begin(); i != contacts_.end(); ++i)
         {
-          setBlockStateCovariance<sizeContact>(stateCovariance,contactInitCovMat_,contactIndex(i->first),stateSize_);
+          setBlockStateCovariance<sizeContact>(stateCovariance,contactInitCovMat_,contactIndex(i->first));
         }
       }
       ekf_.setStateCovariance(stateCovariance);
@@ -424,7 +437,7 @@ namespace stateObservation
     if (resetCovariance)
     {
       Matrix stateCovariance = ekf_.getStateCovariance();
-      setBlockStateCovariance<sizeGyroBias>(stateCovariance,gyroBiasInitCovMat_,gyroBiasIndex(),stateSize_);
+      setBlockStateCovariance<sizeGyroBias>(stateCovariance,gyroBiasInitCovMat_,gyroBiasIndex());
       
       ekf_.setStateCovariance(stateCovariance);
     }
@@ -438,7 +451,7 @@ namespace stateObservation
     if (resetCovariance)
     {
       Matrix stateCovariance = ekf_.getStateCovariance();
-      setBlockStateCovariance<sizeWrench>(stateCovariance,unmodeledWrenchInitCovMat_,unmodeledWrenchIndex(),stateSize_);
+      setBlockStateCovariance<sizeWrench>(stateCovariance,unmodeledWrenchInitCovMat_,unmodeledWrenchIndex());
       
       ekf_.setStateCovariance(stateCovariance);
     }
@@ -800,13 +813,13 @@ namespace stateObservation
 
     /// sets the initial covariance matrix
     Matrix stateCovMat= ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeContact>(stateCovMat,initialCovarianceMatrix,contact.stateIndex,stateSize_);
+    setBlockStateCovariance<sizeContact>(stateCovMat,initialCovarianceMatrix,contact.stateIndex);
     ekf_.setStateCovariance(stateCovMat);
 
     ///Sets the process cov mat
     Matrix processCovMat= ekf_.getQ();
-    setBlockStateCovariance<sizeContact>(processCovMat,processCovarianceMatrix,contact.stateIndex,stateSize_);
-    ekf_.setQ(processCovarianceMatrix);
+    setBlockStateCovariance<sizeContact>(processCovMat,processCovarianceMatrix,contact.stateIndex);
+    ekf_.setQ(processCovMat);
 
     return contactNumber;
    
@@ -883,19 +896,19 @@ namespace stateObservation
   void KineticsObserver::setKinematicsStateCovariance(const Matrix & P_kine)
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeStateKineTangent>(P,P_kine,kineIndex(),stateSize_);
+    setBlockStateCovariance<sizeStateKineTangent>(P,P_kine,kineIndex());
     ekf_.setStateCovariance(P);
   }
 
   void KineticsObserver::setKinematicsInitCovarianceDefault(const Matrix & P_kine)
   {
-    stateKineMatricsInitCovMat_=P_kine;
+    stateKinematicsInitCovMat_=P_kine;
   }
 
   void KineticsObserver::setGyroBiasStateCovariance(const Matrix3 & covMat)
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeGyroBias>(P,covMat,gyroBiasIndex(),stateSize_);
+    setBlockStateCovariance<sizeGyroBias>(P,covMat,gyroBiasIndex());
     ekf_.setStateCovariance(P);
   }
 
@@ -907,14 +920,14 @@ namespace stateObservation
   void KineticsObserver::setGyroBiasProcessCovariance(const Matrix3 & covMat)
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeGyroBias>(P,covMat,gyroBiasIndex(),stateSize_);
+    setBlockStateCovariance<sizeGyroBias>(P,covMat,gyroBiasIndex());
     ekf_.setProcessCovariance(P);
   }
 
   void KineticsObserver::setUnmodeledWrenchStateCovMat(const Matrix6 & currentCovMat)
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeWrench>(P,currentCovMat,unmodeledWrenchIndex(),stateSize_);
+    setBlockStateCovariance<sizeWrench>(P,currentCovMat,unmodeledWrenchIndex());
     ekf_.setStateCovariance(P);
   }
 
@@ -926,14 +939,14 @@ namespace stateObservation
   void KineticsObserver::setUnmodeledWrenchProcessCovMat(const Matrix6 & processCovMat)
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeWrench>(P,processCovMat,unmodeledWrenchIndex(),stateSize_);
+    setBlockStateCovariance<sizeWrench>(P,processCovMat,unmodeledWrenchIndex());
     ekf_.setProcessCovariance(P);
   }
 
   void KineticsObserver::setContactStateCovMat(int contactNbr, const Matrix12 & contactCovMat)
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeContactTangent>(P,contactCovMat,contactIndex(contactNbr),stateSize_);
+    setBlockStateCovariance<sizeContactTangent>(P,contactCovMat,contactIndex(contactNbr));
     ekf_.setStateCovariance(P);
   }
 
@@ -945,7 +958,7 @@ namespace stateObservation
   void KineticsObserver::setContactProcessCovMat(int contactNbr, const Matrix12 & contactCovMat)
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeContactTangent>(P,contactCovMat,contactIndex(contactNbr),stateSize_);
+    setBlockStateCovariance<sizeContactTangent>(P,contactCovMat,contactIndex(contactNbr));
     ekf_.setProcessCovariance(P);
   }
 
@@ -1045,14 +1058,14 @@ namespace stateObservation
   void KineticsObserver::resetStateKinematicsCovMat()
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeContactTangent>(P,stateKineMatricsInitCovMat_,kineIndex(),stateSize_);
+    setBlockStateCovariance<sizeStateKineTangent>(P,stateKinematicsInitCovMat_,kineIndex());
     ekf_.setStateCovariance(P);
   }
 
   void KineticsObserver::resetStateGyroBiasCovMat()
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeGyroBias>(P,gyroBiasInitCovMat_,gyroBiasIndex(),stateSize_);
+    setBlockStateCovariance<sizeGyroBias>(P,gyroBiasInitCovMat_,gyroBiasIndex());
     ekf_.setStateCovariance(P);    
   }
 
@@ -1060,7 +1073,7 @@ namespace stateObservation
   void KineticsObserver::resetStateUnmodeledWrenchCovMat()
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeWrench>(P,unmodeledWrenchInitCovMat_,unmodeledForceIndex(),stateSize_);
+    setBlockStateCovariance<sizeWrench>(P,unmodeledWrenchInitCovMat_,unmodeledForceIndex());
     ekf_.setStateCovariance(P);    
   }
 
@@ -1075,7 +1088,7 @@ namespace stateObservation
   void KineticsObserver::resetStateContactCovMat_(MapContactIterator i)
   {
     Matrix P = ekf_.getStateCovariance();
-    setBlockStateCovariance<sizeContactTangent>(P,contactInitCovMat_,i->second.stateIndex,stateSize_);
+    setBlockStateCovariance<sizeContactTangent>(P,contactInitCovMat_,i->second.stateIndex);
     ekf_.setStateCovariance(P);
   }
 
@@ -1102,21 +1115,21 @@ namespace stateObservation
   void KineticsObserver::resetProcessKinematicsCovMat()
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeContactTangent>(P,stateKineMatricsProcessCovMat_,kineIndex(),stateSize_);
+    setBlockStateCovariance<sizeContactTangent>(P,stateKinematicsProcessCovMat_,kineIndex());
     ekf_.setProcessCovariance(P);
   }
 
   void KineticsObserver::resetProcessGyroBiasCovMat()
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeGyroBias>(P,gyroBiasProcessCovMat_,gyroBiasIndex(),stateSize_);
+    setBlockStateCovariance<sizeGyroBias>(P,gyroBiasProcessCovMat_,gyroBiasIndex());
     ekf_.setProcessCovariance(P);   
   }
 
   void KineticsObserver::resetProcessUnmodeledWrenchCovMat()
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeWrench>(P,unmodeledWrenchProcessCovMat_,unmodeledForceIndex(),stateSize_);
+    setBlockStateCovariance<sizeWrench>(P,unmodeledWrenchProcessCovMat_,unmodeledForceIndex());
     ekf_.setProcessCovariance(P);   
   }
 
@@ -1152,7 +1165,7 @@ namespace stateObservation
   void KineticsObserver::resetProcessContactCovMat_(MapContactIterator i)
   {
     Matrix P = ekf_.getProcessCovariance();
-    setBlockStateCovariance<sizeContactTangent>(P,contactProcessCovMat_,i->second.stateIndex,stateSize_);
+    setBlockStateCovariance<sizeContactTangent>(P,contactProcessCovMat_,i->second.stateIndex);
     ekf_.setProcessCovariance(P);
   }
 

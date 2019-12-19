@@ -438,11 +438,11 @@ protected:
         ///Gets the input size
         virtual unsigned getInputSize() const;
 
-        static void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+        static void stateSum_(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
 
-        static void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        static void stateDifference_(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
-        static void measureDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
+        static void measureDifference_(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
         /////////////////////////////////////// 
 
         ////////////////////////////
@@ -622,6 +622,8 @@ protected:
         static const double stateAngVelProcessVarianceDefault ;
         static const double gyroBiasProcessVarianceDefault ;
         static const double unmodeledWrenchProcessVarianceDefault ;
+        static const double contactPositionProcessVarianceDefault ;
+        static const double contactOrientationProcessVarianceDefault ;
         static const double contactForceProcessVarianceDefault ;
         static const double contactTorqueProcessVarianceDefault ;
         
@@ -668,10 +670,14 @@ protected:
         Matrix3 stateAngVelProcessCovMat_;
         Matrix3 gyroBiasProcessCovMat_;
         Matrix6 unmodeledWrenchProcessCovMat_;
+        Matrix3 contactPositionProcessCovMat_;
+        Matrix3 contactOrientationProcessCovMat_;
+        Matrix3 contactForceProcessCovMat_;
+        Matrix3 contactTorqueProcessCovMat_;
         Matrix12 contactProcessCovMat_;
 
-        Matrix12 stateKineMatricsInitCovMat_;
-        Matrix12 stateKineMatricsProcessCovMat_;
+        Matrix12 stateKinematicsInitCovMat_;
+        Matrix12 stateKinematicsProcessCovMat_;
 
         ///default derivation steps
         static const double defaultdx;
