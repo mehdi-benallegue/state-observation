@@ -367,9 +367,17 @@ namespace stateObservation
 
   kine::Kinematics KineticsObserver::estimateAccelerations()
   {
-    stateKinematics_.fromVector(computeAccelerations_(),
-                                Kinematics::Flags::linAcc|
-                                Kinematics::Flags::angAcc);
+    Vector3 forceLocal = additionalForce_;
+    Vector3 torqueLocal = additionalTorque_;
+
+    addContactAndUnmodeledWrench(stateVector_,forceLocal,torqueLocal);
+
+    /// The accelerations are about to be computed so we set them to "initialized"
+    stateKinematics_.linAcc.set();
+    stateKinematics_.angAcc.set();
+
+    computeAccelerations_(stateKinematics_,forceLocal,torqueLocal,
+                          stateKinematics_.linAcc(), stateKinematics_.angAcc());
 
 
     return stateKinematics_;
