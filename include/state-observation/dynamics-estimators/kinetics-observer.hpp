@@ -451,8 +451,6 @@ protected:
 
         Vector stateNaNCorrection_();
 
-        Vector6 computeAccelerations_();
-
         ///updates stateKine_ from the stateVector            
         void updateKine_();
 
