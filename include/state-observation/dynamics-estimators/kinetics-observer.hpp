@@ -420,10 +420,6 @@ protected:
         void computeContactForces( MapContactIterator i, Kinematics &stateKine, 
                                             Kinematics &contactPose , Vector3 & Force, Vector3 torque) ;
 
-
-
-        
-
         ///Sets a noise which disturbs the state dynamics
         virtual void setProcessNoise(NoiseBase *);
 
