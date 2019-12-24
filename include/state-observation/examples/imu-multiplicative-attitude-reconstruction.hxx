@@ -23,8 +23,7 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   IMUMltpctiveDynamicalSystem imuFunctor;
   imuFunctor.setSamplingPeriod(dt);
   filter.setFunctor(& imuFunctor);
-  filter.setSumFunction(imuFunctor.stateSum);
-  filter.setDifferenceFunction(imuFunctor.stateDifference);
+  filter.setStateArithmetics(& imuFunctor);
 
   ///the initalization of the estimation of the initial state
   filter.setState(xh0,y.getFirstIndex()-1);

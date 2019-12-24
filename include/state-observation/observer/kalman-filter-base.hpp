@@ -25,6 +25,7 @@
 #define KALMANFILTERBASEHPP
 
 #include <state-observation/observer/zero-delay-observer.hpp>
+#include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 
 
 namespace stateObservation
@@ -49,7 +50,8 @@ namespace stateObservation
      *
      *
      */
-    class KalmanFilterBase: public ZeroDelayObserver
+    class KalmanFilterBase: public ZeroDelayObserver,
+                            protected StateArithmetics
     {
     public:
 
@@ -281,9 +283,7 @@ namespace stateObservation
 
         ///set update functions for sum and difference for the state vector
         /// (used for the case of multiplicative Kalman filter)
-        void setSumFunction(void (* sum)(const  Vector& stateVector, const Vector& tangentVector, Vector& result));
-        void setDifferenceFunction(void (* difference)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference));
-        void setMeasurementDifferenceFunction(void (* measurementDifference)(const  Vector& measuementVector1, const Vector& measurementVector2, Vector& difference));
+        void setStateArithmetics(StateArithmetics * arith);
 
     protected:
 
@@ -345,9 +345,8 @@ namespace stateObservation
             Matrix t;
         } oc_;
 
-        void (* sum_)(const  Vector& stateVector, const Vector& tangentVector, Vector& result);
-        void (* difference_)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
-        void (* measurementDifference_)(const  Vector& measurementVector1, const Vector& measurementVector2, Vector& difference);
+        StateArithmetics * arithm_;
+
     public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };

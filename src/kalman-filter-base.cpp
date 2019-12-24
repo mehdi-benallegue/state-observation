@@ -14,8 +14,7 @@ namespace stateObservation
 
     KalmanFilterBase::KalmanFilterBase():
       nt_(0),
-      sum_(detail::defaultSum),
-      difference_(detail::defaultDifference)
+      arithm_(this)
     {
     }
 
@@ -23,9 +22,7 @@ namespace stateObservation
             :ZeroDelayObserver(n,m,p),
             nt_(n),
             mt_(m),
-            sum_(detail::defaultSum),
-            difference_(detail::defaultDifference),
-            measurementDifference_(detail::defaultDifference)
+            arithm_(this)
     {
     }
 
@@ -33,9 +30,7 @@ namespace stateObservation
             :ZeroDelayObserver(n,m,p),
             nt_(nt),
             mt_(mt),
-            sum_(detail::defaultSum),
-            difference_(detail::defaultDifference),
-            measurementDifference_(detail::defaultDifference)
+            arithm_(this)
     {
     }
 
@@ -133,7 +128,7 @@ namespace stateObservation
 
 
         //innovation Measurements
-        measurementDifference_(this->y_[k+1], ybar_(),oc_.inoMeas);
+        arithm_->measurementDifference(this->y_[k+1], ybar_(),oc_.inoMeas);
         oc_.inoMeasCov.noalias() = r_ +  c_ * (oc_.pbar * c_.transpose());
 
         unsigned &  measurementTangentSize =mt_;
@@ -150,7 +145,7 @@ namespace stateObservation
 
         //update
 
-        sum_(xbar_(),innovation_,oc_.xhat);
+        arithm_->stateSum(xbar_(),innovation_,oc_.xhat);
 
 #ifdef VERBOUS_KALMANFILTER
         Eigen::IOFormat CleanFmt(2, 0, " ", "\n", "", "");
@@ -384,15 +379,9 @@ namespace stateObservation
     }
 
 
-    void KalmanFilterBase::setSumFunction(void (* sum )(const  Vector& stateVector, const Vector& tangentVector, Vector& result))
+    void KalmanFilterBase::setStateArithmetics(StateArithmetics * a)
     {
-      sum_ = sum;
+        arithm_ = a;
     }
-
-    void KalmanFilterBase::setDifferenceFunction(void (* difference )(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference))
-    {
-      difference_= difference;
-    }
-
 
 }
