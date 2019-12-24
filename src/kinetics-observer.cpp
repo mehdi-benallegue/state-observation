@@ -1319,6 +1319,99 @@ namespace stateObservation
 
   }
 
+  void KineticsObserver::stateSum(const Vector& stateVector, const Vector & tangentVector, Vector & sum)
+  {
+    Orientation & o = opt_.ori;
+    sum = stateVector;
+    /// use the exponential map integration to perform the sum of the states
+    sum.segment<sizePos>(posIndex())+=tangentVector.segment<sizePos>(posIndexTangent());
+    o.fromVector(stateVector.segment<sizeOri>(oriIndex()));
+    o.integrate(tangentVector.segment<sizeOriTangent>(oriIndexTangent()));
+    sum.segment<sizeOri>(oriIndex())=o.toVector();
+    ///
+    sum.segment<sizeLinVel+sizeAngVel>(linVelIndex()) += tangentVector.segment<sizeLinVel+sizeAngVel>(linVelIndexTangent());
+    if (withGyroBias_)
+    {
+      sum.segment<sizeGyroBias>(gyroBiasIndex())+=tangentVector.segment<sizeGyroBias>(gyroBiasIndexTangent());
+    }
+    if (withUnmodeledWrench_)
+    {
+      sum.segment<sizeWrench>(unmodeledWrenchIndex())+=tangentVector.segment<sizeWrench>(unmodeledWrenchIndexTangent());
+    }
+
+    for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i)
+    {
+      sum.segment<sizePos>(contactPosIndex(i))+=tangentVector.segment<sizePos>(contactPosIndexTangent(i));
+      o.fromVector(stateVector.segment<sizeOri>(contactOriIndex(i)));
+      o.integrate(tangentVector.segment<sizeOriTangent>(contactOriIndexTangent(i)));
+      sum.segment<sizeOri>(contactOriIndexTangent(i)) = o.toVector();
+      sum.segment<sizeWrench>(contactWrenchIndex(i)) += tangentVector.segment<sizeWrench>(contactWrenchIndexTangent(i));
+    }   
+  }
+
+  void KineticsObserver::stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference)
+  {
+    Orientation & o1 = opt_.ori1;
+    Orientation & o2 = opt_.ori2;
+    difference.resize(stateTangentSize_);
+    difference.segment<sizePos>(posIndexTangent()).noalias() = 
+                        stateVector1.segment<sizePos>(posIndex()) - stateVector2.segment<sizePos>(posIndex());
+    o1.fromVector(stateVector1.segment<sizeOri>(oriIndex()));
+    o2.fromVector(stateVector2.segment<sizeOri>(oriIndex()));
+    difference.segment<sizeOriTangent>(oriIndexTangent()) = o2.differentiate(o1);
+    difference.segment<sizeLinVel+sizeAngVel>(linVelIndexTangent()).noalias() = 
+                        stateVector1.segment<sizeLinVel+sizeAngVel>(linVelIndex()) -stateVector2.segment<sizeLinVel+sizeAngVel>(linVelIndex());
+    if (withGyroBias_)
+    {
+      difference.segment<sizeGyroBias>(gyroBiasIndexTangent()).noalias() = 
+                        stateVector1.segment<sizeGyroBias>(gyroBiasIndex()) - stateVector2.segment<sizeGyroBias>(gyroBiasIndex());
+    }
+    if (withUnmodeledWrench_)
+    {
+      difference.segment<sizeWrench>(unmodeledForceIndexTangent()).noalias() =
+                        stateVector1.segment<sizeWrench>(unmodeledWrenchIndex()) - stateVector2.segment<sizeWrench>(unmodeledWrenchIndex());
+    }
+
+    for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i)
+    {
+      difference.segment<sizePos>(contactPosIndexTangent(i)).noalias() = 
+                        stateVector1.segment<sizePos>(contactPosIndex(i)) - stateVector2.segment<sizePos>(contactPosIndex(i));
+      o1.fromVector(stateVector1.segment<sizeOri>(contactOriIndex(i)));
+      o2.fromVector(stateVector1.segment<sizeOri>(contactOriIndex(i)));
+      difference.segment<sizeOriTangent>(contactOriIndexTangent(i))= o2.differentiate(o1);
+      difference.segment<sizeWrench>(contactWrenchIndexTangent(i)).noalias() = 
+                        stateVector1.segment<sizeWrench>(contactWrenchIndex(i)) - stateVector2.segment<sizeWrench>(contactWrenchIndex(i));
+    }    
+  }
+
+  void KineticsObserver::measurementDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference)
+  {
+      Orientation & o1 = opt_.ori1;
+      Orientation & o2 = opt_.ori2;
+      difference.resize(measurementTangentSize_); 
+
+      int currentMeasurementSize =sizeIMUSignal*int(imuSensors_.size()) + sizeWrench*Contact::numberOfRealSensors;
+      
+      difference.segment(0,currentMeasurementSize).noalias() =
+          measureVector1.segment(0,currentMeasurementSize) -
+            measureVector2.segment(0,currentMeasurementSize);
+
+      if (absPoseSensor_.time == k_data)
+      {
+
+        difference.segment<sizePos>(currentMeasurementSize).noalias() =
+          measureVector1.segment<sizePos>(currentMeasurementSize) - measureVector2.segment<sizePos>(currentMeasurementSize);
+
+        currentMeasurementSize += sizePos;
+
+        o1.fromVector(measureVector1.segment<sizeOri>(currentMeasurementSize));
+        o2.fromVector(measureVector2.segment<sizeOri>(currentMeasurementSize));
+        difference.segment<sizeOriTangent>(currentMeasurementSize) = o2.differentiate(o1);
+      }
+  }
+
+
+
   Vector KineticsObserver::stateDynamics(const Vector &xInput, const Vector &/*unused*/ , TimeIndex)
   {
     Vector x = xInput;

@@ -40,7 +40,8 @@ namespace stateObservation
     */
 
     class KineticsObserver: 
-        protected DynamicalSystemFunctorBase
+        protected DynamicalSystemFunctorBase,
+        protected StateArithmetics
     {
     public:
         typedef kine::Kinematics Kinematics;
@@ -457,11 +458,13 @@ protected:
         ///Gets the input size
         virtual unsigned getInputSize() const;
 
-        static void stateSum_(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+public:
 
-        static void stateDifference_(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        virtual void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
 
-        static void measureDifference_(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
+        virtual void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+
+        virtual void measurementDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
         /////////////////////////////////////// 
 
         ////////////////////////////
@@ -709,6 +712,24 @@ protected:
 
         ///default derivation steps
         static const double defaultdx;
+
+
+        /// a structure to optimize computations
+        struct Opt
+        {
+            Opt():
+                kine(kine1),
+                ori(kine.orientation),
+                ori1(kine1.orientation),
+                ori2(kine2.orientation)
+            {}
+
+            Kinematics kine1, kine2;
+            Kinematics & kine;
+            Orientation & ori;
+            Orientation & ori1;
+            Orientation & ori2;
+        } opt_;
 
     };
 
