@@ -276,6 +276,9 @@ namespace stateObservation
 
       inline Orientation & setValue(const Quaternion& q, const Matrix3& m);
 
+      inline Orientation & fromVector(const Vector4 & v);
+      inline Vector4 toVector() const;
+
       inline operator Matrix3();
 
       inline operator Quaternion();
@@ -339,6 +342,13 @@ namespace stateObservation
 
       inline bool isMatrixSet() const;
       inline bool isQuaternionSet() const;
+
+      /// switch the state of the Matrix or quaternion to set or not
+      /// this can be used for forward initialization
+      inline void setMatrix(bool b = true);
+      inline void setQuaternion(bool b = true);
+
+      ///no checks are performed for these functionsm use with caution
 
       inline CheckedMatrix3 & getMatrixRefUnsafe();
       inline CheckedQuaternion & getQuaternionRefUnsafe();
