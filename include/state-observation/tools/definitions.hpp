@@ -470,8 +470,7 @@ namespace stateObservation
     Vector stringToVector(const std::string& str);
   }
 
-
 #include <state-observation/tools/definitions.hxx>
-}
+} //namespace stateObservation
 
 #endif //STATEOBSERVATIONDEFINITIONSHPP
