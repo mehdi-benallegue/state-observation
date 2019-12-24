@@ -30,7 +30,9 @@ namespace stateObservation
     *
     *
     */
-    class IMUMltpctiveDynamicalSystem : public DynamicalSystemFunctorBase
+    class IMUMltpctiveDynamicalSystem :
+      public DynamicalSystemFunctorBase,
+      public StateArithmetics
     {
     public:
         ///The constructor
@@ -74,9 +76,9 @@ namespace stateObservation
         ///Gets the measurement size
         virtual unsigned getMeasurementSize() const;
 
-        static void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+        void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
 
-        static void stateDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        void stateDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
     protected:
         static const unsigned stateSize_=19;

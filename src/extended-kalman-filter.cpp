@@ -177,12 +177,12 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
             opt.dx_.setZero();
             opt.dx_[i]=dx[i];
 
-            sum_(this->x_(),opt.dx_,opt.x_);
+            arithm_->stateSum(this->x_(),opt.dx_,opt.x_);
 
 
             opt.xp_=f_->stateDynamics(opt.x_,opt.u_,k);
 
-            difference_(opt.xp_,xbar_(),opt.dx_);
+            arithm_->stateDifference(opt.xp_,xbar_(),opt.dx_);
 
             opt.dx_/=dx[i];
 
@@ -210,7 +210,7 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
             opt.dx_.setZero();
             opt.dx_[i]=dx[i];
 
-            sum_(xbar_(),opt.dx_,opt.xp_);
+            arithm_->stateSum(xbar_(),opt.dx_,opt.xp_);
 
             opt.yp_=simulateSensor_(opt.xp_, k+1);
 
