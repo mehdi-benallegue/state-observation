@@ -133,7 +133,26 @@ namespace stateObservation
         inline unsigned contactOriIndex(int contactNbr) const;
         inline unsigned contactForceIndex(int contactNbr) const;
         inline unsigned contactTorqueIndex(int contactNbr) const;
-        inline unsigned contactWrenchIndex(int contactNbr) const;        
+        inline unsigned contactWrenchIndex(int contactNbr) const;
+
+        /// Getters for the indexes of the state Vector
+        inline unsigned kineIndexTangent() const;
+        inline unsigned posIndexTangent() const;
+        inline unsigned oriIndexTangent() const;
+        inline unsigned linVelIndexTangent() const;
+        inline unsigned angVelIndexTangent() const;
+        inline unsigned gyroBiasIndexTangent() const;
+        inline unsigned unmodeledWrenchIndexTangent() const;
+        inline unsigned unmodeledForceIndexTangent() const;
+        inline unsigned unmodeledTorqueIndexTangent() const;
+        inline unsigned contactsIndexTangent() const;
+        inline unsigned contactIndexTangent(int contactNbr) const;
+        inline unsigned contactKineIndexTangent(int contactNbr) const;
+        inline unsigned contactPosIndexTangent(int contactNbr) const;
+        inline unsigned contactOriIndexTangent(int contactNbr) const;
+        inline unsigned contactForceIndexTangent(int contactNbr) const;
+        inline unsigned contactTorqueIndexTangent(int contactNbr) const;
+        inline unsigned contactWrenchIndexTangent(int contactNbr) const;          
         
       
 
@@ -523,7 +542,16 @@ protected:
         inline unsigned contactOriIndex(MapContactConstIterator i) const;
         inline unsigned contactForceIndex(MapContactConstIterator i) const;
         inline unsigned contactTorqueIndex(MapContactConstIterator i) const;
-        inline unsigned contactWrenchIndex(MapContactConstIterator i) const;   
+        inline unsigned contactWrenchIndex(MapContactConstIterator i) const; 
+
+        /// Getters for the indexes of the state Vector using private types
+        inline unsigned contactIndexTangent(MapContactConstIterator i) const;
+        inline unsigned contactKineIndexTangent(MapContactConstIterator i) const;
+        inline unsigned contactPosIndexTangent(MapContactConstIterator i) const;
+        inline unsigned contactOriIndexTangent(MapContactConstIterator i) const;
+        inline unsigned contactForceIndexTangent(MapContactConstIterator i) const;
+        inline unsigned contactTorqueIndexTangent(MapContactConstIterator i) const;
+        inline unsigned contactWrenchIndexTangent(MapContactConstIterator i) const;  
 
 
     private:
