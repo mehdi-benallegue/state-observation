@@ -317,8 +317,7 @@ namespace stateObservation
         /// \li Q process noise
         void setProcessNoiseCovariance(const Matrix & Q);
 
-        ///gets the measurement size and vector
-        size_t getMeasurementSize();
+        ///gets the measurement vector
         Vector getMeasurementVector();
 
         /// Gets a const reference on the extended Kalman filter
@@ -382,7 +381,8 @@ namespace stateObservation
         struct Contact:
         public Sensor
         {
-            Contact():Sensor(sizeWrench),withRealSensor(false),stateIndex(-1){}
+            Contact():Sensor(sizeWrench),withRealSensor(false),
+                        stateIndex(-1),stateIndexTangent(-1){}
             virtual ~Contact(){}
             Kinematics localKine;
             Kinematics absPose;
@@ -396,6 +396,7 @@ namespace stateObservation
 
             bool withRealSensor;
             int stateIndex;
+            int stateIndexTangent;
 
             static int numberOfRealSensors;
 
@@ -471,6 +472,7 @@ public:
         virtual void setFiniteDifferenceStep(const Vector & dx);
         virtual void useFiniteDifferencesJacobians(bool b=true);
 
+protected:
         Vector stateNaNCorrection_();
 
         ///updates stateKine_ from the stateVector            
@@ -485,11 +487,12 @@ protected:
         MapIMU imuSensors_;
         MapContact contacts_;
 
-        int maxContacts_;
+        unsigned maxContacts_;
 
         int stateSize_; 
         int stateTangentSize_;
-        int measurementSize_; 
+        int measurementSize_;
+        int measurementTangentSize_;
 
         Kinematics stateKinematics_;
 
@@ -588,10 +591,6 @@ protected:
                                               sizeGyroBias+
                                               sizeForce+
                                               sizeTorque;
-        static const unsigned sizeStatePerContact = sizePos+
-                                                    sizeOri+
-                                                    sizeForce+
-                                                    sizeTorque;
         static const unsigned sizeStateKineTangent =sizePos+
                                                     sizeOriTangent+
                                                     sizeLinVel+
@@ -600,10 +599,6 @@ protected:
                                                     sizeGyroBias+
                                                     sizeForce+
                                                     sizeTorque;
-        static const unsigned sizeStateTangentPerContact = sizePos+
-                                                        sizeOriTangent+
-                                                        sizeForce+
-                                                        sizeTorque;
 
         static const unsigned sizePose = sizePos+
                                         sizeOri;
