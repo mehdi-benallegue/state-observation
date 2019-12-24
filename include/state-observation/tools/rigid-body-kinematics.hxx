@@ -662,6 +662,16 @@ namespace stateObservation
       return *this;
     }
 
+    inline Orientation & Orientation::fromVector(const Vector4 & v)
+    {
+      return (*this) = Quaternion(v);
+    }
+
+    inline Vector4 Orientation::toVector() const
+    {
+      return q_().coeffs();
+    }
+
     inline Orientation::operator Matrix3()
     {
       return getMatrixRef();
@@ -912,6 +922,16 @@ namespace stateObservation
       return ( q_.isSet());
     }
 
+    inline void Orientation::setMatrix(bool b)
+    {
+      m_.set(b);
+    }
+
+    inline void Orientation::setQuaternion(bool b)
+    {
+      q_.set(b);
+    }
+
 
     inline Vector3 Orientation::operator*( const Vector3& v)
     {
@@ -1083,7 +1103,7 @@ namespace stateObservation
         BOOST_ASSERT (v.size()>index+4 && "The kinematics vector size is incorrect (loading orientaTion)");
         if (v.size()>index+4)
         {
-          orientation = Quaternion(v.segment<4>(index));
+          orientation.fromVector(v.segment<4>(index));
           index+=4;
         }       
       }
@@ -1541,7 +1561,7 @@ namespace stateObservation
       }
       if ((flags & Flags::orientation))
       {
-        output.segment<4>(curIndex)=Quaternion(orientation).coeffs();
+        output.segment<4>(curIndex)= orientation.toVector();
         curIndex+=4;
       }
       if ((flags & Flags::linVel))
