@@ -884,7 +884,7 @@ namespace stateObservation
     inline Vector3 Orientation::differentiate(Orientation R_k1) const
     {
       check_();
-      return (Orientation(inverse(),R_k1)).toRotationVector();
+      return (Orientation(R_k1,inverse())).toRotationVector();
     }
 
     inline bool Orientation::isSet() const
