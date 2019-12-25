@@ -278,6 +278,7 @@ namespace stateObservation
 
       inline Orientation & fromVector(const Vector4 & v);
       inline Vector4 toVector() const;
+      inline Vector4 toVector();
 
       inline operator Matrix3();
 
