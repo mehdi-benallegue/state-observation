@@ -32,8 +32,11 @@ namespace stateObservation
         /// Virtual destructor
         virtual ~NoiseBase(){}
 
-        /// The method to overload to add a noise to a given vector
-        virtual Vector addNoise(const Vector &)=0;
+        /// The method to overload to produce the noisy version of a given vector
+        virtual Vector getNoisy( const Vector &)=0;
+
+        /// Actually adds the noise to a given vector
+        virtual Vector addNoise(Vector & v) { return v=getNoisy(v); }
 
 
     protected:

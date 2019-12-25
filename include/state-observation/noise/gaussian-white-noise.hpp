@@ -38,9 +38,10 @@ namespace stateObservation
         ///The default constructor
         GaussianWhiteNoise();
 
-        ///Adds the noise to a given vector it is only an addition of a given vector
+
+        ///get the noisy version of a given vector it is only an addition of a given vector
         ///and a gaussian white noise
-        virtual Vector addNoise(const Vector &);
+        virtual Vector getNoisy(const Vector &);
 
         ///Sets the standard deviation of the Gaussian white noise.
         /// The covariance matrix is then std*std.transpose()

@@ -80,7 +80,7 @@ namespace stateObservation
             storedNoiselessMeasurement_=true;
         }
 
-        return noise_->addNoise( noiselessMeasurement_);
+        return noise_->getNoisy( noiselessMeasurement_);
     }
 
 

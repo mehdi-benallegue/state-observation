@@ -22,7 +22,7 @@ namespace stateObservation
     {
     }
 
-    Vector GaussianWhiteNoise::addNoise(const Vector & v)
+    Vector GaussianWhiteNoise::getNoisy(const Vector & v)
     {
         checkVector_(v);
 
