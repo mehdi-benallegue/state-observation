@@ -1453,7 +1453,7 @@ namespace stateObservation
 
     if (processNoise_!=0x0)
     {
-      processNoise_->addNoise(x);
+      processNoise_->getNoisy(x);
     }
 
     return x;    
@@ -1495,7 +1495,7 @@ namespace stateObservation
 
     if (measurementNoise_ != 0x0)
     {
-      measurementNoise_->addNoise(y);
+      measurementNoise_->getNoisy(y);
     }
 
     return y;

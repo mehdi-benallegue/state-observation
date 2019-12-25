@@ -34,11 +34,7 @@ namespace stateObservation
 
         /// The method to overload to produce the noisy version of a given vector
         virtual Vector getNoisy( const Vector &)=0;
-
-        /// Actually adds the noise to a given vector
-        virtual Vector addNoise(Vector & v) { return v=getNoisy(v); }
-
-
+       
     protected:
 
     };
