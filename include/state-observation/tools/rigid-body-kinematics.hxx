@@ -669,8 +669,14 @@ namespace stateObservation
 
     inline Vector4 Orientation::toVector() const
     {
-      return q_().coeffs();
+      return quaternion().coeffs();
     }
+
+    inline Vector4 Orientation::toVector()
+    {
+      return quaternion().coeffs();
+    }
+
 
     inline Orientation::operator Matrix3()
     {
