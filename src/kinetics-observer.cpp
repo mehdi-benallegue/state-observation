@@ -1271,7 +1271,7 @@ namespace stateObservation
   void  KineticsObserver::computeAccelerations_(Kinematics & stateKine, const Vector3& totalForceLocal,
                                 const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc)
   {
-    Matrix3 Rt =  stateKine.orientation.getMatrixRef().inverse();
+    Matrix3 Rt =  stateKine.orientation.matrix3().inverse();
     Vector3 Rtw = Rt * stateKine.angVel();
     Vector3 corioCentri = 2* Rtw.cross(comd_()+Rtw.cross(com_()));
   
@@ -1470,7 +1470,7 @@ namespace stateObservation
     {
       const IMU & imu= i->second;
       localKine = stateKine * imu.kinematics;
-      localKine.orientation.getMatrixRef();
+      localKine.orientation.matrix3();
       ///accelerometer
       y.segment<sizeAcceleroSignal>(imu.measIndex)  
             = localKine.orientation.getMatrixRefUnsafe()().transpose()  * (localKine.linAcc() + cst::gravity);

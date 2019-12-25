@@ -674,12 +674,12 @@ namespace stateObservation
 
     inline Orientation::operator Matrix3()
     {
-      return getMatrixRef();
+      return matrix3();
     }
 
     inline Orientation::operator Quaternion()
     {
-      return getQuaternionRef();
+      return quaternion();
     }
 
     inline Orientation::operator Matrix3() const
@@ -760,7 +760,7 @@ namespace stateObservation
       }
     }
 
-    inline const Matrix3& Orientation::getMatrixRef()
+    inline const Matrix3& Orientation::matrix3()
     {
       check_();
       if (!isMatrixSet())
@@ -770,7 +770,7 @@ namespace stateObservation
       return m_;
     }
 
-    inline const Quaternion& Orientation::getQuaternionRef()
+    inline const Quaternion& Orientation::quaternion()
     {
       check_();
       if (!isQuaternionSet() )
@@ -780,13 +780,13 @@ namespace stateObservation
       return q_;
     }
 
-    inline const Matrix3& Orientation::getMatrixRef() const
+    inline const Matrix3& Orientation::matrix3() const
     {
       BOOST_ASSERT (isMatrixSet() && "The matrix is not set");
       return m_;
     }
 
-    inline const Quaternion& Orientation::getQuaternionRef() const
+    inline const Quaternion& Orientation::quaternion() const
     {
       BOOST_ASSERT (isQuaternionSet() && "The quaternion is not set");
       return q_;

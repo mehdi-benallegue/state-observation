@@ -293,11 +293,11 @@ namespace stateObservation
       inline AngleAxis toAngleAxis() const;
 
       ///get a const reference on the matrix or the quaternion 
-      inline const Matrix3& getMatrixRef();
-      inline const Quaternion& getQuaternionRef();
+      inline const Matrix3& matrix3();
+      inline const Quaternion& quaternion();
 
-      inline const Matrix3& getMatrixRef() const;
-      inline const Quaternion& getQuaternionRef() const;
+      inline const Matrix3& matrix3() const;
+      inline const Quaternion& quaternion() const;
 
       ///Multiply the rotation (orientation) by another rotation R2
       ///the non const versions allow to use more optimized methods
