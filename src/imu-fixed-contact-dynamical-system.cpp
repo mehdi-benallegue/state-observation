@@ -57,7 +57,7 @@ namespace flexibilityEstimation
         xk1.segment(indexes::angVel,3) = angularVelocityFlex;
 
         if (processNoise_!=0x0)
-            return processNoise_->addNoise(xk1);
+            return processNoise_->getNoisy(xk1);
         else
             return xk1;
     }

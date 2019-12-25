@@ -889,7 +889,7 @@ namespace stateObservation
       }
 
       if (processNoise_!=0x0)
-        return processNoise_->addNoise(op_.xk1);
+        return processNoise_->getNoisy(op_.xk1);
       else
         return xk1_;
     }
