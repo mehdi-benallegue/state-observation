@@ -5,8 +5,8 @@ CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem():
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-CheckedItem<T,lazy,alwaysCheck,assertion, eigenAlignedNew>::CheckedItem(const T&):
-  IsSet(true)
+CheckedItem<T,lazy,alwaysCheck,assertion, eigenAlignedNew>::CheckedItem(const T& v):
+  IsSet(true), v_(v)
 {
 }
 
