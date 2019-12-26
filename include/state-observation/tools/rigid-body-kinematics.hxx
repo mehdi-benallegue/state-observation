@@ -667,12 +667,12 @@ namespace stateObservation
       return (*this) = Quaternion(v);
     }
 
-    inline Vector4 Orientation::toVector() const
+    inline Vector4 Orientation::toVector4() const
     {
       return quaternion().coeffs();
     }
 
-    inline Vector4 Orientation::toVector()
+    inline Vector4 Orientation::toVector4()
     {
       return quaternion().coeffs();
     }
@@ -1567,7 +1567,7 @@ namespace stateObservation
       }
       if ((flags & Flags::orientation))
       {
-        output.segment<4>(curIndex)= orientation.toVector();
+        output.segment<4>(curIndex)= orientation.toVector4();
         curIndex+=4;
       }
       if ((flags & Flags::linVel))
