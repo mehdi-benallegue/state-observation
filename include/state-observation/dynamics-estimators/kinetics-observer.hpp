@@ -19,7 +19,6 @@
 
 #include <state-observation/tools/definitions.hpp>
 #include <state-observation/observer/extended-kalman-filter.hpp>
-#include <state-observation/flexibility-estimation/flexibility-estimator-base.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 #include <state-observation/tools/state-vector-arithmetics.hpp>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
