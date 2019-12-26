@@ -74,23 +74,6 @@ namespace stateObservation
     private:
     };
 
-    /**
-     * \class  StateArithmetics
-     * \brief
-     *        This class is used to customize the way the difference between measurements,
-     *        the state update function and the differentiation are performed. 
-     *         default is the usual natual arithmetics. overload any ohter one
-     *
-     */
-    class StateArithmetics
-    {
-    public:
-        virtual void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
-
-        virtual void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
-
-        virtual void measurementDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
-    };
 }
 
 #endif // STATEOBSERVERDYNAMICSYSTEMFUNCTORBASE_H

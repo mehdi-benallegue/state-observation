@@ -379,7 +379,7 @@ namespace stateObservation
     }
 
 
-    void KalmanFilterBase::setStateArithmetics(StateArithmetics * a)
+    void KalmanFilterBase::setStateArithmetics(StateVectorArithmetics * a)
     {
         arithm_ = a;
     }

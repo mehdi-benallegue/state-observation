@@ -14,6 +14,7 @@
 #define IMU_MULTIPLICATIVE_DYNAMICAL_SYSTEM_HPP
 
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
+#include <state-observation/tools/state-vector-arithmetics.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
 #include <state-observation/noise/noise-base.hpp>
@@ -32,7 +33,7 @@ namespace stateObservation
     */
     class IMUMltpctiveDynamicalSystem :
       public DynamicalSystemFunctorBase,
-      public StateArithmetics
+      public StateVectorArithmetics
     {
     public:
         ///The constructor
