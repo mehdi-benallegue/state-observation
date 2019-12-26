@@ -265,7 +265,7 @@ namespace stateObservation
       Orientation(Orientation & multiplier1, const Orientation & multiplier2 );
       Orientation(const Orientation & multiplier1, Orientation & multiplier2 );
       Orientation(Orientation & multiplier1, Orientation & multiplier2 );
-      
+
       inline Orientation & operator=(const Vector3& v);
 
       inline Orientation & operator=(const Quaternion& q);
@@ -277,8 +277,18 @@ namespace stateObservation
       inline Orientation & setValue(const Quaternion& q, const Matrix3& m);
 
       inline Orientation & fromVector4(const Vector4 & v);
-      inline Vector4 toVector() const;
-      inline Vector4 toVector();
+
+
+      ///get a const reference on the matrix or the quaternion 
+      inline const Matrix3& matrix3();
+      inline const Quaternion& quaternion();
+
+      inline const Matrix3& matrix3() const;
+      inline const Quaternion& quaternion() const;
+
+
+      inline Vector4 toVector4() const;
+      inline Vector4 toVector4();
 
       inline operator Matrix3();
 
@@ -293,12 +303,6 @@ namespace stateObservation
       inline Vector3 toRollPitchYaw() ;
       inline AngleAxis toAngleAxis() const;
 
-      ///get a const reference on the matrix or the quaternion 
-      inline const Matrix3& matrix3();
-      inline const Quaternion& quaternion();
-
-      inline const Matrix3& matrix3() const;
-      inline const Quaternion& quaternion() const;
 
       ///Multiply the rotation (orientation) by another rotation R2
       ///the non const versions allow to use more optimized methods
