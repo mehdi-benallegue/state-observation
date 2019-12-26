@@ -1313,7 +1313,7 @@ namespace stateObservation
     sum.segment<sizePos>(posIndex())+=tangentVector.segment<sizePos>(posIndexTangent());
     o.fromVector4(stateVector.segment<sizeOri>(oriIndex()));
     o.integrate(tangentVector.segment<sizeOriTangent>(oriIndexTangent()));
-    sum.segment<sizeOri>(oriIndex())=o.toVector();
+    sum.segment<sizeOri>(oriIndex())=o.toVector4();
     ///
     sum.segment<sizeLinVel+sizeAngVel>(linVelIndex()) += tangentVector.segment<sizeLinVel+sizeAngVel>(linVelIndexTangent());
     if (withGyroBias_)
@@ -1330,7 +1330,7 @@ namespace stateObservation
       sum.segment<sizePos>(contactPosIndex(i))+=tangentVector.segment<sizePos>(contactPosIndexTangent(i));
       o.fromVector4(stateVector.segment<sizeOri>(contactOriIndex(i)));
       o.integrate(tangentVector.segment<sizeOriTangent>(contactOriIndexTangent(i)));
-      sum.segment<sizeOri>(contactOriIndexTangent(i)) = o.toVector();
+      sum.segment<sizeOri>(contactOriIndexTangent(i)) = o.toVector4();
       sum.segment<sizeWrench>(contactWrenchIndex(i)) += tangentVector.segment<sizeWrench>(contactWrenchIndexTangent(i));
     }   
   }

@@ -45,7 +45,7 @@ int main()
         ori1 = q;
         Matrix3 M1 = ori1;
 
-        err +=  (Quaternion(ori1.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
+        err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                  + (M1 - M).norm();
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -54,7 +54,7 @@ int main()
         kine::Orientation ori2;
         ori2 = M;
         
-        err +=  (Quaternion(ori2.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
+        err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
                 + (ori2.matrix3() - M).norm();
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -63,7 +63,7 @@ int main()
         kine::Orientation ori3;
         ori3 = aa;
 
-        err +=   (Quaternion(ori3.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
+        err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
                  + (ori3.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -72,7 +72,7 @@ int main()
         kine::Orientation ori4;
         ori4 = Vector3(aa.angle()*aa.axis());
 
-        err +=  (Quaternion(ori4.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                 + (ori4.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -82,7 +82,7 @@ int main()
         kine::Orientation ori1(q);
         Matrix3 M1 = ori1;
 
-        err +=  (Quaternion(ori1.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
+        err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                  + (M1 - M).norm();
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -90,7 +90,7 @@ int main()
     {
         kine::Orientation ori2(M);
         
-        err +=  (Quaternion(ori2.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
+        err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
                 + (ori2.matrix3() - M).norm();
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -98,7 +98,7 @@ int main()
     {
         kine::Orientation ori3(aa);
 
-        err +=   (Quaternion(ori3.toVector()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
+        err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
                  + (ori3.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -106,7 +106,7 @@ int main()
     {
         kine::Orientation ori4(Vector3(aa.angle()*aa.axis()));
 
-        err +=  (Quaternion(ori4.toVector()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -114,7 +114,7 @@ int main()
     {
         kine::Orientation ori4(q,M);
 
-        err +=  (Quaternion(ori4.toVector()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -129,7 +129,7 @@ int main()
         kine::Orientation ori4(q2);
         ori4 = M;
 
-        err +=  (Quaternion(ori4.toVector()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -144,7 +144,7 @@ int main()
         kine::Orientation ori4(q2.toRotationMatrix());
         ori4 = q;
 
-        err +=  (Quaternion(ori4.toVector()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -159,7 +159,7 @@ int main()
 
         Matrix3 M3 = ori1;
 
-        err +=  (Quaternion(ori3.toVector()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - M).norm()  
                  + (M3 - M).norm();
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
@@ -216,7 +216,7 @@ int main()
  
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
-        err +=  (Quaternion(ori3.toVector()).toRotationMatrix() - Matrix3::Identity()).norm();
+        err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
