@@ -27,7 +27,7 @@ namespace stateObservation
 
             ///gets White Gaussian Noise
             ///having a given bias and standard deviation(std)
-            static Matrix getWGNoise( const Matrix & std, const Matrix & bias,
+            static Matrix getGaussianRandomVariable( const Matrix & std, const Matrix & bias,
                 unsigned rows, unsigned cols=1);
 
         protected:
