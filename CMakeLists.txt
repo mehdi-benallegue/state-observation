@@ -63,6 +63,7 @@ SET(${PROJECT_NAME}_HEADERS
   include/state-observation/tools/rigid-body-kinematics.hxx
   include/state-observation/tools/logger.hpp
   include/state-observation/tools/logger.hxx
+  include/state-observation/tools/state-vector-arithmetics.hpp
   include/state-observation/dynamical-system/dynamical-system-functor-base.hpp
   include/state-observation/dynamical-system/dynamical-system-simulator.hpp
   include/state-observation/dynamical-system/imu-dynamical-system.hpp

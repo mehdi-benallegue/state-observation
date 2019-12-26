@@ -50,6 +50,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   magnetic-field.cpp
   definitions.cpp
   logger.cpp
+  state-vector-arithmetics.cpp
   accelerometer-gyrometer.cpp
   accelerometer-gyrometer-magnetometer.cpp
   probability-law-simulation.cpp

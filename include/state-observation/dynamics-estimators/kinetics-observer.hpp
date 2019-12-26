@@ -21,6 +21,7 @@
 #include <state-observation/observer/extended-kalman-filter.hpp>
 #include <state-observation/flexibility-estimation/flexibility-estimator-base.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
+#include <state-observation/tools/state-vector-arithmetics.hpp>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
 #include <state-observation/noise/noise-base.hpp>
@@ -41,7 +42,7 @@ namespace stateObservation
 
     class KineticsObserver: 
         protected DynamicalSystemFunctorBase,
-        protected StateArithmetics
+        protected StateVectorArithmetics
     {
     public:
         typedef kine::Kinematics Kinematics;
