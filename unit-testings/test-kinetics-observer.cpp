@@ -1,34 +1,21 @@
 #include <iostream>
 
 #include <state-observation/dynamics-estimators/kinetics-observer.hpp>
-#include <state-observation/noise/gaussian-white-noise.hpp>
+#include <state-observation/tools/probability-law-simulation.hpp>
 
 using namespace stateObservation;
-int main()
-{
-    KineticsObserver o(7);
 
-    
-    std::cout << o.getStateSize()<<std::endl;
-    
-    Vector x0(o.getStateSize());
-    x0.setZero();
-    Vector xf(x0);
-    Vector xs(x0);
-
-    GaussianWhiteNoise random4(4);
+int testOrientation(int errcode)
+{   
 
     
 
-
-
-
+    
     
     Vector4 q_i;
 
-    q_i.setZero();
-    
-    q_i = random4.getNoisy(q_i);
+    tools::ProbabilityLawSimulation s;
+    q_i = s.getGaussianRandomVariable(Matrix4::Identity(),Vector4::Zero(),4);
     q_i.normalize();
 
     Quaternion q(q_i);
@@ -120,13 +107,8 @@ int main()
     }
 
     {   
-        Vector4 q_i2 = Vector4::Zero();
-        q_i2 = random4.getNoisy(q_i);
-        q_i2.normalize();
-
-        Quaternion q2(q_i2);
-
-        kine::Orientation ori4(q2);
+        kine::Orientation ori4;
+        ori4.setRandom();
         ori4 = M;
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
@@ -135,13 +117,8 @@ int main()
     }
 
     {   
-        Vector4 q_i2 = Vector4::Zero();
-        q_i2 = random4.getNoisy(q_i);
-        q_i2.normalize();
-
-        Quaternion q2(q_i2);
-
-        kine::Orientation ori4(q2.toRotationMatrix());
+        kine::Orientation ori4;
+        ori4.setRandom();
         ori4 = q;
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
@@ -232,9 +209,80 @@ int main()
         std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
+    if (err>1e-14)
+    {
+        return errcode;
+    }
+    return 0;
+}
+
+int testKinematics (int errcode)
+{
+    double err;
+    double threshold;
+
+    kine::Kinematics k0();
+
+    Vector3 pos0 = Vector3::Random();
+
+    kine::Orientation ori0;
+    ori.setRandom();
+
+    Vector3 linvel0 = Vector3::Random();
+    Vector3 angvel0 = Vector3::Random();
+    Vector3 linacc0 = Vector3::Random();
+    Vector3 angacc0 = Vector3::Random();
+
+    kine::Kinematics k1();
+
+    Vector3 pos1 = Vector3::Random();
+
+    kine::Orientation ori1;
+    ori.setRandom();
+
+    Vector3 linvel1 = Vector3::Random();
+    Vector3 angvel1 = Vector3::Random();
+    Vector3 linacc1 = Vector3::Random();
+    Vector3 angacc1 = Vector3::Random();
+
+    
+    if (err>threshold )
+    {
+        return errcode;
+    }
+    
+    return 0;
 
 
-    std::cout <<"successfully built" <<std::endl;
+    
 
+    
+
+}
+
+int main()
+{
+
+     KineticsObserver o(7);
+
+    
+    std::cout << o.getStateSize()<<std::endl;
+    
+    Vector x0(o.getStateSize());
+    x0.setZero();
+    Vector xf(x0);
+    Vector xs(x0);
+
+    int returnVal;
+
+    if (returnVal = testOrientation(1)) /// it is not an equality check
+    {
+        std::cout<< "test failed, code : 1" <<std::endl;
+        return returnVal;
+    }
+
+    
+
+    std::cout<< "test succeeded" <<std::endl;
     return 0;
 }
