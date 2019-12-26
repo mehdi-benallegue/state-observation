@@ -1311,7 +1311,7 @@ namespace stateObservation
     sum = stateVector;
     /// use the exponential map integration to perform the sum of the states
     sum.segment<sizePos>(posIndex())+=tangentVector.segment<sizePos>(posIndexTangent());
-    o.fromVector(stateVector.segment<sizeOri>(oriIndex()));
+    o.fromVector4(stateVector.segment<sizeOri>(oriIndex()));
     o.integrate(tangentVector.segment<sizeOriTangent>(oriIndexTangent()));
     sum.segment<sizeOri>(oriIndex())=o.toVector();
     ///
@@ -1328,7 +1328,7 @@ namespace stateObservation
     for (MapContactConstIterator i= contacts_.begin(), ie = contacts_.end(); i!=ie ; ++i)
     {
       sum.segment<sizePos>(contactPosIndex(i))+=tangentVector.segment<sizePos>(contactPosIndexTangent(i));
-      o.fromVector(stateVector.segment<sizeOri>(contactOriIndex(i)));
+      o.fromVector4(stateVector.segment<sizeOri>(contactOriIndex(i)));
       o.integrate(tangentVector.segment<sizeOriTangent>(contactOriIndexTangent(i)));
       sum.segment<sizeOri>(contactOriIndexTangent(i)) = o.toVector();
       sum.segment<sizeWrench>(contactWrenchIndex(i)) += tangentVector.segment<sizeWrench>(contactWrenchIndexTangent(i));
@@ -1342,8 +1342,8 @@ namespace stateObservation
     difference.resize(stateTangentSize_);
     difference.segment<sizePos>(posIndexTangent()).noalias() = 
                         stateVector1.segment<sizePos>(posIndex()) - stateVector2.segment<sizePos>(posIndex());
-    o1.fromVector(stateVector1.segment<sizeOri>(oriIndex()));
-    o2.fromVector(stateVector2.segment<sizeOri>(oriIndex()));
+    o1.fromVector4(stateVector1.segment<sizeOri>(oriIndex()));
+    o2.fromVector4(stateVector2.segment<sizeOri>(oriIndex()));
     difference.segment<sizeOriTangent>(oriIndexTangent()) = o2.differentiate(o1);
     difference.segment<sizeLinVel+sizeAngVel>(linVelIndexTangent()).noalias() = 
                         stateVector1.segment<sizeLinVel+sizeAngVel>(linVelIndex()) -stateVector2.segment<sizeLinVel+sizeAngVel>(linVelIndex());
@@ -1362,8 +1362,8 @@ namespace stateObservation
     {
       difference.segment<sizePos>(contactPosIndexTangent(i)).noalias() = 
                         stateVector1.segment<sizePos>(contactPosIndex(i)) - stateVector2.segment<sizePos>(contactPosIndex(i));
-      o1.fromVector(stateVector1.segment<sizeOri>(contactOriIndex(i)));
-      o2.fromVector(stateVector1.segment<sizeOri>(contactOriIndex(i)));
+      o1.fromVector4(stateVector1.segment<sizeOri>(contactOriIndex(i)));
+      o2.fromVector4(stateVector1.segment<sizeOri>(contactOriIndex(i)));
       difference.segment<sizeOriTangent>(contactOriIndexTangent(i))= o2.differentiate(o1);
       difference.segment<sizeWrench>(contactWrenchIndexTangent(i)).noalias() = 
                         stateVector1.segment<sizeWrench>(contactWrenchIndex(i)) - stateVector2.segment<sizeWrench>(contactWrenchIndex(i));
@@ -1390,8 +1390,8 @@ namespace stateObservation
 
         currentMeasurementSize += sizePos;
 
-        o1.fromVector(measureVector1.segment<sizeOri>(currentMeasurementSize));
-        o2.fromVector(measureVector2.segment<sizeOri>(currentMeasurementSize));
+        o1.fromVector4(measureVector1.segment<sizeOri>(currentMeasurementSize));
+        o2.fromVector4(measureVector2.segment<sizeOri>(currentMeasurementSize));
         difference.segment<sizeOriTangent>(currentMeasurementSize) = o2.differentiate(o1);
       }
   }

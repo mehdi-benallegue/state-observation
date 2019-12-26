@@ -662,7 +662,7 @@ namespace stateObservation
       return *this;
     }
 
-    inline Orientation & Orientation::fromVector(const Vector4 & v)
+    inline Orientation & Orientation::fromVector4(const Vector4 & v)
     {
       return (*this) = Quaternion(v);
     }
@@ -1109,7 +1109,7 @@ namespace stateObservation
         BOOST_ASSERT (v.size()>index+4 && "The kinematics vector size is incorrect (loading orientaTion)");
         if (v.size()>index+4)
         {
-          orientation.fromVector(v.segment<4>(index));
+          orientation.fromVector4(v.segment<4>(index));
           index+=4;
         }       
       }
