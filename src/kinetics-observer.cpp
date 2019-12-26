@@ -1463,14 +1463,30 @@ namespace stateObservation
   {
     Vector y(getMeasurementSize());
 
+    Vector3 forceLocal = additionalForce_;
+    Vector3 torqueLocal = additionalTorque_;
+
+    addContactAndUnmodeledWrench(x,forceLocal,torqueLocal);
+
     Kinematics stateKine(x.segment<sizeStateKine>(kineIndex()), flagsStateKine);
-    Kinematics localKine;
+
+    /// The accelerations are about to be computed so we set them to "initialized"
+    stateKine.linAcc.set();
+    stateKine.angAcc.set();
+    
+    Vector3& linacc = (Vector3&)(stateKine.linAcc);
+    Vector3& angacc = (Vector3&)(stateKine.angAcc);
+
+    computeAccelerations_(stateKine,forceLocal,torqueLocal, linacc, angacc);
+
+    Kinematics & localKine = opt_.kine;
 
     for (MapIMUConstIterator i = imuSensors_.begin(); i !=  imuSensors_.end() ; ++i)
     {
       const IMU & imu= i->second;
       localKine = stateKine * imu.kinematics;
       localKine.orientation.matrix3();
+
       ///accelerometer
       y.segment<sizeAcceleroSignal>(imu.measIndex)  
             = localKine.orientation.getMatrixRefUnsafe()().transpose()  * (localKine.linAcc() + cst::gravity);
