@@ -18,6 +18,7 @@
 
 #include <state-observation/tools/definitions.hpp>
 #include <state-observation/tools/miscellaneous-algorithms.hpp>
+#include <state-observation/tools/probability-law-simulation.hpp>
 
 namespace stateObservation
 {
@@ -277,6 +278,8 @@ namespace stateObservation
       inline Orientation & setValue(const Quaternion& q, const Matrix3& m);
 
       inline Orientation & fromVector4(const Vector4 & v);
+
+      inline Orientation & setRandom();
 
 
       ///get a const reference on the matrix or the quaternion 

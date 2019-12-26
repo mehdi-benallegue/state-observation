@@ -667,6 +667,13 @@ namespace stateObservation
       return (*this) = Quaternion(v);
     }
 
+    inline Orientation & Orientation::setRandom()
+    {
+      tools::ProbabilityLawSimulation s;
+      fromVector4(s.getGaussianRandomVariable(Matrix4::Identity(),Vector4::Zero(),4).normalized());
+      return (*this);
+    }
+
     inline Vector4 Orientation::toVector4() const
     {
       return quaternion().coeffs();
@@ -676,7 +683,6 @@ namespace stateObservation
     {
       return quaternion().coeffs();
     }
-
 
     inline Orientation::operator Matrix3()
     {
