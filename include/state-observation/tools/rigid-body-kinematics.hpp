@@ -276,7 +276,7 @@ namespace stateObservation
 
       inline Orientation & setValue(const Quaternion& q, const Matrix3& m);
 
-      inline Orientation & fromVector(const Vector4 & v);
+      inline Orientation & fromVector4(const Vector4 & v);
       inline Vector4 toVector() const;
       inline Vector4 toVector();
 
