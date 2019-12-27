@@ -25,7 +25,7 @@ namespace stateObservation
         {
         public:
 
-            ///gets White Gaussian Noise
+            ///gets vector Gaussian random variable
             ///having a given bias and standard deviation(std)
             static Matrix getGaussianVector( const Matrix & std, const Matrix & bias,
                 unsigned rows, unsigned cols=1);
