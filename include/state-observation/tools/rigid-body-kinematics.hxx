@@ -1179,7 +1179,61 @@ namespace stateObservation
       }
 
       return *this;
+    }
 
+
+    template <typename t>
+    inline Kinematics & Kinematics::setZero(Kinematics::Flags::Byte flags)
+    {
+
+      bool flagPos = flags & Flags::position;
+      bool flagLinVel = flags & Flags::linVel;
+      bool flagLinAcc = flags & Flags::linAcc;
+      bool flagOri = flags & Flags::orientation;
+      bool flagAngVel = flags & Flags::angVel;
+      bool flagAngAcc = flags & Flags::angAcc;
+
+      if (flagPos )
+      {
+        position.set();
+        position().setZero();
+      }
+
+      if (flagOri )
+      {
+        orientation.setZeroRotation<t>();
+      }
+
+      if (flagLinVel )
+      {
+        linVel.set();
+        linVel().setZero();
+      }
+
+      if (flagAngVel )
+      {
+        angVel.set();
+        angVel().setZero();  
+      }
+
+      if (flagLinAcc )
+      {
+        linAcc.set();
+        linAcc().setZero();
+      }
+
+      if (flagAngAcc )
+      {
+        angAcc.set();
+        angAcc().setZero();
+      }
+
+      return *this;
+    }
+
+    inline Kinematics & Kinematics::setZero(Kinematics::Flags::Byte flags)
+    {
+      return setZero<Quaternion>(flags);
     }
 
     inline const Kinematics & Kinematics::integrate(double dt)

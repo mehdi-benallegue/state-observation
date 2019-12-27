@@ -426,6 +426,14 @@ namespace stateObservation
       /// position orientation (quaternion) linevel angvel linAcc angAcc
       /// use the flags to define the structure of the vector
       Kinematics & fromVector(const Vector & v, Flags::Byte=Flags::all);
+
+      /// initializes at zero all the flagged fields
+      /// the typename allows to set if the prefered type for rotation 
+      /// is a Matrix3 or a Quaternion (Quaternion by default)
+      template <typename t >
+      Kinematics & setZero(Flags::Byte=Flags::all);
+
+      Kinematics & setZero(Flags::Byte=Flags::all);
       
       inline const Kinematics & integrate(double dt);
 
