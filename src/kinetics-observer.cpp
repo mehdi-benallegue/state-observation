@@ -1438,7 +1438,7 @@ namespace stateObservation
       /// The error between the current kinematics and the rest kinematics 
       /// of the flexibility
       Kinematics errorKine;
-      errorKine.setToProductNoAlias(globalKine, localKine.inverse());
+      errorKine.setToProductNoAlias(globalKine, localKine.getInverse());
 
       /// Inverse of the orientation of the foot in the global frame
       Orientation Rcit(globalKine.orientation.inverse());
