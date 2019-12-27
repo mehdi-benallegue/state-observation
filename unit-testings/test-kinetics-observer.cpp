@@ -218,32 +218,149 @@ int testOrientation(int errcode)
 
 int testKinematics (int errcode)
 {
-    double err;
-    double threshold;
+    double err=0;
+    double threshold=1e-25;
 
-    kine::Kinematics k0();
+    kine::Kinematics k0;
 
     Vector3 pos0 = Vector3::Random();
 
     kine::Orientation ori0;
-    ori.setRandom();
+    ori0.setRandom();
 
     Vector3 linvel0 = Vector3::Random();
     Vector3 angvel0 = Vector3::Random();
     Vector3 linacc0 = Vector3::Random();
     Vector3 angacc0 = Vector3::Random();
 
-    kine::Kinematics k1();
+    kine::Kinematics k1;
 
     Vector3 pos1 = Vector3::Random();
 
     kine::Orientation ori1;
-    ori.setRandom();
+    ori1.setRandom();
 
     Vector3 linvel1 = Vector3::Random();
     Vector3 angvel1 = Vector3::Random();
     Vector3 linacc1 = Vector3::Random();
     Vector3 angacc1 = Vector3::Random();
+
+    int count = 100000;
+
+    tools::ProbabilityLawSimulation s;
+
+    kine::Kinematics k;
+
+    
+    
+
+    for (int i = 0; i < count; i++)
+    {
+        k0.reset();
+        k1.reset();
+
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "0" ;
+            k0.position = pos0;
+        }
+        if (true) ///the orientation has to be set 
+        {
+            std::cout << "1" ;
+            k0.orientation = ori0;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "2" ;
+            k0.linVel = linvel0;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "3" ;
+            k0.angVel = angvel0;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "4" ;
+            k0.linAcc = linacc0;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "5" ;
+            k0.angAcc = angacc0;
+        }
+
+        std::cout << " " ;
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "0" ;
+            k1.position = pos1;
+        }
+        if (true)///the orientation has to be set 
+        {
+            std::cout << "1" ;
+            k1.orientation = ori1;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "2" ;
+            k1.linVel = linvel1;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "3" ;
+            k1.angVel = angvel1;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "4" ;
+            k1.linAcc = linacc1;
+        }
+        if (s.getGaussianScalar()>0.0)
+        {
+            std::cout << "5" ;
+            k1.angAcc = angacc1;
+        }
+
+        std::cout << " " ;
+
+        k = k0 * k1 * k1.getInverse() * k0.getInverse();
+
+        if (k.position.isSet())
+        {
+            std::cout << "0" ;
+            err += k.position().squaredNorm();
+        }
+        if (k.orientation.isSet())
+        {
+            std::cout << "1" ;
+            err += k.orientation.toRotationVector().squaredNorm();
+        }
+        if (k.linVel.isSet())
+        {
+            std::cout << "2" ;
+            err +=  k.linVel().squaredNorm();
+        }
+        if (k.angVel.isSet())
+        {
+            std::cout << "3" ;
+            err += k.angVel().squaredNorm();
+        }
+        if (k.linAcc.isSet())
+        {
+            std::cout << "4" ;
+            err += k.linAcc().squaredNorm();
+        }
+        if (k.angAcc.isSet())
+        {
+            std::cout << "6" ;
+            err += k.angAcc().squaredNorm();
+        }
+        
+        std::cout << " " << err << std::endl;
+        
+    }
+    
 
     
     if (err>threshold )
@@ -275,11 +392,19 @@ int main()
 
     int returnVal;
 
-    if (returnVal = testOrientation(1)) /// it is not an equality check
+    if ((returnVal = testOrientation(1))) /// it is not an equality check
     {
         std::cout<< "test failed, code : 1" <<std::endl;
         return returnVal;
     }
+
+
+    if ((returnVal = testKinematics(1))) /// it is not an equality check
+    {
+        std::cout<< "test failed, code : 1" <<std::endl;
+        return returnVal;
+    }
+
 
     
 
