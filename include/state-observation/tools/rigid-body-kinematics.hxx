@@ -1282,6 +1282,7 @@ namespace stateObservation
 
     }
 
+
     inline const Kinematics & Kinematics::update(const Kinematics & newValue, double dt, Flags::Byte flags)
     {
       bool flagPos = flags & Flags::position;
@@ -1537,31 +1538,32 @@ namespace stateObservation
 
         if (angVel.isSet())
         {
-          inverted.angVel =  -(r2 * angVel()); //omega2
+          inverted.angVel = -(r2 * angVel()); //omega2
 
           if (angAcc.isSet())
           {
-            inverted.angAcc =   r2 * (angVel().cross(angVel()) - angAcc()); //omega2dot
+            inverted.angAcc = r2 * (angVel().cross(angVel()) - angAcc()); //omega2dot
           }
         }
 
         if (position.isSet())
         {
-          inverted.position= - (r2 * position()) ;
+          inverted.position = -(r2 * position());
 
-          if (linVel.isSet())
+          if (linVel.isSet() && angVel.isSet())
           {
-            Vector3 omegaxp= angVel().cross(position());
-            inverted.linVel= r2 * ( omegaxp - linVel()); //t2dot
-            if (linAcc.isSet())
+
+            Vector3 omegaxp = angVel().cross(position());
+            inverted.linVel = r2 * (omegaxp - linVel()); //t2dot
+            if (linAcc.isSet() && (angAcc.isSet()))
             {
-                inverted.linAcc=  r2 * ( angVel().cross(2 * linVel - omegaxp)
-                                        - linAcc() + angAcc().cross(position())); //t2dotdot
+
+              inverted.linAcc = r2 * (angVel().cross(2 * linVel - omegaxp) 
+                            - linAcc() + angAcc().cross(position())); //t2dotdot
             }
           }
         }
       }
-
       return inverted;
 
     }
