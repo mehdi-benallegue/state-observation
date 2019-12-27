@@ -24,6 +24,10 @@ namespace stateObservation
         class ProbabilityLawSimulation
         {
         public:
+            ///gets a scalar Gaussian random variable
+            ///having a given bias and standard deviation(std)
+            ///default is the cetered unit Gaussian
+            double getGaussianScalar(double std = 1, double bias = 0);
 
             ///gets vector Gaussian random variable
             ///having a given bias and standard deviation(std)
