@@ -8,7 +8,7 @@ namespace stateObservation
 
         boost::lagged_fibonacci1279 ProbabilityLawSimulation::gen_;
 
-        Matrix ProbabilityLawSimulation::getGaussianRandomVariable(const Matrix& std,
+        Matrix ProbabilityLawSimulation::getGaussianVector(const Matrix& std,
                                           const Matrix& bias,unsigned rows, unsigned cols)
         {
             boost::normal_distribution<> g(0, 1);

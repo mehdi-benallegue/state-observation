@@ -123,10 +123,10 @@ double testExtendedKalmanFilter()
 
             ///generation of Gaussian white noises
             ekf::StateVector v= stateObservation::tools::ProbabilityLawSimulation::
-                                getGaussianRandomVariable(q1,f.stateVectorZero(),f.getStateSize(),1);
+                                getGaussianVector(q1,f.stateVectorZero(),f.getStateSize(),1);
 
             ekf::MeasureVector w= stateObservation::tools::ProbabilityLawSimulation::
-                                  getGaussianRandomVariable(r1,f.measureVectorZero(),f.getMeasureSize());
+                                  getGaussianVector(r1,f.measureVectorZero(),f.getMeasureSize());
 
             ///the dynamics is executed here
             xk[k]=x=func.stateDynamics(x,uk[k-1],k-1)+v;

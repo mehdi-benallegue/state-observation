@@ -670,7 +670,7 @@ namespace stateObservation
     inline Orientation & Orientation::setRandom()
     {
       tools::ProbabilityLawSimulation s;
-      fromVector4(s.getGaussianRandomVariable(Matrix4::Identity(),Vector4::Zero(),4).normalized());
+      fromVector4(s.getGaussianVector(Matrix4::Identity(),Vector4::Zero(),4).normalized());
       return (*this);
     }
 

@@ -15,7 +15,7 @@ int testOrientation(int errcode)
     Vector4 q_i;
 
     tools::ProbabilityLawSimulation s;
-    q_i = s.getGaussianRandomVariable(Matrix4::Identity(),Vector4::Zero(),4);
+    q_i = s.getGaussianVector(Matrix4::Identity(),Vector4::Zero(),4);
     q_i.normalize();
 
     Quaternion q(q_i);
