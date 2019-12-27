@@ -1455,7 +1455,7 @@ namespace stateObservation
       return *this;
     }
 
-    inline Kinematics Kinematics::inverse() const
+    inline Kinematics Kinematics::getInverse() const
     {
       Kinematics inverted;
 

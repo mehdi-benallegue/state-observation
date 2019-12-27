@@ -426,7 +426,7 @@ namespace stateObservation
 
       inline const Kinematics & update(const Kinematics & newValue, double dt=0, Flags::Byte=Flags::all);
 
-      inline Kinematics inverse() const;
+      inline Kinematics getInverse() const;
 
       ///converts the object to a vector
       /// the order of the vector is 
