@@ -281,6 +281,11 @@ namespace stateObservation
 
       inline Orientation & setRandom();
 
+      template <typename t>
+      inline Orientation & setZeroRotation();
+
+      inline Orientation & setZeroRotation();
+
 
       ///get a const reference on the matrix or the quaternion 
       inline const Matrix3& matrix3();

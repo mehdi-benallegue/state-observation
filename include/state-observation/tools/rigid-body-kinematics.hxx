@@ -674,6 +674,23 @@ namespace stateObservation
       return (*this);
     }
 
+    template <>
+    inline Orientation & Orientation::setZeroRotation<Quaternion>()
+    {
+      return (*this) = Quaternion(1,0,0,0);
+    }
+
+    template <>
+    inline Orientation & Orientation::setZeroRotation<Matrix3>()
+    {
+      return (*this) = Matrix3(Matrix3::Identity());
+    }
+
+    inline Orientation & Orientation::setZeroRotation()
+    {
+      return setZeroRotation<Quaternion>();
+    }
+
     inline Vector4 Orientation::toVector4() const
     {
       return quaternion().coeffs();
