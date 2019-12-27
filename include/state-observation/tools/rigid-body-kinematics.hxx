@@ -1105,7 +1105,7 @@ namespace stateObservation
     }
 
 
-    inline Kinematics Kinematics::fromVector(const Vector & v, Kinematics::Flags::Byte flags)
+    inline Kinematics & Kinematics::fromVector(const Vector & v, Kinematics::Flags::Byte flags)
     {
       int index=0;
 
@@ -1118,7 +1118,7 @@ namespace stateObservation
 
       if (flagPos )
       {
-        BOOST_ASSERT (v.size()>index+3 && "The kinematics vector size is incorrect (loading position)");
+        BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading position)");
         if (v.size()>index+3)
         {
           position = v.segment<3>(index);
@@ -1129,7 +1129,7 @@ namespace stateObservation
 
       if (flagOri )
       {
-        BOOST_ASSERT (v.size()>index+4 && "The kinematics vector size is incorrect (loading orientaTion)");
+        BOOST_ASSERT (v.size()>=index+4 && "The kinematics vector size is incorrect (loading orientaTion)");
         if (v.size()>index+4)
         {
           orientation.fromVector4(v.segment<4>(index));
@@ -1139,7 +1139,7 @@ namespace stateObservation
 
       if (flagLinVel )
       {
-        BOOST_ASSERT (v.size()>index+3 && "The kinematics vector size is incorrect (loading linear velocity)");
+        BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading linear velocity)");
         if (v.size()>index+3)
         {
           linVel = v.segment<3>(index);
@@ -1147,9 +1147,9 @@ namespace stateObservation
         }        
       }
 
-      if (v.size()>index+3 && flagAngVel )
+      if (flagAngVel )
       {
-        BOOST_ASSERT (v.size()>index+3 && "The kinematics vector size is incorrect (loading angular velocity)");
+        BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading angular velocity)");
         if (v.size()>index+3)
         {
           angVel = v.segment<3>(index);
@@ -1158,9 +1158,9 @@ namespace stateObservation
 
       }
 
-      if (v.size()>index+3 && flagLinAcc )
+      if (flagLinAcc )
       {
-        BOOST_ASSERT (v.size()>index+3 && "The kinematics vector size is incorrect (loading linear acceleration)");
+        BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading linear acceleration)");
         if (v.size()>index+3)
         {
           linAcc = v.segment<3>(index);
@@ -1168,9 +1168,9 @@ namespace stateObservation
         }       
       }
 
-      if (v.size()>index+3 && flagAngAcc )
+      if (flagAngAcc )
       {
-        BOOST_ASSERT (v.size()>index+3 && "The kinematics vector size is incorrect (loading angular acceleration)");
+        BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading angular acceleration)");
         if (v.size()>index+3)
         {
           angAcc = v.segment<3>(index);

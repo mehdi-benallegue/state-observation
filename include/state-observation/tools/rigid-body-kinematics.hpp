@@ -425,7 +425,7 @@ namespace stateObservation
       /// the order of the vector is 
       /// position orientation (quaternion) linevel angvel linAcc angAcc
       /// use the flags to define the structure of the vector
-      Kinematics fromVector(const Vector & v, Flags::Byte=Flags::all);
+      Kinematics & fromVector(const Vector & v, Flags::Byte=Flags::all);
       
       inline const Kinematics & integrate(double dt);
 
