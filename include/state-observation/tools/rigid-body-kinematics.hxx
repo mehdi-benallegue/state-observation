@@ -1656,9 +1656,7 @@ namespace stateObservation
           else
           {
             thisVel = thisOri.differentiate(newOri)/ dt;
-          }
-          
-          
+          }          
         } 
 
         if (posMethod == useOrientation)
@@ -1682,10 +1680,8 @@ namespace stateObservation
               if (posMethod == useAcceleration)
               {
                 thisOri.integrate(thisAcc() * dt * dt / 0.5);
-              }
-              
-            }
-            
+              }              
+            }            
           }
         }
         
@@ -1935,10 +1931,10 @@ namespace stateObservation
     inline Kinematics Kinematics::templateSetToProductNoAlias_(operand1& multiplier1, operand2& multiplier2)
     {
       BOOST_ASSERT(multiplier1.orientation.isSet()
-       && "The multiplier 1 orientation is not initialized, the multiplication is not possible");
+       && "The multiplier 1 orientation is not initialized, the multiplication is not possible.");
 
       BOOST_ASSERT((multiplier2.position.isSet() || multiplier2.orientation.isSet())
-        &&"The multiplier 2 kinematics is not initialized, the multiplication is not possible");
+        &&"The multiplier 2 kinematics is not initialized, the multiplication is not possible.");
 
 
       if (multiplier2.position.isSet() && multiplier1.position.isSet())
