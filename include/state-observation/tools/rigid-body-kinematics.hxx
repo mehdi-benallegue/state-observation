@@ -1735,39 +1735,41 @@ namespace stateObservation
     {
       Kinematics inverted;
 
-      if (orientation.isSet())
+      BOOST_ASSERT(orientation.isSet()
+       && "The orientation is not initialized, the kinematics cannot be inverted.");
+
+      inverted.orientation = orientation.inverse();
+      Orientation & r2 = inverted.orientation;
+
+      if (angVel.isSet())
       {
-        inverted.orientation = orientation.inverse();
-        Orientation & r2 = inverted.orientation;
+        inverted.angVel = -(r2 * angVel()); //omega2
 
-        if (angVel.isSet())
+        if (angAcc.isSet())
         {
-          inverted.angVel = -(r2 * angVel()); //omega2
-
-          if (angAcc.isSet())
-          {
-            inverted.angAcc = r2 * (angVel().cross(angVel()) - angAcc()); //omega2dot
-          }
+          inverted.angAcc = r2 * (angVel().cross(angVel()) - angAcc()); //omega2dot
         }
+      }
 
-        if (position.isSet())
+      if (position.isSet())
+      {
+        inverted.position = -(r2 * position());
+
+        if (linVel.isSet() && angVel.isSet())
         {
-          inverted.position = -(r2 * position());
 
-          if (linVel.isSet() && angVel.isSet())
+          Vector3 omegaxp = angVel().cross(position());
+          inverted.linVel = r2 * (omegaxp - linVel()); //t2dot
+          if (linAcc.isSet() && (angAcc.isSet()))
           {
 
-            Vector3 omegaxp = angVel().cross(position());
-            inverted.linVel = r2 * (omegaxp - linVel()); //t2dot
-            if (linAcc.isSet() && (angAcc.isSet()))
-            {
-
-              inverted.linAcc = r2 * (angVel().cross(2 * linVel - omegaxp) 
-                            - linAcc() + angAcc().cross(position())); //t2dotdot
-            }
+            inverted.linAcc = r2 * (angVel().cross(2 * linVel - omegaxp) 
+                          - linAcc() + angAcc().cross(position())); //t2dotdot
           }
         }
       }
+      
+     
       return inverted;
 
     }
