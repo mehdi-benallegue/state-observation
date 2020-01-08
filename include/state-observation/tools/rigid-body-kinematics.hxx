@@ -1285,244 +1285,412 @@ namespace stateObservation
 
     inline const Kinematics & Kinematics::update(const Kinematics & newValue, double dt, Flags::Byte flags)
     {
-      bool flagPos = flags & Flags::position;
-      bool flagLinVel = flags & Flags::linVel;
-      bool flagLinAcc = flags & Flags::linAcc;
-      bool flagOri = flags & Flags::orientation;
-      bool flagAngVel = flags & Flags::angVel;
-      bool flagAngAcc = flags & Flags::angAcc;
-
       {
-        CheckedVector3 curPos,curLinVel;
+        bool flagPos = flags & Flags::position;
+        bool flagLinVel = flags & Flags::linVel;
+        bool flagLinAcc = flags & Flags::linAcc;
+
+        CheckedVector3 & thisPos = position;
+        CheckedVector3 & thisVel = linVel;
+        CheckedVector3 & thisAcc = linAcc;
+
+
+        const CheckedVector3 & newPos = newValue.position;
+        const CheckedVector3 & newVel = newValue.linVel;
+        const CheckedVector3 & newAcc = newValue.linAcc;
+
+        enum method  { noUpdate, usePosition, useVelocity, useAcceleration, useVelAndAcc, usePosAndVel};
+
+        method posMethod = noUpdate;
+        method velMethod = noUpdate;
+        method accMethod = noUpdate;
 
         if (flagPos)
         {
-          if (flagLinVel && !newValue.linVel.isSet() && position.isSet() && newValue.position.isSet())
+          if (newPos.isSet())
           {
-            curPos=position;
-          }
-          if (newValue.position.isSet())
-          {
-            position=newValue.position;
+            posMethod = usePosition;
           }
           else
           {
-            if (position.isSet() )
+            BOOST_ASSERT(thisPos.isSet() && "The position is cannot be updated without initial value");
+            if (! thisPos.isSet()) //code to not use an uninitialized value in release
             {
-              if(linVel.isSet())
+              
+              thisPos.set();
+              thisPos().setZero(); //the default value is zero
+            }
+
+            if (thisVel.isSet())
+            {
+              if (thisAcc.isSet())
               {
-                position()+=linVel()*dt;
-                if (linAcc.isSet())
-                {
-                  position()+=linAcc()*dt*dt/2;
-                }
+                posMethod = useVelAndAcc;
               }
+              else
+              {
+                posMethod = useVelocity;
+              }              
             }
             else
             {
-              position.set();
-              position().setZero();
-            }
+              if (thisAcc.isSet())
+              {
+                posMethod = useAcceleration;
+              }
+            }            
           }
-
+          
         }
 
         if (flagLinVel)
         {
-          if (flagLinAcc && !newValue.linAcc.isSet() && newValue.linVel.isSet())
+          if (newVel.isSet())
           {
-            curLinVel=linVel;
-          }
-
-          if (newValue.linVel.isSet())
-          {
-            linVel = newValue.linVel;
+            velMethod = useVelocity;
           }
           else
           {
-            if (
-              newValue.position.isSet() &&
-              (curPos.isSet() || ( position.isSet() && !flagPos))
-            )
+            if (thisPos.isSet() && newPos.isSet())
             {
-              if (curPos.isSet())
-              {
-                linVel=(newValue.position() - curPos())/dt;
-              }
-              else
-              {
-                linVel=(newValue.position() - position())/dt;
-              }
+              velMethod = usePosition;
             }
             else
             {
-              if (linVel.isSet())
+              BOOST_ASSERT(thisVel.isSet() && "The linear velocity is cannot be updated without initial value");
+              if (!thisVel.isSet()) //code to not use an uninitialized value in releasse
               {
-                if (linAcc.isSet())
-                {
-                  linVel()+=linAcc()*dt;
-                }
+                thisVel.set();
+                thisVel().setZero(); //the default value is zero
               }
-              else
+              
+              if (thisAcc.isSet())
               {
-                linVel.set();
-                linVel().setZero();
+                velMethod = useAcceleration;
               }
             }
-
+            
           }
+          
         }
 
         if (flagLinAcc)
         {
-          if (newValue.linAcc.isSet())
+          if (newAcc.isSet())
           {
-            linAcc =  newValue.linAcc;
+            accMethod= useAcceleration;
           }
           else
           {
-            if (
-              newValue.linVel.isSet() &&
-              (curLinVel.isSet() || (linVel.isSet() && !flagLinVel))
-            )
+            if (thisVel.isSet() && newVel.isSet())
             {
-              if (curLinVel.isSet())
-              {
-                linAcc=(newValue.linVel()-curLinVel())/dt;
-              }
-              else
-              {
-                linAcc=(newValue.linVel()-linVel())/dt;
-              }
+              accMethod = useVelocity;
             }
             else
             {
-              if (!linAcc.isSet())
+              if (thisVel.isSet() && velMethod == usePosition)
               {
-                linAcc.set();
-                linAcc().setZero();
+                accMethod = usePosAndVel;
               }
-            }
+            
+              else ///velocity is not available
+              {
+                if (thisPos.isSet() && newPos.isSet())
+                {
+                  accMethod = usePosition;
+                }
+                else
+                {
+                  BOOST_ASSERT (thisAcc.isSet() && "The linear accleration cannot be updated without initial value");
+                  if (! thisAcc.isSet() ) //code to not use an uninitialized value in releasse
+                  {
+                    thisAcc.set();
+                    thisAcc().setZero();
+                  }
+                }
+              }
+            } 
+          }
+          
+        }
+
+        if (accMethod == useVelocity) //then velocity cannot use accelerations
+        {
+          thisAcc = (newVel()-thisVel())/dt;
+        }
+        else
+        {
+          if (accMethod == usePosition) //then velocity cannot use accelerations
+          {
+            thisAcc = 2*(newPos()-thisPos())/(dt*dt);
           }
         }
-      }
+        
+        if (velMethod == usePosition) //then position cannot use velocity
+        {
+          if (accMethod == usePosAndVel) //use position and velocity to get the accelerations
+          {
+            thisAcc = -thisVel();
+            thisVel = (newPos()-thisPos())/ dt;
+            thisAcc() += thisVel();
+            thisAcc() /=dt;
+          }
+          else
+          {
+            thisVel = (newPos()-thisPos())/ dt;
+          }
+        } 
 
+        if (posMethod == usePosition)
+        {
+          thisPos= newPos;
+        }
+        else
+        {
+          if (posMethod == useVelocity)
+          {
+            thisPos() += thisVel()*dt;
+          }
+          else
+          {
+            if (posMethod == useVelAndAcc)
+            {
+              thisPos() += thisVel()*dt + thisAcc() * dt * dt / 0.5;
+            }
+            else
+            {
+              if (posMethod == useAcceleration)
+              {
+                thisPos() += thisAcc() * dt * dt / 0.5;
+              }
+              
+            }
+            
+          }
+        }
+        
+        if (velMethod == useVelocity)
+        {
+          thisVel = newVel;
+        }
+        else
+        {
+          if ( velMethod == useAcceleration )
+          {
+            thisVel() += thisAcc()*dt;            
+          }
+        }
+
+        if (accMethod == useAcceleration)
+        {
+          thisAcc = newAcc();
+        }
+      }       
+
+      
       {
-        Orientation curOri;
-        CheckedVector3 curAngVel;
+        bool flagOri = flags & Flags::orientation;
+        bool flagAngVel = flags & Flags::angVel;
+        bool flagAngAcc = flags & Flags::angAcc;
+       
+        Orientation & thisOri = orientation;
+        CheckedVector3 & thisVel = angVel;
+        CheckedVector3 & thisAcc = angAcc;
 
+
+        const Orientation & newOri = newValue.orientation;
+        const CheckedVector3 & newVel = newValue.angVel;
+        const CheckedVector3 & newAcc = newValue.angAcc;
+
+        enum method  { noUpdate, useOrientation, useVelocity, useAcceleration, useVelAndAcc, useOriAndVel};
+
+        method posMethod = noUpdate;
+        method velMethod = noUpdate;
+        method accMethod = noUpdate;
 
         if (flagOri)
         {
-          if (flagAngVel && !newValue.angVel.isSet() && orientation.isSet()  && newValue.orientation.isSet())
+          if (newOri.isSet())
           {
-            curOri=orientation;
-          }
-          if (newValue.orientation.isSet())
-          {
-            orientation=newValue.orientation;
+            posMethod = useOrientation;
           }
           else
           {
-            if (orientation.isSet() )
+            BOOST_ASSERT(thisOri.isSet() && "The orientation is trying to be updated without initial value");
+            if (! thisOri.isSet()) //code to not use an uninitialized value in release
             {
-              if(angVel.isSet())
+              
+              thisOri.setZeroRotation(); //the default value is zero
+            }
+
+            if (thisVel.isSet())
+            {
+              if (thisAcc.isSet())
               {
-                Vector3 increment = Vector3::Zero();
-                increment+=angVel()*dt;
-                if (angAcc.isSet())
-                {
-                  increment+=angAcc()*dt*dt/2;
-                }
-                orientation.integrate(increment);
+                posMethod = useVelAndAcc;
               }
+              else
+              {
+                posMethod = useVelocity;
+              }              
             }
             else
             {
-              orientation=Quaternion::Identity();
-            }
+              if (thisAcc.isSet())
+              {
+                posMethod = useAcceleration;
+              }
+            }            
           }
+          
         }
 
         if (flagAngVel)
         {
-          if (flagAngAcc && !newValue.angAcc.isSet() && newValue.angVel.isSet())
+          if (newVel.isSet())
           {
-            curAngVel=angVel;
-          }
-
-          if (newValue.angVel.isSet())
-          {
-            angVel = newValue.angVel;
+            velMethod = useVelocity;
           }
           else
           {
-            if (
-              newValue.orientation.isSet() &&
-              (curOri.isSet() || ( orientation.isSet() && !flagOri))
-            )
+            if (thisOri.isSet() && newOri.isSet())
             {
-              if (curOri.isSet())
-              {
-                angVel=curOri.differentiate(newValue.orientation)/dt;
-              }
-              else
-              {
-                angVel=orientation.differentiate(newValue.orientation)/dt;
-              }
+              velMethod = useOrientation;
             }
             else
             {
-              if (angVel.isSet())
+              BOOST_ASSERT(thisVel.isSet() && "The angular velocity is trying to be updated without initial value");
+              if (!thisVel.isSet()) //code to not use an uninitialized value in releasse
               {
-                if (angAcc.isSet())
-                {
-                  angVel()+=angAcc()*dt;
-                }
+                thisVel.set();
+                thisVel().setZero(); //the default value is zero
               }
-              else
+              
+              if (thisAcc.isSet())
               {
-                angVel.set();
-                angVel().setZero();
+                velMethod = useAcceleration;
               }
             }
-
+            
           }
+          
         }
 
         if (flagAngAcc)
         {
-          if (newValue.angAcc.isSet())
+          if (newAcc.isSet())
           {
-            angAcc =  newValue.angAcc;
+            accMethod= useAcceleration;
           }
           else
           {
-            if (
-              newValue.angVel.isSet() &&
-              (curAngVel.isSet() || (angVel.isSet() && !flagAngVel))
-            )
+            if (thisVel.isSet() && newVel.isSet())
             {
-              if (curAngVel.isSet())
-              {
-                angAcc=(newValue.angVel()-curAngVel())/dt;
-              }
-              else
-              {
-                angAcc=(newValue.angVel()-angVel())/dt;
-              }
+              accMethod = useVelocity;
             }
             else
             {
-              if (!angAcc.isSet())
+              if (thisVel.isSet() && velMethod == useOrientation)
               {
-                angAcc.set();
-                angAcc().setZero();
+                accMethod = useOriAndVel;
+              }
+              else ///velocity is not available
+              {
+                if (thisOri.isSet() && newOri.isSet())
+                {
+                  accMethod = useOrientation;
+                }
+                else
+                {
+                  BOOST_ASSERT (thisAcc.isSet() && "The angular accleration is trying to be updated without initial value");
+                  if (! thisAcc.isSet() ) //code to not use an uninitialized value in releasse
+                  {
+                    thisAcc.set();
+                    thisAcc().setZero();
+                  }
+                }
               }
             }
           }
+          
         }
+
+        if (accMethod == useVelocity) //then velocity cannot use accelerations
+        {
+          thisAcc = (newVel()-thisVel())/dt;
+        }
+        else
+        {
+          if (accMethod == useOrientation) //then velocity cannot use accelerations
+          {
+            thisAcc = 2*newOri.differentiate(thisOri)/(dt*dt);
+          }
+        }
+        
+        if (velMethod == useOrientation) //then position cannot use velocity
+        {
+          if (accMethod==useVelAndAcc)
+          {
+            thisAcc = -thisVel();
+            thisVel = thisOri.differentiate(newOri)/ dt;
+            thisAcc() += thisVel();
+            thisAcc() /=dt;
+          }
+          else
+          {
+            thisVel = thisOri.differentiate(newOri)/ dt;
+          }
+          
+          
+        } 
+
+        if (posMethod == useOrientation)
+        {
+          thisOri= newOri;
+        }
+        else
+        {
+          if (posMethod == useVelocity)
+          {
+            thisOri.integrate(thisVel()*dt);
+          }
+          else
+          {
+            if (posMethod == useVelAndAcc)
+            {
+              thisOri.integrate (thisVel()*dt + thisAcc() * dt * dt / 0.5);
+            }
+            else
+            {
+              if (posMethod == useAcceleration)
+              {
+                thisOri.integrate(thisAcc() * dt * dt / 0.5);
+              }
+              
+            }
+            
+          }
+        }
+        
+        if (velMethod == useVelocity)
+        {
+          thisVel = newVel;
+        }
+        else
+        {
+          if ( velMethod == useAcceleration )
+          {
+            thisVel() += thisAcc()*dt;            
+          }
+        }
+
+        if (accMethod == useAcceleration)
+        {
+          thisAcc = newAcc();
+        }
+        
       }
+
 
       return *this;
     }
