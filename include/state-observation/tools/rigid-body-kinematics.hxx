@@ -1472,7 +1472,7 @@ namespace stateObservation
           {
             if (posMethod == useVelAndAcc)
             {
-              thisPos() += thisVel()*dt + thisAcc() * dt * dt / 0.5;
+              thisPos() += thisVel()*dt + thisAcc() * dt * dt / 2;
             }
             else
             {
@@ -1675,7 +1675,7 @@ namespace stateObservation
           {
             if (posMethod == useVelAndAcc)
             {
-              thisOri.integrate (thisVel()*dt + thisAcc() * dt * dt / 0.5);
+              thisOri.integrate (thisVel()*dt + thisAcc() * dt * dt / 2);
             }
             else
             {
