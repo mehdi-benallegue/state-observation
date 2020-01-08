@@ -1846,6 +1846,250 @@ namespace stateObservation
 
       return *this;
     }
+
+     inline const Kinematics & Kinematics::update_deprecated(const Kinematics & newValue, double dt, Flags::Byte flags)
+    {
+      bool flagPos = flags & Flags::position;
+      bool flagLinVel = flags & Flags::linVel;
+      bool flagLinAcc = flags & Flags::linAcc;
+      bool flagOri = flags & Flags::orientation;
+      bool flagAngVel = flags & Flags::angVel;
+      bool flagAngAcc = flags & Flags::angAcc;
+
+      {
+        CheckedVector3 curPos,curLinVel;
+
+        if (flagPos)
+        {
+          if (flagLinVel && !newValue.linVel.isSet() && position.isSet() && newValue.position.isSet())
+          {
+            curPos=position;
+          }
+          if (newValue.position.isSet())
+          {
+            position=newValue.position;
+          }
+          else
+          {
+            if (position.isSet() )
+            {
+              if(linVel.isSet())
+              {
+                position()+=linVel()*dt;
+                if (linAcc.isSet())
+                {
+                  position()+=linAcc()*dt*dt/2;
+                }
+              }
+            }
+            else
+            {
+              position.set();
+              position().setZero();
+            }
+          }
+
+        }
+
+        if (flagLinVel)
+        {
+          if (flagLinAcc && !newValue.linAcc.isSet() && newValue.linVel.isSet())
+          {
+            curLinVel=linVel;
+          }
+
+          if (newValue.linVel.isSet())
+          {
+            linVel = newValue.linVel;
+          }
+          else
+          {
+            if (
+              newValue.position.isSet() &&
+              (curPos.isSet() || ( position.isSet() && !flagPos))
+            )
+            {
+              if (curPos.isSet())
+              {
+                linVel=(newValue.position() - curPos())/dt;
+              }
+              else
+              {
+                linVel=(newValue.position() - position())/dt;
+              }
+            }
+            else
+            {
+              if (linVel.isSet())
+              {
+                if (linAcc.isSet())
+                {
+                  linVel()+=linAcc()*dt;
+                }
+              }
+              else
+              {
+                linVel.set();
+                linVel().setZero();
+              }
+            }
+
+          }
+        }
+
+        if (flagLinAcc)
+        {
+          if (newValue.linAcc.isSet())
+          {
+            linAcc =  newValue.linAcc;
+          }
+          else
+          {
+            if (
+              newValue.linVel.isSet() &&
+              (curLinVel.isSet() || (linVel.isSet() && !flagLinVel))
+            )
+            {
+              if (curLinVel.isSet())
+              {
+                linAcc=(newValue.linVel()-curLinVel())/dt;
+              }
+              else
+              {
+                linAcc=(newValue.linVel()-linVel())/dt;
+              }
+            }
+            else
+            {
+              if (!linAcc.isSet())
+              {
+                linAcc.set();
+                linAcc().setZero();
+              }
+            }
+          }
+        }
+      }
+
+      {
+        Orientation curOri;
+        CheckedVector3 curAngVel;
+
+
+        if (flagOri)
+        {
+          if (flagAngVel && !newValue.angVel.isSet() && orientation.isSet()  && newValue.orientation.isSet())
+          {
+            curOri=orientation;
+          }
+          if (newValue.orientation.isSet())
+          {
+            orientation=newValue.orientation;
+          }
+          else
+          {
+            if (orientation.isSet() )
+            {
+              if(angVel.isSet())
+              {
+                Vector3 increment = Vector3::Zero();
+                increment+=angVel()*dt;
+                if (angAcc.isSet())
+                {
+                  increment+=angAcc()*dt*dt/2;
+                }
+                orientation.integrate(increment);
+              }
+            }
+            else
+            {
+              orientation=Quaternion::Identity();
+            }
+          }
+        }
+
+        if (flagAngVel)
+        {
+          if (flagAngAcc && !newValue.angAcc.isSet() && newValue.angVel.isSet())
+          {
+            curAngVel=angVel;
+          }
+
+          if (newValue.angVel.isSet())
+          {
+            angVel = newValue.angVel;
+          }
+          else
+          {
+            if (
+              newValue.orientation.isSet() &&
+              (curOri.isSet() || ( orientation.isSet() && !flagOri))
+            )
+            {
+              if (curOri.isSet())
+              {
+                angVel=curOri.differentiate(newValue.orientation)/dt;
+              }
+              else
+              {
+                angVel=orientation.differentiate(newValue.orientation)/dt;
+              }
+            }
+            else
+            {
+              if (angVel.isSet())
+              {
+                if (angAcc.isSet())
+                {
+                  angVel()+=angAcc()*dt;
+                }
+              }
+              else
+              {
+                angVel.set();
+                angVel().setZero();
+              }
+            }
+
+          }
+        }
+
+        if (flagAngAcc)
+        {
+          if (newValue.angAcc.isSet())
+          {
+            angAcc =  newValue.angAcc;
+          }
+          else
+          {
+            if (
+              newValue.angVel.isSet() &&
+              (curAngVel.isSet() || (angVel.isSet() && !flagAngVel))
+            )
+            {
+              if (curAngVel.isSet())
+              {
+                angAcc=(newValue.angVel()-curAngVel())/dt;
+              }
+              else
+              {
+                angAcc=(newValue.angVel()-angVel())/dt;
+              }
+            }
+            else
+            {
+              if (!angAcc.isSet())
+              {
+                angAcc.set();
+                angAcc().setZero();
+              }
+            }
+          }
+        }
+      }
+
+      return *this;
+    }
     
 
   }

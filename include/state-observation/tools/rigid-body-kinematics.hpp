@@ -475,6 +475,7 @@ namespace stateObservation
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
+      inline const Kinematics & update_deprecated(const Kinematics & newValue, double dt, Flags::Byte=Flags::all);
       ///this is a helper function to avoid code duplication
       template<typename operand1,typename operand2>
       inline Kinematics templateSetToProductNoAlias_(operand1& multilplier1, operand2& multiplier2);
