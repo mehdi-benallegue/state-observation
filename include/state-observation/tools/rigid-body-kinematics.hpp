@@ -437,7 +437,8 @@ namespace stateObservation
       
       inline const Kinematics & integrate(double dt);
 
-      inline const Kinematics & update(const Kinematics & newValue, double dt=0, Flags::Byte=Flags::all);
+      inline const Kinematics & update(const Kinematics & newValue, double dt, Flags::Byte=Flags::all);
+      
 
       inline Kinematics getInverse() const;
 
