@@ -144,6 +144,8 @@ namespace stateObservation
     ///Merge the roll pitch from R1 with yaw from R2
     inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2);
 
+    inline Quaternion zeroRotationQuaternion();
+
     ///transforms a rotation into translation given a constraint of a fixed point
     inline void fixedPointRotationToTranslation
     (const Matrix3 & R, const Vector3 & rotationVelocity,
@@ -368,6 +370,12 @@ namespace stateObservation
 
       ///synchronizes the representations (quaternion and rotation matrix)
       inline void synchronize();
+
+      /// retruns a zero rotation
+      static inline Orientation zeroRotation();
+
+      ///Returns a uniformly distributed random rotation
+      static inline Orientation randomRotation();
 
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
