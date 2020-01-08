@@ -24,9 +24,7 @@ int testOrientation(int errcode)
 
     double err=0.;
 
-    unsigned testNum =0;
-
-  
+ 
     {
         kine::Orientation ori1;
         ori1 = q;
@@ -34,7 +32,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                  + (M1 - M).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -43,7 +40,6 @@ int testOrientation(int errcode)
         
         err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
                 + (ori2.matrix3() - M).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -52,7 +48,6 @@ int testOrientation(int errcode)
 
         err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
                  + (ori3.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -61,7 +56,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                 + (ori4.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
 
@@ -71,7 +65,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                  + (M1 - M).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -79,7 +72,6 @@ int testOrientation(int errcode)
         
         err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
                 + (ori2.matrix3() - M).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -87,7 +79,6 @@ int testOrientation(int errcode)
 
         err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
                  + (ori3.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -95,7 +86,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -103,7 +93,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {   
@@ -113,7 +102,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {   
@@ -123,7 +111,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
 
@@ -138,7 +125,6 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - M).norm()  
                  + (M3 - M).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
 
@@ -184,7 +170,6 @@ int testOrientation(int errcode)
                 (ori15.matrix3() - Matrix3::Identity()).norm()+
                 (ori16.matrix3() - Matrix3::Identity()).norm()+
                 (ori17.matrix3() - Matrix3::Identity()).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -194,7 +179,6 @@ int testOrientation(int errcode)
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     {
@@ -206,7 +190,6 @@ int testOrientation(int errcode)
         Vector3 v2 = ori1.differentiate(ori2) ;
  
         err +=  (v1- v2).norm();
-        std::cout << "orientation error " << ++testNum << " " << err <<std::endl;
     }
 
     if (err>1e-14)
@@ -218,153 +201,353 @@ int testOrientation(int errcode)
 
 int testKinematics (int errcode)
 {
-    double err=0;
-    double threshold=1e-25;
+    typedef kine::Kinematics::Flags Flags;
+
 
     kine::Kinematics k0;
-
-    Vector3 pos0 = Vector3::Random();
-
-    kine::Orientation ori0;
-    ori0.setRandom();
-
-    Vector3 linvel0 = Vector3::Random();
-    Vector3 angvel0 = Vector3::Random();
-    Vector3 linacc0 = Vector3::Random();
-    Vector3 angacc0 = Vector3::Random();
-
     kine::Kinematics k1;
 
-    Vector3 pos1 = Vector3::Random();
+ 
+    
 
-    kine::Orientation ori1;
-    ori1.setRandom();
+    Flags::Byte flag0 = BOOST_BINARY(000000);
+    Flags::Byte flag1 = BOOST_BINARY(000000);
 
-    Vector3 linvel1 = Vector3::Random();
-    Vector3 angvel1 = Vector3::Random();
-    Vector3 linacc1 = Vector3::Random();
-    Vector3 angacc1 = Vector3::Random();
 
-    int count = 100000;
-
-    tools::ProbabilityLawSimulation s;
-
-    kine::Kinematics k;
+    kine::Kinematics k,l,k2,k3;
 
     
-    
+    int count = pow(2,6)*pow(2,6);
+    double err=0;
+    double threshold=1e-30*count;
 
     for (int i = 0; i < count; i++)
     {
+
+        Vector3 pos0 = Vector3::Random();
+        kine::Orientation ori0 = kine::Orientation::randomRotation();
+        Vector3 linvel0 = Vector3::Random();
+        Vector3 angvel0 = Vector3::Random();
+        Vector3 linacc0 = Vector3::Random();
+        Vector3 angacc0 = Vector3::Random();
+
+
+        Vector3 pos1 = Vector3::Random();
+        kine::Orientation ori1= kine::Orientation::randomRotation();
+        Vector3 linvel1 = Vector3::Random();
+        Vector3 angvel1 = Vector3::Random();
+        Vector3 linacc1 = Vector3::Random();
+        Vector3 angacc1 = Vector3::Random();
+
         k0.reset();
         k1.reset();
 
-        if (s.getGaussianScalar()>0.0)
+        if (flag0 & Flags::position)
         {
-            std::cout << "0" ;
             k0.position = pos0;
         }
         if (true) ///the orientation has to be set 
         {
-            std::cout << "1" ;
             k0.orientation = ori0;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag0 & Flags::linVel)
         {
-            std::cout << "2" ;
             k0.linVel = linvel0;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag0 & Flags::angVel)
         {
-            std::cout << "3" ;
             k0.angVel = angvel0;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag0 & Flags::linAcc)
         {
-            std::cout << "4" ;
             k0.linAcc = linacc0;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag0 & Flags::angAcc)
         {
-            std::cout << "5" ;
             k0.angAcc = angacc0;
         }
 
-        std::cout << " " ;
-        if (s.getGaussianScalar()>0.0)
+        if (flag1 & Flags::position)
         {
-            std::cout << "0" ;
             k1.position = pos1;
         }
-        if (true)///the orientation has to be set 
+        if (! k1.position.isSet() || flag1 & Flags::orientation)///the orientation has to be set 
         {
-            std::cout << "1" ;
             k1.orientation = ori1;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag1 & Flags::linVel)
         {
-            std::cout << "2" ;
             k1.linVel = linvel1;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag1 & Flags::angVel)
         {
-            std::cout << "3" ;
             k1.angVel = angvel1;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag1 & Flags::linAcc)
         {
-            std::cout << "4" ;
             k1.linAcc = linacc1;
         }
-        if (s.getGaussianScalar()>0.0)
+        if (flag1 & Flags::angAcc)
         {
-            std::cout << "5" ;
             k1.angAcc = angacc1;
         }
 
-        std::cout << " " ;
+        if ((flag0 = (flag0+1) & Flags::all)==0) ///update the flags to span all the possibilties
+            flag1 = (flag1+1) & Flags::all;
 
-        k = k0 * k1 * k1.getInverse() * k0.getInverse();
+        k2=k1;
+        if (!k1.orientation.isSet())
+        {
+            k2.orientation.setZeroRotation();
+        }
+
+        k = ((k0 
+            * k2) 
+            * k2.getInverse() )
+            * k0.getInverse();
 
         if (k.position.isSet())
         {
-            std::cout << "0" ;
             err += k.position().squaredNorm();
         }
         if (k.orientation.isSet())
         {
-            std::cout << "1" ;
             err += k.orientation.toRotationVector().squaredNorm();
         }
         if (k.linVel.isSet())
         {
-            std::cout << "2" ;
             err +=  k.linVel().squaredNorm();
         }
         if (k.angVel.isSet())
         {
-            std::cout << "3" ;
             err += k.angVel().squaredNorm();
         }
         if (k.linAcc.isSet())
         {
-            std::cout << "4" ;
             err += k.linAcc().squaredNorm();
         }
         if (k.angAcc.isSet())
         {
-            std::cout << "6" ;
             err += k.angAcc().squaredNorm();
         }
         
-        std::cout << " " << err << std::endl;
-        
+    }
+
+     if (err>threshold )
+    {
+        std::cout << "Error too large : " << err <<std::endl;
+        return errcode;
     }
     
+    err =0;
+
+    threshold = 1e-19*count;
+
+
+
+    flag0 = BOOST_BINARY(000000);
+    flag1 = BOOST_BINARY(000000);
+
+     
+    for (int i = 0; i < count; i++)
+    {
+        Vector3 pos0 = Vector3::Random();
+        kine::Orientation ori0 = kine::Orientation::randomRotation();
+        Vector3 linvel0 = Vector3::Random();
+        Vector3 angvel0 = Vector3::Random();
+        Vector3 linacc0 = Vector3::Random();
+        Vector3 angacc0 = Vector3::Random();
+
+        k.reset();
+        k.position = pos0;
+        k.orientation = ori0;
+        k.linVel = linvel0;
+        k.angVel = angvel0;
+        k.linAcc = linacc0;
+        k.angAcc = angacc0;
+
+        l = k;
+
+        double dt = 0.001;
+        k.integrate(dt);
+
+
+        k0.reset();
+        k1.reset();
+
+        if (i==-1)
+        {
+            std::cout <<"debug me ";
+        }
+
+        if (flag0 & Flags::position)
+        {
+            k0.position = l.position;
+        }
+        if (flag0 & Flags::orientation)  
+        {
+            k0.orientation = l.orientation;
+        }
+        if (flag0 & Flags::linVel)
+        {
+            k0.linVel = l.linVel;
+        }
+        if (flag0 & Flags::angVel)
+        {
+            k0.angVel = l.angVel;
+        }
+        if (flag0 & Flags::linAcc)
+        {
+            k0.linAcc = l.linAcc;
+        }
+        if (flag0 & Flags::angAcc)
+        {
+            k0.angAcc = l.angAcc;
+        }
+
+        if (flag1 & Flags::position)
+        {
+            k1.position = k.position;
+        }
+        if (flag1 & Flags::orientation)
+        {
+            k1.orientation = k.orientation;
+        }
+        if (flag1 & Flags::linVel)
+        {
+            k1.linVel = k.linVel;
+        }
+        if (flag1 & Flags::angVel)
+        {
+            k1.angVel = k.angVel;
+        }
+        if (flag1 & Flags::linAcc)
+        {
+            k1.linAcc = k.linAcc;
+        }
+        if (flag1 & Flags::angAcc)
+        {
+            k1.angAcc = k.angAcc;
+        }
+
+
+        if ((flag0 = (flag0+1) & Flags::all)==0) ///update the flags to span all the possibilties
+            flag1 = (flag1+1) & Flags::all;
+
+        kine::Kinematics::Flags::Byte flag =BOOST_BINARY(000000);
+
+        if (k1.position.isSet() || 
+            (k0.position.isSet() && k0.linVel.isSet() && k0.linAcc.isSet())
+           )
+        {
+            flag = flag | kine::Kinematics::Flags::position;
+        }
+        if (k1.orientation.isSet() || 
+            (k0.orientation.isSet() && k0.angVel.isSet() && k0.angAcc.isSet())
+            )
+        {
+            flag = flag | kine::Kinematics::Flags::orientation;
+        }
+        if (k1.linVel.isSet() || 
+            (k0.position.isSet() && k1.position.isSet()) || 
+            (k0.linAcc.isSet() && k0.linVel.isSet())
+            )
+        {
+            flag = flag | kine::Kinematics::Flags::linVel;
+        }
+        if (k1.angVel.isSet() ||
+            (k0.orientation.isSet() && k1.orientation.isSet()) || 
+            (k0.angVel.isSet() && k0.angAcc.isSet())
+           )
+        {
+            flag = flag | kine::Kinematics::Flags::angVel;
+        }
+        if (k1.linAcc.isSet() ||
+             (k0.linVel.isSet() && k1.linVel.isSet())||
+             (k0.linVel.isSet() && k0.position.isSet() && k1.position.isSet())
+            )
+        {
+            flag = flag | kine::Kinematics::Flags::linAcc;
+        }
+        if (k1.angAcc.isSet()||
+            (k0.angVel.isSet() && k1.angVel.isSet()) ||
+            (k0.angVel.isSet() && k0.orientation.isSet() && k1.orientation.isSet())
+            )
+        {
+            flag = flag | kine::Kinematics::Flags::angAcc;
+        }
+
+        k3 = k0;
+        k0.update(k1,dt,flag);
+
+        if (k0.position.isSet())
+        {
+            err += (k.position()-k0.position()).squaredNorm();
+        }
+        if (k0.orientation.isSet())
+        {
+            err += (k.orientation.differentiate(k0.orientation)).squaredNorm();
+        }
+        if (k0.linVel.isSet())
+        {
+            if ((k.linVel()-k0.linVel()).squaredNorm()<1e-8)
+            {
+                err +=  (k.linVel()-k0.linVel()).squaredNorm();
+            }
+            else
+            {
+                err += ((k.position()-l.position())/dt-k0.linVel()).squaredNorm();
+            }
+            
+            
+        }
+        if (k0.angVel.isSet())
+        {
+            if ((k.angVel()-k0.angVel()).squaredNorm()<1e-9)
+            {
+                err +=  (k.angVel()-k0.angVel()).squaredNorm();
+            }
+            else
+            {
+                err += (l.orientation.differentiate(k.orientation)/dt-k0.angVel()).squaredNorm();
+            }
+        }
+        if (k0.linAcc.isSet())
+        {
+            if ((k.linAcc()-k0.linAcc()).squaredNorm() < 1e-5)
+            {
+                err +=(k.linAcc()-k0.linAcc()).squaredNorm() ;
+            }
+            else
+            {
+                err +=(k.linAcc()-2*k0.linAcc()).squaredNorm() ;
+            }            
+        }
+        if (k0.angAcc.isSet())
+        {            
+            if ((k.angAcc()-k0.angAcc()).squaredNorm()< 1e-5)
+            {
+                err +=(k.angAcc()-k0.angAcc()).squaredNorm() ;
+            }
+            else
+            {
+                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm() ;
+            }            
+        }
+
+//        std::cout<< i<<" "<<err << std::endl;
+
+        if (err>threshold )
+        {
+            break;
+        }
+        
+    }
 
     
     if (err>threshold )
     {
+        std::cout << "Error too large : " << err <<std::endl;
         return errcode;
     }
     
@@ -383,7 +566,7 @@ int main()
      KineticsObserver o(7);
 
     
-    std::cout << o.getStateSize()<<std::endl;
+    
     
     Vector x0(o.getStateSize());
     x0.setZero();
@@ -397,12 +580,21 @@ int main()
         std::cout<< "test failed, code : 1" <<std::endl;
         return returnVal;
     }
+    else
+    {
+        std::cout << "Orientation test succeeded" << std::endl;
+    }
+    
 
 
-    if ((returnVal = testKinematics(1))) /// it is not an equality check
+    if ((returnVal = testKinematics(2))) /// it is not an equality check
     {
         std::cout<< "test failed, code : 1" <<std::endl;
         return returnVal;
+    }
+    else
+    {
+        std::cout << "Kinematics test succeeded" << std::endl;
     }
 
 
