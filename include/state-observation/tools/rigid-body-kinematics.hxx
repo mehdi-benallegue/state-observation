@@ -1502,6 +1502,19 @@ namespace stateObservation
         {
           thisAcc = newAcc();
         }
+
+        if (!flagPos)
+        {
+          thisPos.reset();
+        }
+        if (!flagLinVel)
+        {
+          thisVel.reset();
+        }
+        if (!flagLinAcc)
+        {
+          thisAcc.reset();
+        }
       }       
 
       
@@ -1702,9 +1715,19 @@ namespace stateObservation
           thisAcc = newAcc();
         }
         
+        if (!flagOri)
+        {
+          thisOri.reset();
+        }
+        if (!flagAngVel)
+        {
+          thisVel.reset();
+        }
+        if (!flagAngAcc)
+        {
+          thisAcc.reset();
+        }
       }
-
-
       return *this;
     }
 
