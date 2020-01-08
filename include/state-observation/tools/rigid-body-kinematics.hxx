@@ -369,6 +369,11 @@ namespace stateObservation
       return mergeTiltWithYaw(R1.transpose()*Vector3::UnitZ(),R2);     
     }
 
+    inline Quaternion zeroRotationQuaternion()
+    {
+      return Quaternion(1,0,0,0);
+    }
+
     ///transforms a rotation into translation given a constraint of a fixed point
     inline void fixedPointRotationToTranslation
     (const Matrix3 & R, const Vector3 & rotationVelocity,
@@ -677,7 +682,7 @@ namespace stateObservation
     template <>
     inline Orientation & Orientation::setZeroRotation<Quaternion>()
     {
-      return (*this) = Quaternion(1,0,0,0);
+      return (*this) = zeroRotationQuaternion();
     }
 
     template <>
@@ -1064,6 +1069,18 @@ namespace stateObservation
       }
 
       return *this;
+    }
+
+    inline Orientation Orientation::zeroRotation()
+    {
+      return Orientation(zeroRotation(), Matrix3::Identity());
+    }
+
+    inline Orientation Orientation::randomRotation()
+    {
+      Orientation o;
+      o.setRandom();
+      return o;
     }
 
     ///////////////////////////////////////////////////////////////////////
