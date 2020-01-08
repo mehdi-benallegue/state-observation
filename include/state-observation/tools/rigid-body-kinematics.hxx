@@ -1331,13 +1331,6 @@ namespace stateObservation
           else
           {
             BOOST_ASSERT(thisPos.isSet() && "The position is cannot be updated without initial value");
-            if (! thisPos.isSet()) //code to not use an uninitialized value in release
-            {
-              
-              thisPos.set();
-              thisPos().setZero(); //the default value is zero
-            }
-
             if (thisVel.isSet())
             {
               if (thisAcc.isSet())
@@ -1375,12 +1368,6 @@ namespace stateObservation
             else
             {
               BOOST_ASSERT(thisVel.isSet() && "The linear velocity is cannot be updated without initial value");
-              if (!thisVel.isSet()) //code to not use an uninitialized value in releasse
-              {
-                thisVel.set();
-                thisVel().setZero(); //the default value is zero
-              }
-              
               if (thisAcc.isSet())
               {
                 velMethod = useAcceleration;
@@ -1419,11 +1406,6 @@ namespace stateObservation
                 else
                 {
                   BOOST_ASSERT (thisAcc.isSet() && "The linear accleration cannot be updated without initial value");
-                  if (! thisAcc.isSet() ) //code to not use an uninitialized value in releasse
-                  {
-                    thisAcc.set();
-                    thisAcc().setZero();
-                  }
                 }
               }
             } 
@@ -1547,12 +1529,6 @@ namespace stateObservation
           else
           {
             BOOST_ASSERT(thisOri.isSet() && "The orientation is trying to be updated without initial value");
-            if (! thisOri.isSet()) //code to not use an uninitialized value in release
-            {
-              
-              thisOri.setZeroRotation(); //the default value is zero
-            }
-
             if (thisVel.isSet())
             {
               if (thisAcc.isSet())
@@ -1590,12 +1566,7 @@ namespace stateObservation
             else
             {
               BOOST_ASSERT(thisVel.isSet() && "The angular velocity is trying to be updated without initial value");
-              if (!thisVel.isSet()) //code to not use an uninitialized value in releasse
-              {
-                thisVel.set();
-                thisVel().setZero(); //the default value is zero
-              }
-              
+            
               if (thisAcc.isSet())
               {
                 velMethod = useAcceleration;
@@ -1633,11 +1604,6 @@ namespace stateObservation
                 else
                 {
                   BOOST_ASSERT (thisAcc.isSet() && "The angular accleration is trying to be updated without initial value");
-                  if (! thisAcc.isSet() ) //code to not use an uninitialized value in releasse
-                  {
-                    thisAcc.set();
-                    thisAcc().setZero();
-                  }
                 }
               }
             }
