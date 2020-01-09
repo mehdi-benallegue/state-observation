@@ -351,6 +351,11 @@ namespace stateObservation
     return stateVector_;
   }
 
+  stateObservation::TimeIndex KineticsObserver::getStateVectorSampleTime() const
+  {
+    return ekf_.getCurrentTime() ;
+  }
+
   kine::Kinematics KineticsObserver::getKinematics() const
   {
     return stateKinematics_; 

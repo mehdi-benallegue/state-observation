@@ -81,6 +81,9 @@ namespace stateObservation
         /// Gets an estimation of the state in the form of a state vector $\hat{x_{k+1}}$
         Vector getStateVector() const;
 
+        /// Gets the internal sample time of the state vector
+        stateObservation::TimeIndex getStateVectorSampleTime() const;
+
         /// Get the Kinematics of the observed frams
         Kinematics getKinematics() const;
 
