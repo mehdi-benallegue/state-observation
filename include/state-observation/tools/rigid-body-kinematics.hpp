@@ -490,8 +490,14 @@ namespace stateObservation
 
       Vector3 tempVec_;
     };
+
+    
+    
+
   }///namespace kine
 }///namespace stateObservation
+
+inline std::ostream& operator<<(std::ostream& os, const stateObservation::kine::Kinematics & k);
 
 #include <state-observation/tools/rigid-body-kinematics.hxx>
 

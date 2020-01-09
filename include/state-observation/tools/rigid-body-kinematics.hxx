@@ -1571,7 +1571,7 @@ namespace stateObservation
               {
                 velMethod = useAcceleration;
               }
-            }
+            } 
             
           }
           
@@ -2265,4 +2265,82 @@ namespace stateObservation
     
 
   }
+
+
+}
+
+inline std::ostream &operator<<(std::ostream &os, const stateObservation::kine::Kinematics &k)
+{
+  if (  !k.position.isSet() && ! k.orientation.isSet() &&
+        !k.linVel.isSet() && !k.angVel.isSet() &&
+        !k.linAcc.isSet() && !k.angAcc.isSet() )
+  {
+    os <<"empty kinematics"<< std::endl;
+  }
+
+  if (k.position.isSet() || k.orientation.isSet())
+  {
+    if (k.position.isSet())
+    {
+      os << "pos   : " << k.position().transpose() <<"   ";
+    }
+    else
+    {
+      os << "pos   :                                  ";
+    }
+    
+                                  
+    if (k.orientation.isSet())
+    {
+      os << "ori   : " << k.orientation.toRotationVector().transpose() << std::endl;
+    }
+    else
+    {
+      os << "ori   :" << std::endl;
+    }
+  }
+
+  if (k.linVel.isSet() || k.angVel.isSet())
+  {
+    if (k.linVel.isSet())
+    {
+      os << "linVel: " << k.linVel().transpose() <<"   ";
+    }
+    else
+    {
+      os << "linVel:                                  ";
+    }
+
+    if (k.angVel.isSet())
+    {
+      os << "angVel: " << k.angVel().transpose() << std::endl;
+    }
+    else
+    {
+      os << "angVel:" << std::endl;
+    }
+  }
+
+  if (k.linAcc.isSet() || k.angAcc.isSet())
+  {
+    if (k.linAcc.isSet())
+    {
+      os << "linAcc: " << k.linAcc().transpose() <<"   ";
+    }
+    else
+    {
+      os << "linAcc:                                  ";
+    }
+
+    if (k.angAcc.isSet())
+    {
+      os << "angAcc: " << k.angAcc().transpose() << std::endl;
+    }
+    else
+    {
+      os << "angAcc:" << std::endl;
+    }
+  }
+
+  return os;
 }
