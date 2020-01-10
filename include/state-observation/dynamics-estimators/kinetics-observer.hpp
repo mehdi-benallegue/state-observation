@@ -88,8 +88,10 @@ namespace stateObservation
         Kinematics getKinematics() const;
 
         /// Get the kinematics of a given frame
-        Kinematics getKinematics(const Kinematics & localKinematics) const;
-        Kinematics getKinematics(const Kinematics & localKinematics);
+        Kinematics getKinematicsOf(const Kinematics & localKinematics) const;
+        Kinematics getKinematicsOf(const Kinematics & localKinematics);
+        Kinematics getKinematicsOf(Kinematics & localKinematics) const;
+        Kinematics getKinematicsOf(Kinematics & localKinematics);
 
         ///get the contact force provided by the estimator 
         /// which is different from a contact sensor measurement

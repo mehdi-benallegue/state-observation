@@ -361,7 +361,22 @@ namespace stateObservation
     return stateKinematics_; 
   }  
 
-  kine::Kinematics KineticsObserver::getKinematics( const Kinematics & local) const
+  kine::Kinematics KineticsObserver::getKinematicsOf( const Kinematics & local) const
+  {
+    return Kinematics(stateKinematics_,local);///product of the kinematics
+  }
+
+  kine::Kinematics KineticsObserver::getKinematicsOf( const Kinematics & local)
+  {
+    return Kinematics(stateKinematics_,local);///product of the kinematics
+  }
+
+  kine::Kinematics KineticsObserver::getKinematicsOf( Kinematics & local) const
+  {
+    return Kinematics(stateKinematics_,local);///product of the kinematics
+  }
+
+  kine::Kinematics KineticsObserver::getKinematicsOf( Kinematics & local)
   {
     return Kinematics(stateKinematics_,local);///product of the kinematics
   }
