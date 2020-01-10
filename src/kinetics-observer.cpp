@@ -437,7 +437,7 @@ namespace stateObservation
     if (resetCovariance)
     {
       Matrix stateCovariance = ekf_.getStateCovariance();
-      setBlockStateCovariance<sizeStateKine>(stateCovariance,stateKinematicsInitCovMat_,kineIndex());
+      setBlockStateCovariance<sizeStateKineTangent>(stateCovariance,stateKinematicsInitCovMat_,kineIndex());
 
       if (resetForces)
       {
