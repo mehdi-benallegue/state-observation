@@ -1040,19 +1040,17 @@ namespace stateObservation
       {
         if (R1.isMatrixSet() && R2.isMatrixSet())
         {
-          m_.set();
-          m_().noalias() = R1.m_()*R2.m_();
+          m_.set().noalias() = R1.m_()*R2.m_();
         }
         else
         {
           m_.reset();
         }
-        q_.set();
-        q_() = R1.q_()*R2.q_();
+        q_ = R1.q_()*R2.q_();
       }
       else 
       {
-        m_.set();
+        m_.set(true); /// we set the matrix as initialized before giving the value
         if (!R1.isMatrixSet() )
         {
           m_().noalias() = R1.quaternionToMatrix_()*R2.m_();
@@ -1212,8 +1210,7 @@ namespace stateObservation
 
       if (flagPos )
       {
-        position.set();
-        position().setZero();
+        position.set().setZero();
       }
 
       if (flagOri )
@@ -1223,26 +1220,22 @@ namespace stateObservation
 
       if (flagLinVel )
       {
-        linVel.set();
-        linVel().setZero();
+        linVel.set().setZero();
       }
 
       if (flagAngVel )
       {
-        angVel.set();
-        angVel().setZero();  
+        angVel.set().setZero();  
       }
 
       if (flagLinAcc )
       {
-        linAcc.set();
-        linAcc().setZero();
+        linAcc.set().setZero();
       }
 
       if (flagAngAcc )
       {
-        angAcc.set();
-        angAcc().setZero();
+        angAcc.set().setZero();
       }
 
       return *this;
@@ -1930,16 +1923,16 @@ namespace stateObservation
 
       if (multiplier2.position.isSet() && multiplier1.position.isSet())
       {
-        position.set();
-        Vector3& R1p2 = position(); /// reference
+        position.set(true);
+        Vector3& R1p2 = position(); /// reference ( Vector3&  )
         R1p2.noalias() = multiplier1.orientation*multiplier2.position();
 
         if (multiplier2.linVel.isSet() && multiplier1.linVel.isSet() && multiplier1.angVel.isSet())
         {
-          linVel.set();
           Vector3& R1p2d = tempVec_; /// reference
           R1p2d.noalias() = multiplier1.orientation*multiplier2.linVel();       
           
+          linVel.set(true);
           Vector3& w1xR1p2 = linVel(); /// reference
           w1xR1p2.noalias() = multiplier1.angVel().cross(R1p2);
           
@@ -1948,7 +1941,7 @@ namespace stateObservation
 
           if (multiplier2.linAcc.isSet() && multiplier1.linAcc.isSet() && multiplier1.angAcc.isSet())
           {
-            linAcc.set();
+            linAcc.set(true);
             linAcc().noalias()  = multiplier1.orientation*multiplier2.linAcc();
             linAcc().noalias() += multiplier1.angAcc().cross(R1p2);
             linAcc().noalias() += multiplier1.angVel().cross(w1xR1p2_R1p2d+R1p2d);
@@ -1985,13 +1978,13 @@ namespace stateObservation
 
         if (multiplier2.angVel.isSet() && multiplier1.angVel.isSet())
         {
-          angVel.set();
-          Vector3& R1w2 = angVel();
+          angVel.set(true);
+          Vector3& R1w2 = angVel(); ///reference
           R1w2.noalias() = multiplier1.orientation * multiplier2.angVel();          
 
           if (multiplier2.angAcc.isSet() && multiplier1.angAcc.isSet())
           {
-            angAcc.set();
+            angAcc.set(true);
             angAcc().noalias()  = multiplier1.orientation * multiplier2.angAcc();
             angAcc().noalias() += multiplier1.angVel().cross(R1w2);
             angAcc()           += multiplier1.angAcc();
@@ -2056,8 +2049,7 @@ namespace stateObservation
             }
             else
             {
-              position.set();
-              position().setZero();
+              position.set().setZero();
             }
           }
 
@@ -2101,8 +2093,7 @@ namespace stateObservation
               }
               else
               {
-                linVel.set();
-                linVel().setZero();
+                linVel.set().setZero();
               }
             }
 
@@ -2135,8 +2126,7 @@ namespace stateObservation
             {
               if (!linAcc.isSet())
               {
-                linAcc.set();
-                linAcc().setZero();
+                linAcc.set().setZero();
               }
             }
           }
@@ -2218,8 +2208,7 @@ namespace stateObservation
               }
               else
               {
-                angVel.set();
-                angVel().setZero();
+                angVel.set().setZero();
               }
             }
 
@@ -2252,8 +2241,7 @@ namespace stateObservation
             {
               if (!angAcc.isSet())
               {
-                angAcc.set();
-                angAcc().setZero();
+                angAcc.set().setZero();
               }
             }
           }
