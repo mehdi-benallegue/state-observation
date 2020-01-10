@@ -405,8 +405,8 @@ namespace stateObservation
     addContactAndUnmodeledWrench(stateVector_,forceLocal,torqueLocal);
 
     /// The accelerations are about to be computed so we set them to "initialized"
-    stateKinematics_.linAcc.set();
-    stateKinematics_.angAcc.set();
+    stateKinematics_.linAcc.set(true);
+    stateKinematics_.angAcc.set(true);
 
     computeAccelerations_(stateKinematics_,forceLocal,torqueLocal,
                           stateKinematics_.linAcc(), stateKinematics_.angAcc());
