@@ -418,6 +418,9 @@ namespace stateObservation
   void KineticsObserver::setStateKinematics(const Kinematics & kine, bool resetForces,
                                             bool resetCovariance)
   {
+    BOOST_ASSERT( kine.position.isSet() && kine.orientation.isSet() && 
+                  kine.linVel.isSet()   && kine.angVel.isSet() &&
+                  "The Kinematics is not correctly initialized");
     stateKinematics_ = kine;
     stateVector_.segment<sizeStateKine>(kineIndex()) = stateKinematics_.toVector(flagsStateKine);
 
