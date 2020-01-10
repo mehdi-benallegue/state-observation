@@ -1432,11 +1432,11 @@ namespace stateObservation
     Kinematics stateKine(x.segment<sizeStateKine>(kineIndex()), flagsStateKine);
 
     /// The accelerations are about to be computed so we set them to "initialized"
-    stateKine.linAcc.set();
-    stateKine.angAcc.set();
+    stateKine.linAcc.set(true);
+    stateKine.angAcc.set(true);
     
-    Vector3& linacc = (Vector3&)(stateKine.linAcc);
-    Vector3& angacc = (Vector3&)(stateKine.angAcc);
+    Vector3& linacc = stateKine.linAcc();///reference (Vector3&)
+    Vector3& angacc = stateKine.angAcc();///reference
 
     computeAccelerations_(stateKine,forceLocal,torqueLocal, linacc, angacc);
     
@@ -1494,8 +1494,8 @@ namespace stateObservation
     Kinematics stateKine(x.segment<sizeStateKine>(kineIndex()), flagsStateKine);
 
     /// The accelerations are about to be computed so we set them to "initialized"
-    stateKine.linAcc.set();
-    stateKine.angAcc.set();
+    stateKine.linAcc.set(true);
+    stateKine.angAcc.set(true);
     
     Vector3& linacc = (Vector3&)(stateKine.linAcc);
     Vector3& angacc = (Vector3&)(stateKine.angAcc);
