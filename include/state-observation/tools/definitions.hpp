@@ -194,12 +194,17 @@ namespace stateObservation
     inline void reset();
 
     /// set the value of the initialization check boolean
-    inline void set(bool value=true);
+    inline void set(bool value);
 
     void setAssertMessage(std::string s);
     void setExceptionPtr(std::exception* e);
 
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(eigenAlignedNew)
+    /// allows to set the initialization boolean to true and give a reference
+    /// to the object with the same instruction
+    /// should be used to initialize the object without using the
+    /// assignment operator
+    inline T& set();
+
   protected:
 
     static const bool do_check_ = !lazy || isDebug;
@@ -219,6 +224,9 @@ namespace stateObservation
 
     bool chckitm_check_() const throw(std::exception);
     T v_;
+  public:
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(eigenAlignedNew)
   };
 
   typedef CheckedItem<Matrix3,false,false,true,true> CheckedMatrix3;
