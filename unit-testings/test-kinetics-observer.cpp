@@ -4,6 +4,7 @@
 #include <state-observation/tools/probability-law-simulation.hpp>
 
 using namespace stateObservation;
+using namespace kine;
 
 int testOrientation(int errcode)
 {   
@@ -560,24 +561,60 @@ int testKinematics (int errcode)
 
 }
 
-int main()
+int testKineticsObserver(int code)
 {
+    double dt = 0.001;
+    KineticsObserver o(6);
 
-     KineticsObserver o(7);
-
-    
-    
-    
     Vector x0(o.getStateSize());
     x0.setZero();
     Vector xf(x0);
     Vector xs(x0);
 
+    o.setSamplingTime(dt);
+
+    Kinematics stateKine;
+
+    stateKine.position.set() << 0,0,0.7;
+    stateKine.orientation.setZeroRotation();
+    stateKine.linVel.set().setZero();
+    stateKine.angVel.set().setZero();
+
+
+    o.setStateKinematics(stateKine);
+
+    Vector x = o.getStateVector();
+    stateObservation::TimeIndex index = o.getStateVectorSampleTime();
+
+    std::cout << index << " " << x.transpose() << std::endl;
+
+    o.update();
+
+    Kinematics k = o.getKinematics();
+
+    
+
+    std::cout << k;
+
+    Kinematics l = o.getKinematicsOf(k);
+
+    std::cout << l;
+
+    
+
+     
+
+
+    return 0;
+}
+
+int main()
+{
     int returnVal;
 
     if ((returnVal = testOrientation(1))) /// it is not an equality check
     {
-        std::cout<< "test failed, code : 1" <<std::endl;
+        std::cout<< "Orientation test failed, code : 1" <<std::endl;
         return returnVal;
     }
     else
@@ -589,12 +626,22 @@ int main()
 
     if ((returnVal = testKinematics(2))) /// it is not an equality check
     {
-        std::cout<< "test failed, code : 1" <<std::endl;
+        std::cout<< "Kinematics test failed, code : 1" <<std::endl;
         return returnVal;
     }
     else
     {
         std::cout << "Kinematics test succeeded" << std::endl;
+    }
+
+    if ((returnVal = testKineticsObserver(3)))
+    {
+        std::cout<< "Kinetics Observer test failed, code : 3" <<std::endl;
+        return returnVal;
+    }
+    else
+    {
+        std::cout << "Kinetics Observer test succeeded" << std::endl;
     }
 
 
