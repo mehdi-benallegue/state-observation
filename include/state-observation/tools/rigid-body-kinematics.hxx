@@ -1134,7 +1134,7 @@ namespace stateObservation
       if (flagPos )
       {
         BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading position)");
-        if (v.size()>index+3)
+        if (v.size()>=index+3)
         {
           position = v.segment<3>(index);
           index+=3;
@@ -1145,7 +1145,7 @@ namespace stateObservation
       if (flagOri )
       {
         BOOST_ASSERT (v.size()>=index+4 && "The kinematics vector size is incorrect (loading orientaTion)");
-        if (v.size()>index+4)
+        if (v.size()>=index+4)
         {
           orientation.fromVector4(v.segment<4>(index));
           index+=4;
@@ -1155,7 +1155,7 @@ namespace stateObservation
       if (flagLinVel )
       {
         BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading linear velocity)");
-        if (v.size()>index+3)
+        if (v.size()>=index+3)
         {
           linVel = v.segment<3>(index);
           index+=3;
@@ -1165,7 +1165,7 @@ namespace stateObservation
       if (flagAngVel )
       {
         BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading angular velocity)");
-        if (v.size()>index+3)
+        if (v.size()>=index+3)
         {
           angVel = v.segment<3>(index);
           index+=3;
@@ -1176,7 +1176,7 @@ namespace stateObservation
       if (flagLinAcc )
       {
         BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading linear acceleration)");
-        if (v.size()>index+3)
+        if (v.size()>=index+3)
         {
           linAcc = v.segment<3>(index);
           index+=3;
@@ -1186,10 +1186,10 @@ namespace stateObservation
       if (flagAngAcc )
       {
         BOOST_ASSERT (v.size()>=index+3 && "The kinematics vector size is incorrect (loading angular acceleration)");
-        if (v.size()>index+3)
+        if (v.size()>=index+3)
         {
           angAcc = v.segment<3>(index);
-          index+=3;
+          //index+=3; ///useless
         }
       }
 
