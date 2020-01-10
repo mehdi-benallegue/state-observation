@@ -128,6 +128,13 @@ inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::reset()
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::set()
+{
+  isSet_.set(true);
+  return v_;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::set(bool value)
 {
   isSet_.set(value);
