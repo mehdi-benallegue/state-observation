@@ -49,8 +49,8 @@ namespace stateObservation
 
         /// The constructor.
         ///  \li maxContacts : maximum number of contacts,
-        ///  \li dx gives the derivation step for a finite differences derivation method
-        KineticsObserver(int maxContacts=4);
+        ///  \li maxNumberOfIMU : the maximumnumber of IMUs
+        KineticsObserver(int maxContacts=4, int maxNumberOfIMU = 1);
 
         ///virtual destructor
         virtual ~KineticsObserver();
@@ -111,7 +111,10 @@ namespace stateObservation
         void setStateKinematics(const Kinematics &, bool resetContactWrenches=true,
                                    bool resetCovariance=true);
 
-        void setGyroBias(const Vector3 &,  bool resetCovariance=true);
+        /// Allows to initializa the value of the gyro bias of the IMU 
+        /// corresponding to the numberOfIMU
+        /// reset Covariance allows to reinitialize the gyro bias
+        void setGyroBias(const Vector3 &, unsigned numberOfIMU = 1,  bool resetCovariance=true);
 
         ///if only force or torque is available, set the unavailable value to zero 
         void setStateUnmodeledWrench(const Vector6 &, bool resetCovariance=true);
@@ -120,26 +123,24 @@ namespace stateObservation
         /// can be used for initialization of the estimator 
         void setStateVector(const Vector &,bool resetCovariance=true);
 
-
-
         /// Getters for the indexes of the state Vector
         inline unsigned kineIndex() const;
         inline unsigned posIndex() const;
         inline unsigned oriIndex() const;
         inline unsigned linVelIndex() const;
         inline unsigned angVelIndex() const;
-        inline unsigned gyroBiasIndex() const;
+        inline unsigned gyroBiasIndex(unsigned IMUNumber) const;
         inline unsigned unmodeledWrenchIndex() const;
         inline unsigned unmodeledForceIndex() const;
         inline unsigned unmodeledTorqueIndex() const;
         inline unsigned contactsIndex() const;
-        inline unsigned contactIndex(int contactNbr) const;
-        inline unsigned contactKineIndex(int contactNbr) const;
-        inline unsigned contactPosIndex(int contactNbr) const;
-        inline unsigned contactOriIndex(int contactNbr) const;
-        inline unsigned contactForceIndex(int contactNbr) const;
-        inline unsigned contactTorqueIndex(int contactNbr) const;
-        inline unsigned contactWrenchIndex(int contactNbr) const;
+        inline unsigned contactIndex(unsigned contactNbr) const;
+        inline unsigned contactKineIndex(unsigned contactNbr) const;
+        inline unsigned contactPosIndex(unsigned contactNbr) const;
+        inline unsigned contactOriIndex(unsigned contactNbr) const;
+        inline unsigned contactForceIndex(unsigned contactNbr) const;
+        inline unsigned contactTorqueIndex(unsigned contactNbr) const;
+        inline unsigned contactWrenchIndex(unsigned contactNbr) const;
 
         /// Getters for the indexes of the state Vector
         inline unsigned kineIndexTangent() const;
@@ -147,18 +148,18 @@ namespace stateObservation
         inline unsigned oriIndexTangent() const;
         inline unsigned linVelIndexTangent() const;
         inline unsigned angVelIndexTangent() const;
-        inline unsigned gyroBiasIndexTangent() const;
+        inline unsigned gyroBiasIndexTangent(unsigned IMUNumber) const;
         inline unsigned unmodeledWrenchIndexTangent() const;
         inline unsigned unmodeledForceIndexTangent() const;
         inline unsigned unmodeledTorqueIndexTangent() const;
         inline unsigned contactsIndexTangent() const;
-        inline unsigned contactIndexTangent(int contactNbr) const;
-        inline unsigned contactKineIndexTangent(int contactNbr) const;
-        inline unsigned contactPosIndexTangent(int contactNbr) const;
-        inline unsigned contactOriIndexTangent(int contactNbr) const;
-        inline unsigned contactForceIndexTangent(int contactNbr) const;
-        inline unsigned contactTorqueIndexTangent(int contactNbr) const;
-        inline unsigned contactWrenchIndexTangent(int contactNbr) const;          
+        inline unsigned contactIndexTangent(unsigned contactNbr) const;
+        inline unsigned contactKineIndexTangent(unsigned contactNbr) const;
+        inline unsigned contactPosIndexTangent(unsigned contactNbr) const;
+        inline unsigned contactOriIndexTangent(unsigned contactNbr) const;
+        inline unsigned contactForceIndexTangent(unsigned contactNbr) const;
+        inline unsigned contactTorqueIndexTangent(unsigned contactNbr) const;
+        inline unsigned contactWrenchIndexTangent(unsigned contactNbr) const;
         
       
 
@@ -200,15 +201,16 @@ namespace stateObservation
         /// the best is to provide the position , the orientation, 
         /// the angular and the linear velocities. 
         
-        void setContactWrenchSensor(const Vector6& wrenchMeasurement, const Kinematics &localKine, int contactNumber);
+        void setContactWrenchSensor(const Vector6& wrenchMeasurement, const Kinematics &localKine, unsigned contactNumber);
         void setContactWrenchSensor(const Vector6& wrenchMeasurement, const Matrix6 & wrenchCovMatrix, 
-                                                                                    const Kinematics &localKine, int contactNumber);
+                                                                                    const Kinematics &localKine, unsigned contactNumber);
 
         void setContactWrenchSensorDefaultCovarianceMatrix(const Matrix6 & wrenchSensorCovMat);
         
         /// sets the the kinematics of the contact expressed in the observed frame
-        /// the best is to provide the position, the orientation, the angular and the linear velocities. 
-        void setContactWithNoSensor(const Kinematics &localKine, int contactNumber);
+        /// the best is to provide the position, the orientation, the angular and the linear velocities.
+        /// otherwise they will be automatically computed 
+        void setContactWithNoSensor(const Kinematics &localKine, unsigned contactNumber);
                                                                
         /// Set a measurement of the pose. The input is the Measured kinematics 
         /// namely position and orientation.
@@ -303,9 +305,9 @@ namespace stateObservation
         void setKinematicsInitCovarianceDefault(const Matrix & );
         void setKinematicsProcessCovariance(const Matrix & );
 
-        void setGyroBiasStateCovariance(const Matrix3 & covMat);
+        void setGyroBiasStateCovariance(const Matrix3 & covMat, unsigned imuNumber);
         void setGyroBiasInitCovarianceDefault(const Matrix3 & covMat);
-        void setGyroBiasProcessCovariance(const Matrix3 & covMat);
+        void setGyroBiasProcessCovariance(const Matrix3 & covMat, unsigned imuNumber);
 
         void setUnmodeledWrenchStateCovMat(const Matrix6 & currentCovMat);
         void setUnmodeledWrenchIniCovMatDefault(const Matrix6 & initCovMat);
@@ -335,17 +337,17 @@ namespace stateObservation
         ///Resets the covariance matrices to their original values
         void resetStateCovarianceMat();
         void resetStateKinematicsCovMat();
-        void resetStateGyroBiasCovMat();
+        void resetStateGyroBiasCovMat( unsigned i);
         void resetStateUnmodeledWrenchCovMat();  
         void resetStateContactsCovMat();
-        void resetStateContactCovMat(int contactNbr);       
+        void resetStateContactCovMat(unsigned contactNbr);       
 
         void resetProcessCovarianceMat();
         void resetProcessKinematicsCovMat();
-        void resetProcessGyroBiasCovMat();
+        void resetProcessGyroBiasCovMat( unsigned i);
         void resetProcessUnmodeledWrenchCovMat();
         void resetProcessContactsCovMat();
-        void resetProcessContactCovMat(int contactNbr); 
+        void resetProcessContactCovMat(unsigned contactNbr); 
 
         ///Reset the default values for the covariance matrix
         void resetSensorsDefaultCovMat();
@@ -374,22 +376,25 @@ namespace stateObservation
             Vector6 acceleroGyro;
             Matrix3 covMatrixAccelero;
             Matrix3 covMatrixGyro;
+
+            static int currentNumber;
+
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
         };
 
-        typedef std::map<int, IMU, std::less<int>, 
-             Eigen::aligned_allocator<std::pair<const int, IMU> > > MapIMU;
-        typedef MapIMU::iterator MapIMUIterator;
-        typedef MapIMU::const_iterator MapIMUConstIterator;
-        typedef std::pair<int, IMU> PairIMU;
+        typedef std::vector<IMU, Eigen::aligned_allocator< IMU > > VectorIMU;
+        typedef VectorIMU::iterator VectorIMUIterator;
+        typedef VectorIMU::const_iterator VectorIMUConstIterator;
         
         struct Contact:
         public Sensor
         {
-            Contact():Sensor(sizeWrench),withRealSensor(false),
+            Contact():Sensor(sizeWrench),isSet(false),withRealSensor(false),
                         stateIndex(-1),stateIndexTangent(-1){}
             virtual ~Contact(){}
-            Kinematics localKine;
+
+            
+
             Kinematics absPose;
             Vector6 wrench;
             CheckedMatrix6 sensorCovMatrix;
@@ -399,27 +404,26 @@ namespace stateObservation
             Matrix3 angularStiffness;
             Matrix3 angularDamping;
 
+            bool isSet;
             bool withRealSensor;
             int stateIndex;
             int stateIndexTangent;
+
+            Kinematics localKine; ///describes the kinematics of the contact point in the local frame
+            static const Kinematics::Flags::Byte localKineFlags = ///flags for the components of the kinematics
+                            Kinematics::Flags::position |
+                            Kinematics::Flags::orientation |
+                            Kinematics::Flags::linVel |
+                            Kinematics::Flags::angVel;
 
             static int numberOfRealSensors;
 
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
         };
 
-        struct stateContainer
-        {
-            Kinematics kine;
-
-            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        };
-
-        typedef std::map <int, Contact, std::less<int>, 
-                Eigen::aligned_allocator<std::pair<const int, Contact> > > MapContact;
-        typedef MapContact::iterator MapContactIterator;
-        typedef MapContact::const_iterator MapContactConstIterator;
-        typedef std::pair<int, Contact> PairContact;
+       typedef std::vector < Contact, Eigen::aligned_allocator < Contact > > VectorContact;
+        typedef VectorContact::iterator VectorContactIterator;
+        typedef VectorContact::const_iterator VectorContactConstIterator;
 
         struct AbsolutePoseSensor:
         public Sensor
@@ -437,13 +441,13 @@ protected:
         virtual Vector measureDynamics(const Vector &x, const Vector &u, TimeIndex k);
 
 
-        void addContactAndUnmodeledWrench(const Vector &stateVector, Vector3 & force, Vector3 & torque);
+        void addUnmodeledAndContactWrench_(const Vector &stateVector, Vector3 & force, Vector3 & torque);
 
         void computeAccelerations_( Kinematics & stateKine, const Vector3& totalForceLocal,
                                 const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc);
 
         ///the kinematics is not const to allow more optimized non const operators to work
-        void computeContactForces_( MapContactIterator i, Kinematics &stateKine, 
+        void computeContactForces_( VectorContactIterator i, Kinematics &stateKine, 
                                             Kinematics &contactPose , Vector3 & Force, Vector3 torque) ;
 
         ///Sets a noise which disturbs the state dynamics
@@ -488,11 +492,12 @@ protected:
 
 protected:
 
-        AbsolutePoseSensor absPoseSensor_;
-        MapIMU imuSensors_;
-        MapContact contacts_;
-
         unsigned maxContacts_;
+        unsigned maxImuNumber_;
+
+        AbsolutePoseSensor absPoseSensor_;
+        VectorContact contacts_;
+        VectorIMU imuSensors_;
 
         int stateSize_; 
         int stateTangentSize_;
@@ -521,8 +526,8 @@ protected:
         IndexedVector3 sigma_,sigmad_;
         IndexedMatrix3 I_, Id_;
 
-        TimeIndex k_est;
-        TimeIndex k_data;
+        TimeIndex k_est_;
+        TimeIndex k_data_;
 
         double mass_;
 
@@ -542,27 +547,23 @@ protected:
         virtual Matrix computeAMatrix_();
         virtual Matrix computeCMatrix_();
 
-
-        void resetStateContactCovMat_(MapContactIterator );  
-        void resetProcessContactCovMat_(MapContactIterator ); 
+        /// Getters for the indexes of the state Vector using private types
+        inline unsigned contactIndex(VectorContactConstIterator i) const;
+        inline unsigned contactKineIndex(VectorContactConstIterator i) const;
+        inline unsigned contactPosIndex(VectorContactConstIterator i) const;
+        inline unsigned contactOriIndex(VectorContactConstIterator i) const;
+        inline unsigned contactForceIndex(VectorContactConstIterator i) const;
+        inline unsigned contactTorqueIndex(VectorContactConstIterator i) const;
+        inline unsigned contactWrenchIndex(VectorContactConstIterator i) const;
 
         /// Getters for the indexes of the state Vector using private types
-        inline unsigned contactIndex(MapContactConstIterator i) const;
-        inline unsigned contactKineIndex(MapContactConstIterator i) const;
-        inline unsigned contactPosIndex(MapContactConstIterator i) const;
-        inline unsigned contactOriIndex(MapContactConstIterator i) const;
-        inline unsigned contactForceIndex(MapContactConstIterator i) const;
-        inline unsigned contactTorqueIndex(MapContactConstIterator i) const;
-        inline unsigned contactWrenchIndex(MapContactConstIterator i) const; 
-
-        /// Getters for the indexes of the state Vector using private types
-        inline unsigned contactIndexTangent(MapContactConstIterator i) const;
-        inline unsigned contactKineIndexTangent(MapContactConstIterator i) const;
-        inline unsigned contactPosIndexTangent(MapContactConstIterator i) const;
-        inline unsigned contactOriIndexTangent(MapContactConstIterator i) const;
-        inline unsigned contactForceIndexTangent(MapContactConstIterator i) const;
-        inline unsigned contactTorqueIndexTangent(MapContactConstIterator i) const;
-        inline unsigned contactWrenchIndexTangent(MapContactConstIterator i) const;  
+        inline unsigned contactIndexTangent(VectorContactConstIterator i) const;
+        inline unsigned contactKineIndexTangent(VectorContactConstIterator i) const;
+        inline unsigned contactPosIndexTangent(VectorContactConstIterator i) const;
+        inline unsigned contactOriIndexTangent(VectorContactConstIterator i) const;
+        inline unsigned contactForceIndexTangent(VectorContactConstIterator i) const;
+        inline unsigned contactTorqueIndexTangent(VectorContactConstIterator i) const;
+        inline unsigned contactWrenchIndexTangent(VectorContactConstIterator i) const;
 
 
     private:
@@ -593,7 +594,6 @@ protected:
                                              sizeLinVel+
                                              sizeAngVel;
         static const unsigned sizeStateBase = sizeStateKine+
-                                              sizeGyroBias+
                                               sizeForce+
                                               sizeTorque;
         static const unsigned sizeStateKineTangent =sizePos+
@@ -601,7 +601,6 @@ protected:
                                                     sizeLinVel+
                                                     sizeAngVel;
         static const unsigned sizeStateTangentBase =sizeStateKineTangent+
-                                                    sizeGyroBias+
                                                     sizeForce+
                                                     sizeTorque;
 
