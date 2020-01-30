@@ -94,6 +94,7 @@ SETUP_PROJECT()
 SET(BOOST_COMPONENTS filesystem system thread program_options unit_test_framework timer)
 
 SEARCH_FOR_BOOST()
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
 SEARCH_FOR_EIGEN()
 
 PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
