@@ -41,6 +41,9 @@ namespace stateObservation
   ///1D Vector
   typedef Eigen::Matrix<double,1,1> Vector1;
 
+  ///2d Vector
+  typedef Eigen::Matrix2d Vector2;
+
   ///3D vector
   typedef Eigen::Vector3d Vector3;
 
@@ -55,6 +58,12 @@ namespace stateObservation
 
   ///Dynamic sized Matrix
   typedef Eigen::MatrixXd Matrix;
+
+  ///1D scalar Matrix
+  typedef Eigen::Matrix<double,1,1> Matrix1;
+
+  ///2D scalar Matrix
+  typedef Eigen::Matrix2d Matrix2;
 
   ///3x3 Scalar Matrix
   typedef Eigen::Matrix3d Matrix3;
