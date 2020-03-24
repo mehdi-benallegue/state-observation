@@ -1,3 +1,11 @@
+/*
+* Copyright (c) 2019-2020
+* @author Mehdi BENALLEGUE
+*
+* National Institute of Advanced Industrial Science and Technology (AIST)
+*/
+
+
 #include <state-observation/dynamics-estimators/kinetics-observer.hpp>
 
 
