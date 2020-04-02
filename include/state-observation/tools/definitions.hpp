@@ -42,7 +42,7 @@ namespace stateObservation
   typedef Eigen::Matrix<double,1,1> Vector1;
 
   ///2d Vector
-  typedef Eigen::Matrix2d Vector2;
+  typedef Eigen::Matrix<double,2,1> Vector2;
 
   ///3D vector
   typedef Eigen::Vector3d Vector3;
