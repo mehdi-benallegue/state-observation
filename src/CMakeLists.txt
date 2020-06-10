@@ -4,8 +4,7 @@
 # state-observation is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
+# (at your option) any later version. 
 # state-observation is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,30 +12,68 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with state-observation.  If not, see <http://www.gnu.org/licenses/>.
 
-# prefix and suffix each element of list by ${prefix}elemnt${suffix}
-macro(ADDPREFIX newlist prefix list_name)
-    # create empty list - necessary?
-    SET(${newlist})
+SET(HEADERS
+  ../include/state-observation/observer/tilt-estimator.hpp
+  ../include/state-observation/observer/extended-kalman-filter.hpp
+  ../include/state-observation/observer/kalman-filter-base.hpp
+  ../include/state-observation/observer/linear-kalman-filter.hpp
+  ../include/state-observation/observer/observer-base.hpp
+  ../include/state-observation/observer/zero-delay-observer.hpp
+  ../include/state-observation/observer/compile-time/compile-time-extended-kalman-filter.hpp
+  ../include/state-observation/observer/compile-time/compile-time-extended-kalman-filter.hxx
+  ../include/state-observation/observer/compile-time/compile-time-kalman-filter-base.hpp
+  ../include/state-observation/observer/compile-time/compile-time-kalman-filter-base.hxx
+  ../include/state-observation/observer/compile-time/compile-time-kalman-filter.hpp
+  ../include/state-observation/observer/compile-time/compile-time-kalman-filter.hxx
+  ../include/state-observation/observer/compile-time/compile-time-observer-base.hpp
+  ../include/state-observation/observer/compile-time/compile-time-observer-base.hxx
+  ../include/state-observation/observer/compile-time/compile-time-zero-delay-observer.hpp
+  ../include/state-observation/observer/compile-time/compile-time-zero-delay-observer.hxx
+  ../include/state-observation/sensors-simulation/sensor-base.hpp
+  ../include/state-observation/sensors-simulation/algebraic-sensor.hpp
+  ../include/state-observation/sensors-simulation/accelerometer-gyrometer.hpp
+  ../include/state-observation/sensors-simulation/accelerometer-gyrometer-magnetometer.hpp
+  ../include/state-observation/noise/noise-base.hpp
+  ../include/state-observation/noise/gaussian-white-noise.hpp
+  ../include/state-observation/sensors-simulation/algorithm/rotation-velocity.hpp
+  ../include/state-observation/sensors-simulation/algorithm/linear-acceleration.hpp
+  ../include/state-observation/sensors-simulation/algorithm/magnetic-field.hpp
+  ../include/state-observation/tools/definitions.hpp
+  ../include/state-observation/tools/definitions.hxx
+  ../include/state-observation/tools/hrp2.hpp
+  ../include/state-observation/tools/probability-law-simulation.hpp
+  ../include/state-observation/tools/miscellaneous-algorithms.hpp
+  ../include/state-observation/tools/rigid-body-kinematics.hpp
+  ../include/state-observation/tools/rigid-body-kinematics.hxx
+  ../include/state-observation/tools/logger.hpp
+  ../include/state-observation/tools/logger.hxx
+  ../include/state-observation/tools/state-vector-arithmetics.hpp
+  ../include/state-observation/dynamical-system/dynamical-system-functor-base.hpp
+  ../include/state-observation/dynamical-system/dynamical-system-simulator.hpp
+  ../include/state-observation/dynamical-system/imu-dynamical-system.hpp
+  ../include/state-observation/dynamical-system/imu-mltpctive-dynamical-system.hpp
+  ../include/state-observation/dynamical-system/imu-magnetometer-dynamical-system.hpp
+  ../include/state-observation/dynamical-system/bidim-elastic-inv-pendulum-dyn-sys.hpp
+  ../include/state-observation/flexibility-estimation/flexibility-estimator-base.hpp
+  ../include/state-observation/flexibility-estimation/ekf-flexibility-estimator-base.hpp
+  ../include/state-observation/flexibility-estimation/fixed-contact-ekf-flex-estimator-imu.hpp
+  ../include/state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp
+  ../include/state-observation/flexibility-estimation/imu-fixed-contact-dynamical-system.hpp
+  ../include/state-observation/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp
+  ../include/state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp
+  ../include/state-observation/dynamics-estimators/kinetics-observer.hpp
+  ../include/state-observation/dynamics-estimators/kinetics-observer.hxx
+  ../include/state-observation/examples/imu-attitude-trajectory-reconstruction.hpp
+  ../include/state-observation/examples/imu-attitude-trajectory-reconstruction.hxx
+  ../include/state-observation/examples/imu-multiplicative-attitude-reconstruction.hpp
+  ../include/state-observation/examples/imu-multiplicative-attitude-reconstruction.hxx
+  ../include/state-observation/examples/offline-ekf-flexibility-estimation.hpp
+  ../include/state-observation/examples/offline-ekf-flexibility-estimation.hxx
+  ../include/state-observation/examples/offline-model-base-flex-estimation.hpp
+  ../include/state-observation/examples/offline-model-base-flex-estimation.hxx
+)
 
-     # prefix and suffix elements
-    foreach(l ${${list_name}})
-      list(APPEND ${newlist} ${prefix}${l} )
-    endforeach()
-
-endmacro(ADDPREFIX)
-
-if(${_Eigen_VERSION} VERSION_LESS "3.2.0")
-    add_definitions(-DEIGEN_VERSION_LESS_THAN_3_2)
-endif()
-
-ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
-
-SET(LIBRARY_NAME ${PROJECT_NAME})
-
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
-
-ADD_LIBRARY(${LIBRARY_NAME}
-  SHARED
+SET(SRC 
   tilt-estimator.cpp
   kalman-filter-base.cpp
   observer-base.cpp
@@ -69,20 +106,23 @@ ADD_LIBRARY(${LIBRARY_NAME}
   imu-elastic-local-frame-dynamical-system.cpp
   bidim-elastic-inv-pendulum-dyn-sys.cpp
   kinetics-observer.cpp
-  ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
-  )
+)
 
-SET_TARGET_PROPERTIES(${LIBRARY_NAME}
-  PROPERTIES
-  SOVERSION ${PROJECT_VERSION}
-  INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
+SET(LIBRARY_NAME ${PROJECT_NAME})
+ADD_LIBRARY(${LIBRARY_NAME} SHARED ${SRC} ${HEADERS})
+TARGET_INCLUDE_DIRECTORIES(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
+TARGET_LINK_LIBRARIES(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::system Boost::thread Boost::program_options Boost::timer)
+if(TARGET Eigen3::Eigen)
+  target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen)
+else()
+  target_include_directories(${LIBRARY_NAME} SYSTEM INTERFACE "${EIGEN3_INCLUDE_DIR}")
+endif()
+SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 
 INSTALL(TARGETS ${LIBRARY_NAME}
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-
-ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIRS})
-SET(LINEAR_ALGEBRA_LIB_FOUND 1)
-SET(_EIGEN_MATRIX_FOUND_ 1)
-
-
+  EXPORT "${TARGETS_EXPORT_NAME}"
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+INSTALL(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DESTINATION})
