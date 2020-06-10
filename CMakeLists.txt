@@ -32,9 +32,9 @@ INCLUDE(cmake/eigen.cmake)
 
 PROJECT(${PROJECT_NAME} LANGUAGES CXX)
 
-find_package(Boost COMPONENTS filesystem system thread program_options unit_test_framework timer)
+add_project_dependency(Boost COMPONENTS filesystem system thread program_options unit_test_framework timer)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-find_package(Eigen3 QUIET NO_CMAKE_PACKAGE_REGISTRY)
+add_project_dependency(Eigen3 QUIET NO_CMAKE_PACKAGE_REGISTRY)
 if(Eigen3_FOUND)
   add_project_dependency(Eigen3 REQUIRED NO_CMAKE_PACKAGE_REGISTRY)
 else()
