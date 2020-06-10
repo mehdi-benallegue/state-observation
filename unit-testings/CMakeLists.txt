@@ -1,7 +1,3 @@
-
-# provide path to dependency libraries
-
-
 MACRO(ADD_STATE_ESTIMATOR_TEST NAME)
   add_executable(${NAME} ${NAME}.cpp)
   target_link_libraries(${NAME} PUBLIC state-observation Boost::unit_test_framework Eigen3::Eigen) 
