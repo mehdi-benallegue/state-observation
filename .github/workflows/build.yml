@@ -13,12 +13,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-16.04, ubuntu-18.04, macos-latest]
+        os: [ubuntu-16.04, ubuntu-18.04, macos-latest, windows-latest]
         build-type: [Debug, RelWithDebInfo]
         compiler: [gcc, clang]
         exclude:
           # Only default compiler on macos-latest and windows-latest
           - os: macos-latest
+            compiler: clang
+          - os: windows-latest
             compiler: clang
 
     runs-on: ${{ matrix.os }}
@@ -35,6 +37,10 @@ jobs:
           apt: libeigen3-dev doxygen doxygen-latex libboost-all-dev
         macos: |
           brew: eigen boost pkg-config doxygen
+        windows: |
+          github:
+            - path: eigenteam/eigen-git-mirror
+              ref: 3.3.7
     - name: Build and test
       uses: jrl-umi3218/github-actions/build-cmake-project@master
       with:
