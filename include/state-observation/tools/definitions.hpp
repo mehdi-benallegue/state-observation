@@ -100,7 +100,7 @@ namespace stateObservation
 #endif // NDEBUG
 
 
-/// Debud item is an item that exists when the debug variable is true, 
+/// Debud item is an item that exists when the debug variable is true,
 ///otherwise it is empty and returns only the default value
   template <typename T, const T& defaultValue=T(), bool debug=true>
   class DebugItem
@@ -231,7 +231,7 @@ namespace stateObservation
     AssertMsg assertMsg_;
     ExceptionPtr exceptionPtr_;
 
-    bool chckitm_check_() const throw(std::exception);
+    bool chckitm_check_() const;
     T v_;
   public:
 

@@ -98,7 +98,7 @@ inline  T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_check_() const throw(std::exception)
+inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_check_() const
 {
   if (assertion)
   {
