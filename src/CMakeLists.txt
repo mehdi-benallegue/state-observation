@@ -116,7 +116,7 @@ TARGET_LINK_LIBRARIES(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::system Boo
 if(TARGET Eigen3::Eigen)
   target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen)
 else()
-  target_include_directories(${LIBRARY_NAME} SYSTEM INTERFACE "${EIGEN3_INCLUDE_DIR}")
+  target_include_directories(${LIBRARY_NAME} PUBLIC "${EIGEN3_INCLUDE_DIR}")
 endif()
 SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 

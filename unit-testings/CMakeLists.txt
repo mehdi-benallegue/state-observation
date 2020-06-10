@@ -1,6 +1,6 @@
 MACRO(ADD_STATE_ESTIMATOR_TEST NAME)
   add_executable(${NAME} ${NAME}.cpp)
-  target_link_libraries(${NAME} PUBLIC state-observation Boost::unit_test_framework Eigen3::Eigen) 
+  target_link_libraries(${NAME} PUBLIC state-observation Boost::unit_test_framework) 
   target_compile_definitions(${NAME} PRIVATE -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
   add_test(${NAME} ${NAME})
 ENDMACRO()
