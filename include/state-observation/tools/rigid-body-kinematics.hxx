@@ -194,17 +194,7 @@ namespace stateObservation
     ///( R = Ry*Rp*Rr)
     inline Matrix3 rollPitchYawToRotationMatrix(double roll, double pitch, double yaw)
     {
-      AngleAxis rollAngle(roll, Eigen::Vector3d::UnitX());
-      AngleAxis pitchAngle(pitch, Eigen::Vector3d::UnitY());
-      AngleAxis yawAngle(yaw, Eigen::Vector3d::UnitZ());
-
-      Quaternion q;
-
-      q=yawAngle;
-      q=q*pitchAngle;
-      q=q*rollAngle;
-
-      return q.toRotationMatrix() ;
+      return rollPitchYawToQuaternion( roll, pitch, yaw).toRotationMatrix() ;
     }
 
     inline Matrix3 rollPitchYawToRotationMatrix(const Vector3 & rpy)
@@ -220,9 +210,8 @@ namespace stateObservation
       AngleAxis pitchAngle(pitch, Eigen::Vector3d::UnitY());
       AngleAxis yawAngle(yaw, Eigen::Vector3d::UnitZ());
 
-      Quaternion q;
+      Quaternion q(yawAngle);
 
-      q=yawAngle;
       q=q*pitchAngle;
       q=q*rollAngle;
 
