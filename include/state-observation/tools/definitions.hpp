@@ -17,6 +17,7 @@
 #include <vector>
 #include <deque>
 #include <stdexcept>
+#include <chrono>
 
 #ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
 #   include <iostream>
@@ -129,7 +130,7 @@ namespace stateObservation
 
   };
 
-  template <typename T, const T& defaultValue>
+  template <typename T, const T & defaultValue>
   class DebugItem<T,defaultValue,false>
   {
   public:
@@ -465,15 +466,25 @@ namespace stateObservation
   {
     struct SimplestStopwatch
     {
-      inline void start();
+      /** Always pick a steady clock */
+      using clock = typename std::conditional<std::chrono::high_resolution_clock::is_steady,
+                                        std::chrono::high_resolution_clock,
+                                        std::chrono::steady_clock>::type;
+      using time_ns = clock::time_point;
+      time_ns startTime;
+
+      inline void start()
+      {
+        startTime = clock::now();
+      }
 
       ///provides the time since the start
       ///the value is in nanoseconds
-      inline double stop();
-
-      inline double diff(const timespec & start, const timespec & end);
-
-      timespec time1, time2, time3;
+      inline double stop()
+      {
+        auto elapsed = clock::now() - startTime;
+        return static_cast<double>(elapsed.count());
+      }
     };
 
     std::string matrixToString(const Matrix& mat);
