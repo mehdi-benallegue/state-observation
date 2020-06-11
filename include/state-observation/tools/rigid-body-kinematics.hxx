@@ -5,6 +5,8 @@
 * National Institute of Advanced Industrial Science and Technology (AIST)
 */
 
+#include <cmath>
+
 namespace stateObservation
 {
   namespace kine
@@ -98,15 +100,17 @@ namespace stateObservation
     /// gets close to 2pi
     inline Vector regulateOrientationVector(const Vector3 & v )
     {
-      double n2=v.squaredNorm();
-      if (n2 > (3./2.) * M_PI * (3./2.) * M_PI )
+      double n2 = v.squaredNorm();
+      if (n2 > std::pow(3./2. * M_PI, 2))
       {
-        double n=sqrt(n2);
+        double n = sqrt(n2);
         unsigned k =  unsigned(ceil((n - M_PI) / (2*M_PI))) ;
         return (v / n) * ( n - k*2*M_PI );
       }
       else
+      {
         return v;
+      }
     }
 
     /// Transform the rotation vector into angle axis
