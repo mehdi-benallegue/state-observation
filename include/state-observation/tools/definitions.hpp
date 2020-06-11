@@ -29,6 +29,10 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#ifndef M_PI
+#  include <boost/math/constants/constants.hpp>
+#  define M_PI boost::math::constants::pi<double>()
+#endif
 
 
 // basic file operations
@@ -101,7 +105,7 @@ namespace stateObservation
 #endif // NDEBUG
 
 
-/// Debud item is an item that exists when the debug variable is true,
+/// Debug item is an item that exists when the debug variable is true,
 ///otherwise it is empty and returns only the default value
   template <typename T, const T& defaultValue=T(), bool debug=true>
   class DebugItem
