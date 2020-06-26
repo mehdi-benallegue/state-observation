@@ -157,7 +157,7 @@ namespace stateObservation
       return defaultValue;
     }
   private:
-    T b_;
+    ///no object
   };
 
   namespace detail
