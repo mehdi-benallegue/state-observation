@@ -105,13 +105,88 @@ namespace stateObservation
 #endif // NDEBUG
 
 
+/// Debug item default value is just a way to give a default value to debug item
+///this was required by a compilation issue on Visual Studio
+template <typename T, const T defaultValue=T()>
+class DebugItemDefaultValue
+{
+  public:
+    static const T v;
+};
+
+template <typename T, const T defaultValue> 
+    const T DebugItemDefaultValue<T,defaultValue>::v=defaultValue;
+
+namespace detail
+{
+  typedef DebugItemDefaultValue<bool,true> defaultTrue;
+  
+  enum errorType
+  {
+    message,
+    exception,
+    exceptionAddr
+  };
+
+  template <errorType i = message, int dummy=0>
+  class DebugItemDefaultError
+  {
+  };
+
+  template <int dummy>
+  class DebugItemDefaultError<message, dummy>
+  {
+  public:
+    static const char* v;
+  };
+
+  template <int dummy>
+  class DebugItemDefaultError<exception, dummy>
+  {
+  public:
+    static const std::runtime_error v;
+  };
+
+
+  template <int dummy>
+  class DebugItemDefaultError<exceptionAddr, dummy>
+  {
+  public:
+    static const std::runtime_error * v;
+  };
+
+  template <int dummy>
+  const char * DebugItemDefaultError<message, dummy>::v = "The Object is not initialized. \
+       If this happened during initialization then run command chckitm_set() \
+       to switch it to set. And if the initialization is incomplete, run \
+       chckitm_reset() afterwards.";
+  
+  template <int dummy>
+  const std::runtime_error DebugItemDefaultError< exception, dummy>::v = std::runtime_error(DebugItemDefaultError<message>::v);
+
+  template <int dummy>
+  const std::runtime_error * DebugItemDefaultError<exceptionAddr, dummy>::v = &DebugItemDefaultError<exception>::v;
+
+
+
+
+  typedef DebugItemDefaultError<message> defaultErrorMSG;
+  typedef DebugItemDefaultError<exception> defaultException;
+  typedef DebugItemDefaultError<exceptionAddr> defaultExceptionAddr;
+
+  void defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+  void defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+
+}
+
+
 /// Debug item is an item that exists when the debug variable is true,
 ///otherwise it is empty and returns only the default value
-  template <typename T, const T& defaultValue=T(), bool debug=true>
+  template <typename T, typename defaultValue = DebugItemDefaultValue<T>, bool debug=true>
   class DebugItem
   {
   public:
-    DebugItem():b_(defaultValue) {}
+    DebugItem():b_(defaultValue::v) {}
     explicit DebugItem(const T& v):b_(v) {}
     inline T& operator=(T v)
     {
@@ -134,7 +209,7 @@ namespace stateObservation
 
   };
 
-  template <typename T, const T & defaultValue>
+  template <typename T, typename defaultValue >
   class DebugItem<T,defaultValue,false>
   {
   public:
@@ -142,35 +217,26 @@ namespace stateObservation
     explicit DebugItem(T v) {}
     inline T& operator=(T v)
     {
-      return defaultValue;
+      return defaultValue::v;
     }
     inline operator T() const
     {
-      return defaultValue;
+      return defaultValue::v;
     }
     inline T set(const T& v)
     {
-      return defaultValue;
+      return defaultValue::v;
     }
     T get()const
     {
-      return defaultValue;
+      return defaultValue::v;
     }
   private:
-    ///no object
+     ///no object
   };
 
-  namespace detail
-  {
-    extern const bool defaultTrue;
-    extern const char* defaultErrorMSG;
-    extern const std::runtime_error defaultException;
-    extern const std::exception* defaultExcepionAddr;
 
-    void defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
-    void defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
-  }
 
   ///this is simply a structure allowing for automatically verifying that
   /// the item has been initialized or not. The chckitm_reset() function allows to
@@ -227,7 +293,7 @@ namespace stateObservation
 
     typedef DebugItem<bool,detail::defaultTrue,do_check_> IsSet;
     typedef DebugItem<const char*,detail::defaultErrorMSG, do_assert_> AssertMsg;
-    typedef DebugItem<const std::exception*,detail::defaultExcepionAddr,
+    typedef DebugItem<const std::exception*,detail::defaultExceptionAddr,
                                                     do_exception_> ExceptionPtr;
 
 
@@ -236,7 +302,7 @@ namespace stateObservation
     AssertMsg assertMsg_;
     ExceptionPtr exceptionPtr_;
 
-    bool chckitm_check_() const;
+    bool chckitm_check_() const; /// this can throw(std::exception)
     T v_;
   public:
 
