@@ -17,3 +17,7 @@ ADD_STATE_ESTIMATOR_TEST(test_acceleration_stabilization)
 ADD_STATE_ESTIMATOR_TEST(test_model-base-ekf-flex-estimator-imu)
 ADD_STATE_ESTIMATOR_TEST(zmpEstimation)
 ADD_STATE_ESTIMATOR_TEST(test-kinetics-observer)
+
+add_custom_command(TARGET test_model-base-ekf-flex-estimator-imu POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/unit-testings/inputFiles/ $<TARGET_FILE_DIR:test_model-base-ekf-flex-estimator-imu>/inputFiles/)

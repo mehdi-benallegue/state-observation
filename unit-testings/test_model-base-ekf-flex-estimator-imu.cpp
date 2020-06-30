@@ -38,8 +38,10 @@ int test()
     const unsigned kinit=0;
     const unsigned kmax=1400;
     const unsigned measurementSize=6;
-    const unsigned inputSize=54;
+    (void) measurementSize; ///avoid warning
+    const unsigned inputSize=60;
     const unsigned stateSize=18;
+    (void) stateSize;    
     unsigned contactNbr = 2;
     // State initialization => not used here because it is set in model-base-ekf-flex-estimator-imu
 
@@ -86,7 +88,13 @@ int test()
              7.91959e-20,
              -0.000299589,
              -1.24742e-06,
-             -4.7647e-16;
+             -4.7647e-16,
+             0,
+             0,
+             0,
+             0,
+             0,
+             0; ///external forces and moments
 
     stateObservation::flexibilityEstimation::ModelBaseEKFFlexEstimatorIMU est;
     est.setSamplingPeriod(dt);
@@ -107,31 +115,31 @@ int test()
 
    /// Definitions of input vectors
      // Measurement
-    IndexedMatrixArray y;
+    IndexedVectorArray y;
     std::cout << "Loading measurements file" << std::endl;
-    y.readFromFile("source_measurement.dat",1,measurementSize);
+    y.readVectorsFromFile("inputFiles/source_measurement.dat");
     std::cout << "Done, size " << y.size()<<  std::endl;
      // Input
-    IndexedMatrixArray u;
+    IndexedVectorArray u;
      std::cout << "Loading input file" << std::endl;
-    u.readFromFile("source_input.dat",1,inputSize);
+    u.readVectorsFromFile("inputFiles/source_input.dat");
     std::cout << "Done, size " << u.size()<<  std::endl;
       //state
-    IndexedMatrixArray xRef;
+    IndexedVectorArray xRef;
     std::cout << "Loading reference state file" << std::endl;
-    xRef.readFromFile("source_state.dat",stateSize,1);
+    xRef.readVectorsFromFile("inputFiles/source_state.dat");
     std::cout << "Done, size " << xRef.size()<<  std::endl;
 
 
    /// Definition of ouptut vectors
      // State: what we want
-    IndexedMatrixArray x_output;
+    IndexedVectorArray x_output;
      // Measurement
-    IndexedMatrixArray y_output;
+    IndexedVectorArray y_output;
      // Input
-    IndexedMatrixArray u_output;
+    IndexedVectorArray u_output;
 
-    IndexedMatrixArray deltax_output;
+    IndexedVectorArray deltax_output;
 
 
     est.setMeasurementNoiseCovariance(Cov);
@@ -144,21 +152,35 @@ int test()
     Vector xdifference(flexibility);
 
     tools::SimplestStopwatch stopwatch;
-    IndexedMatrixArray computationTime_output;
-    double computationTime_moy=0;
+    IndexedVectorArray computationTime_output;
+    double computationTime_sum=0;
     Vector computeTime;
     computeTime.resize(1);
 
-    Vector errorsum=Vector::Zero(18);
+    Vector errorsum=Vector::Zero(12);
 
     est.setContactModel(stateObservation::flexibilityEstimation::
                 ModelBaseEKFFlexEstimatorIMU::contactModel::elasticContact);
 
+    // for (TimeIndex k=u.getFirstIndex(); k<u.getNextIndex();++k)
+    // {
+    //   Vector uk(est.getInputSize());
+    //   uk.head<42>() = u[k].head<42>();
+    //   uk.segment<6>(42) << 0,0,0,0,0,0;
+    //   for (unsigned  i =0; i<contactNbr ;++i)
+    //   {
+    //     uk.segment<6>(42+12*i)=u[k].segment<6>(42+6*i);
+    //     uk.segment<6>(42+12*i+6)<<0,0,0,0,0,0;
+    //   }
+      
+    //   u[k]=uk;
+    // }
+
     std::cout << "Beginning reconstruction "<<std::endl;
     for (unsigned k=kinit+2;k<kmax;++k)
     {
-        est.setMeasurement(y[k].transpose());
-        est.setMeasurementInput(u[k].transpose());
+        est.setMeasurement(y[k]);
+        est.setMeasurementInput(u[k]);
 
         stopwatch.start();
 
@@ -166,9 +188,7 @@ int test()
 
         computeTime[0]=stopwatch.stop();
 
-        xdifference =flexibility.head(18)-xRef[k];
-
-        errorsum += xdifference.cwiseProduct(xdifference);
+        xdifference =flexibility.head<12>()-xRef[k].head<12>();
 
         x_output.setValue(flexibility,k);
         y_output.setValue(y[k],k);
@@ -176,43 +196,66 @@ int test()
         deltax_output.setValue(xdifference,k);
 
         computationTime_output.setValue(computeTime,k);
-        computationTime_moy+=computeTime[0];
+        computationTime_sum+=computeTime[0];
     }
 
     std::cout << "Completed "<<std::endl;
 
-    computeTime[0]=computationTime_moy/(kmax-kinit-2);
+    computeTime[0]=computationTime_sum/(kmax-kinit-2);
     computationTime_output.setValue(computeTime,kmax);
     computationTime_output.writeInFile("computationTime.dat");
 
-    x_output.writeInFile("state.dat");
-    y_output.writeInFile("measurement.dat");
-    u_output.writeInFile("input.dat");
+    /// this code is useful to generate new input files
+    // x_output.writeInFile("unit-testings/result-state.dat");
+    // y_output.writeInFile("unit-testings/result-measurement.dat");
+    // u_output.writeInFile("unit-testings/result-input.dat");
 
     errorsum = errorsum/(kmax-kinit-2);
 
-    Vector error(6);
+    Vector error(4);
 
-    error(0) = sqrt((errorsum(indexes::pos) + errorsum(indexes::pos+1) + errorsum(indexes::pos+2))/(kmax-kinit-2));
-    error(1) = sqrt((errorsum(indexes::linVel) + errorsum(indexes::linVel+1) + errorsum(indexes::linVel+2))/(kmax-kinit-2));
-    error(2) = sqrt((errorsum(indexes::linAcc) + errorsum(indexes::linAcc+1) + errorsum(indexes::linAcc+2))/(kmax-kinit-2));
-    error(3) = sqrt((errorsum(indexes::ori) + errorsum(indexes::ori+1) + errorsum(indexes::ori+2))/(kmax-kinit-2));
-    error(4) = sqrt((errorsum(indexes::angVel) + errorsum(indexes::angVel+1) + errorsum(indexes::angVel+2))/(kmax-kinit-2));
-    error(5) = sqrt((errorsum(indexes::angAcc) + errorsum(indexes::angAcc+1) + errorsum(indexes::angAcc+2))/(kmax-kinit-2));
+    typedef flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::state State;
 
+    error(0) = sqrt((errorsum(State::pos) + errorsum(State::pos+1) + errorsum(State::pos+2)));
+    error(1) = sqrt((errorsum(State::linVel) + errorsum(State::linVel+1) + errorsum(State::linVel+2)));
+    error(2) = sqrt((errorsum(State::ori) + errorsum(State::ori+1) + errorsum(State::ori+2)));
+    error(3) = sqrt((errorsum(State::angVel) + errorsum(State::angVel+1) + errorsum(State::angVel+2)));
+    
     std::cout << "Mean computation time " << computeTime[0] <<std::endl;
 
     std::cout << "Mean error " << error.transpose() <<std::endl;
 
-    double syntherror = 40000*error(0)+600*error(1)+10*error(2)+10*error(3)+error(4)+error(5);
+    double posgain = 40000;
+    double linvelgain = 600;
+    
+    double origain = 10;
+    double angvelgain = 1;
 
-    std::cout << "Synthetic error " << syntherror <<std::endl;
 
-    if (syntherror>0.2)
+    double syntherror = posgain*error(0)+ linvelgain*error(1) + origain*error(2) + angvelgain*error(3);
+    
+    std::cout << "Synthetic error " << posgain*error(0) << " + " << linvelgain*error(1) 
+                          << " + " << origain*error(2) << " + " << angvelgain*error(3)
+                          << " = " << syntherror << std::endl;
+
+
+    if (syntherror == syntherror)
     {
-      std::cout << "Failed : error is too big !!"<< std::endl <<"The end" << std::endl;
-      return 1;
+      if (syntherror>0.2)
+      {
+        std::cout << "Failed : error is too big !!"<< std::endl <<"The end" << std::endl;
+        return 1;
+      }
     }
+    else
+    {
+      if (syntherror>0.2)
+      {
+        std::cout << "Failed : NaN !!"<< std::endl <<"The end" << std::endl;
+        return 2;
+      }
+    }
+    
 #ifdef NDEBUG
     if (computeTime[0]>2e5)
      {
@@ -223,12 +266,7 @@ int test()
 
 
     std::cout << "Succeed !!"<< std::endl <<"The end" << std::endl;
-    return 1;
-
-
-
-
-
+    return 0;
 }
 
 int main()
