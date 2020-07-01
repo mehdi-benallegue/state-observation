@@ -829,6 +829,7 @@ int testKineticsObserverCodeAccessor(int /*code*/)
     contactKine.position.set()<< 1,0.1,0;
     int i = o.addContact(contactKine,initialCov,processCov,-1);
 
+    (void)i; ///avoid warning in release mode
     assert(i==1);
 
     contactKine.position.set() << 1,-0.1,0;
