@@ -1,13 +1,13 @@
-ADD_EXECUTABLE(flexEstimatorTester model-base-flex-estimator-file-tester.cpp)
-TARGET_LINK_LIBRARIES(flexEstimatorTester PUBLIC ${PROJECT_NAME})
 
-ADD_EXECUTABLE(fileSplitter file-splitter.cpp)
-TARGET_LINK_LIBRARIES(fileSplitter PUBLIC ${PROJECT_NAME})
+MACRO(ADD_STATE_ESTIMATOR_TOOL NAME)
+add_executable(${NAME} ${NAME}.cpp)
+target_link_libraries(${NAME} PUBLIC state-observation Boost::unit_test_framework) 
+ENDMACRO()
 
-ADD_EXECUTABLE(real-offline-flexibility-estimator real-offline-flexibility-estimator.cpp)
-TARGET_LINK_LIBRARIES(real-offline-flexibility-estimator PUBLIC ${PROJECT_NAME})
 
-ADD_EXECUTABLE(test_model-base-ekf-flex-estimator-imu_withComBias_withForcesSensors 
-                test_model-base-ekf-flex-estimator-imu_withComBias_withForcesSensors.cpp)
-TARGET_LINK_LIBRARIES(test_model-base-ekf-flex-estimator-imu_withComBias_withForcesSensors 
-                                            PUBLIC ${PROJECT_NAME})
+ADD_STATE_ESTIMATOR_TOOL(model-base-flex-estimator-file-tester)
+ADD_STATE_ESTIMATOR_TOOL(file-splitter)
+ADD_STATE_ESTIMATOR_TOOL(real-offline-flexibility-estimator)
+ADD_STATE_ESTIMATOR_TOOL(test_model-base-ekf-flex-estimator-imu_withComBias_withForcesSensors)
+ADD_STATE_ESTIMATOR_TOOL(zmpEstimation)
+

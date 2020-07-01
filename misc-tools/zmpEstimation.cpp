@@ -347,7 +347,7 @@ int test()
     std::cout << "coucou" << std::endl;
     //zmp_output.writeInFile("zmp.dat");
 
-    return 1;
+    return 0;
 
 }
 
