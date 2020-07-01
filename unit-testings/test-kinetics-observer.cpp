@@ -397,6 +397,8 @@ int testOrientation(int errcode)
 
 int testKinematics (int errcode)
 {
+
+    std::cout << "Kinematics test started" <<std::endl;
     typedef kine::Kinematics::Flags Flags;
 
 
@@ -528,6 +530,8 @@ int testKinematics (int errcode)
         }
         
     }
+
+    std::cout << "Error 1 : " << err <<std::endl;
 
      if (err>threshold )
     {
@@ -740,12 +744,14 @@ int testKinematics (int errcode)
         
     }
 
+    std::cout << "Error 2 : " << err <<std::endl;
     
     if (err>threshold )
     {
-        std::cout << "Error too large : " << err <<std::endl;
+        std::cout << "Error too large !" <<std::endl;
         return errcode;
     }
+    
     
     return 0;
 
