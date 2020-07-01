@@ -172,24 +172,38 @@ int testOrientation(int errcode)
         kine::Orientation ori16 (ori2,ori3);
         kine::Orientation ori17 (ori3,ori2);
 
-        err +=  (ori00.matrix3() - Matrix3::Identity()).norm()+
-                (ori01.matrix3() - Matrix3::Identity()).norm()+
-                (ori02.matrix3() - Matrix3::Identity()).norm()+
-                (ori03.matrix3() - Matrix3::Identity()).norm()+
-                (ori04.matrix3() - Matrix3::Identity()).norm()+
-                (ori05.matrix3() - Matrix3::Identity()).norm()+
-                (ori06.matrix3() - Matrix3::Identity()).norm()+
-                (ori07.matrix3() - Matrix3::Identity()).norm()+
-                (ori10.matrix3() - Matrix3::Identity()).norm()+
-                (ori11.matrix3() - Matrix3::Identity()).norm()+
-                (ori12.matrix3() - Matrix3::Identity()).norm()+
-                (ori13.matrix3() - Matrix3::Identity()).norm()+
-                (ori14.matrix3() - Matrix3::Identity()).norm()+
-                (ori15.matrix3() - Matrix3::Identity()).norm()+
-                (ori16.matrix3() - Matrix3::Identity()).norm()+
-                (ori17.matrix3() - Matrix3::Identity()).norm();
-
+        err += (ori00.matrix3() - Matrix3::Identity()).norm();
         std::cout<<"Multiplication test  1 done. Current error "<<  err << std::endl;
+        err += (ori01.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  2 done. Current error "<<  err << std::endl;
+        err += (ori02.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  3 done. Current error "<<  err << std::endl;
+        err += (ori03.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  4 done. Current error "<<  err << std::endl;
+        err += (ori04.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  5 done. Current error "<<  err << std::endl;
+        err += (ori05.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  6 done. Current error "<<  err << std::endl;
+        err += (ori06.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  7 done. Current error "<<  err << std::endl;
+        err += (ori07.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  8 done. Current error "<<  err << std::endl;
+        err += (ori10.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  9 done. Current error "<<  err << std::endl;
+        err += (ori11.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  10 done. Current error "<<  err << std::endl;
+        err += (ori12.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  11 done. Current error "<<  err << std::endl;
+        err += (ori13.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  12 done. Current error "<<  err << std::endl;
+        err += (ori14.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  13 done. Current error "<<  err << std::endl;
+        err += (ori15.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  14 done. Current error "<<  err << std::endl;
+        err += (ori16.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  15 done. Current error "<<  err << std::endl;
+        err += (ori17.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  16 done. Current error "<<  err << std::endl;
     }
 
     {
@@ -199,7 +213,7 @@ int testOrientation(int errcode)
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
-        std::cout<<"Multiplication test 2 done. Current error "<<  err << std::endl;
+        std::cout<<"Multiplication test 17 done. Current error "<<  err << std::endl;
     }
 
     {
