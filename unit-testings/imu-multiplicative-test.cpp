@@ -13,7 +13,7 @@ typedef kine::indexes<kine::quaternion> indexes2;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=1000000;
+    const unsigned kmax=10000;
 
     ///sampling period
     const double dt=1e-3;
