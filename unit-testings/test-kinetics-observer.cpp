@@ -155,20 +155,33 @@ int testOrientation(int errcode)
         const kine::Orientation & ori3=ori1;
         
         kine::Orientation ori00 = ori0*ori1;
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori01 = ori1*ori0;
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori02 = ori0*ori3; 
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori03 = ori3*ori0;
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori04 = ori2*ori1;
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori05 = ori1*ori2;
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori06 = ori2*ori3;
         kine::Orientation ori07 = ori3*ori2;
+        
 
         kine::Orientation ori10 (ori0,ori1);
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori11 (ori1,ori0);
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori12 (ori0,ori3); 
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori13 (ori3,ori0);
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori14 (ori2,ori1);
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori15 (ori1,ori2);
+        ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori16 (ori2,ori3);
         kine::Orientation ori17 (ori3,ori2);
 
@@ -207,13 +220,160 @@ int testOrientation(int errcode)
     }
 
     {
+
+        kine::Orientation ori0(q);
+        kine::Orientation ori1(q);
+        ori1=ori1.inverse();
+        const kine::Orientation & ori2=ori0;
+        const kine::Orientation & ori3=ori1;
+        
+        kine::Orientation ori00 = ori0*ori1;
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori01 = ori1*ori0;
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori02 = ori0*ori3; 
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori03 = ori3*ori0;
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori04 = ori2*ori1;
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori05 = ori1*ori2;
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori06 = ori2*ori3;
+        kine::Orientation ori07 = ori3*ori2;
+        
+
+        kine::Orientation ori10 (ori0,ori1);
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori11 (ori1,ori0);
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori12 (ori0,ori3); 
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori13 (ori3,ori0);
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori14 (ori2,ori1);
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori15 (ori1,ori2);
+        ori0=q;ori1=q;ori1=ori1.inverse();
+        kine::Orientation ori16 (ori2,ori3);
+        kine::Orientation ori17 (ori3,ori2);
+
+        err += (ori00.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  17 done. Current error "<<  err << std::endl;
+        err += (ori01.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  18 done. Current error "<<  err << std::endl;
+        err += (ori02.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  19 done. Current error "<<  err << std::endl;
+        err += (ori03.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  20 done. Current error "<<  err << std::endl;
+        err += (ori04.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  21 done. Current error "<<  err << std::endl;
+        err += (ori05.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  22 done. Current error "<<  err << std::endl;
+        err += (ori06.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  23 done. Current error "<<  err << std::endl;
+        err += (ori07.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  24 done. Current error "<<  err << std::endl;
+        err += (ori10.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  25 done. Current error "<<  err << std::endl;
+        err += (ori11.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  26 done. Current error "<<  err << std::endl;
+        err += (ori12.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  27 done. Current error "<<  err << std::endl;
+        err += (ori13.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  28 done. Current error "<<  err << std::endl;
+        err += (ori14.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  29 done. Current error "<<  err << std::endl;
+        err += (ori15.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  30 done. Current error "<<  err << std::endl;
+        err += (ori16.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  31 done. Current error "<<  err << std::endl;
+        err += (ori17.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  32 done. Current error "<<  err << std::endl;
+    }
+
+    {
+
+        kine::Orientation ori0(M);
+        kine::Orientation ori1(M);
+        ori1=ori1.inverse();
+        const kine::Orientation & ori2=ori0;
+        const kine::Orientation & ori3=ori1;
+
+        ori0=M;ori1=M;ori1=ori1.inverse();        
+        kine::Orientation ori00 = ori0*ori1;
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori01 = ori1*ori0;
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori02 = ori0*ori3; 
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori03 = ori3*ori0;
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori04 = ori2*ori1;
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori05 = ori1*ori2;
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori06 = ori2*ori3;
+        kine::Orientation ori07 = ori3*ori2;
+        
+
+        kine::Orientation ori10 (ori0,ori1);
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori11 (ori1,ori0);
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori12 (ori0,ori3); 
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori13 (ori3,ori0);
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori14 (ori2,ori1);
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori15 (ori1,ori2);
+        ori0=M;ori1=M;ori1=ori1.inverse();
+        kine::Orientation ori16 (ori2,ori3);
+        kine::Orientation ori17 (ori3,ori2);
+
+        err += (ori00.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  33 done. Current error "<<  err << std::endl;
+        err += (ori01.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  34 done. Current error "<<  err << std::endl;
+        err += (ori02.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  35 done. Current error "<<  err << std::endl;
+        err += (ori03.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  36 done. Current error "<<  err << std::endl;
+        err += (ori04.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  37 done. Current error "<<  err << std::endl;
+        err += (ori05.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  38 done. Current error "<<  err << std::endl;
+        err += (ori06.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  39 done. Current error "<<  err << std::endl;
+        err += (ori07.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  40 done. Current error "<<  err << std::endl;
+        err += (ori10.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  41 done. Current error "<<  err << std::endl;
+        err += (ori11.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  42 done. Current error "<<  err << std::endl;
+        err += (ori12.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  43 done. Current error "<<  err << std::endl;
+        err += (ori13.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  44 done. Current error "<<  err << std::endl;
+        err += (ori14.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  45 done. Current error "<<  err << std::endl;
+        err += (ori15.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  46 done. Current error "<<  err << std::endl;
+        err += (ori16.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  47 done. Current error "<<  err << std::endl;
+        err += (ori17.matrix3() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test  48 done. Current error "<<  err << std::endl;
+    }
+
+    {
         kine::Orientation ori1(q);
         kine::Orientation ori2(M);
  
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
-        std::cout<<"Multiplication test 17 done. Current error "<<  err << std::endl;
+        std::cout<<"Multiplication test 49 done. Current error "<<  err << std::endl;
     }
 
     {
@@ -228,7 +388,7 @@ int testOrientation(int errcode)
         std::cout<<"Integration/differentiation test 1 done. Current error "<<  err << std::endl;
     }
 
-    if (err>1e-14)
+    if (err>1e-13)
     {
         return errcode;
     }
@@ -596,7 +756,7 @@ int testKinematics (int errcode)
 
 }
 
-int testKineticsObserverCodeAccessor(int code)
+int testKineticsObserverCodeAccessor(int /*code*/)
 {
     double dt = 0.001;
     KineticsObserver o(4,2);
