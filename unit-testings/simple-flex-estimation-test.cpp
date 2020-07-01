@@ -218,7 +218,7 @@ int test()
 
     std::cout << "Error " << error << ", test: " ;
 
-    if (error > 2)
+    if (error > 5.)
     {
         std::cout << "FAILED !!!!!!!";
         return 1;
