@@ -16,14 +16,19 @@ int testOrientation(int errcode)
     Vector4 q_i;
 
     tools::ProbabilityLawSimulation s;
-    q_i = s.getGaussianVector(Matrix4::Identity(),Vector4::Zero(),4);
+
+    ///random orientation
+    q_i = s.getGaussianVector(Matrix4::Identity(),Vector4::Zero(),4); 
     q_i.normalize();
 
+    ///several representations of the orientation
     Quaternion q(q_i);
     AngleAxis aa(q);
     Matrix3 M(q.toRotationMatrix());
 
     double err=0.;
+
+    std::cout<<"Orientation test started " <<  err << std::endl;
 
  
     {
@@ -33,6 +38,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                  + (M1 - M).norm();
+        std::cout<<"Assignment operaton test 1 (Quaternion) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -41,6 +47,7 @@ int testOrientation(int errcode)
         
         err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
                 + (ori2.matrix3() - M).norm();
+        std::cout<<"Assignment operaton test 2 (Matrix3) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -49,6 +56,7 @@ int testOrientation(int errcode)
 
         err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
                  + (ori3.matrix3()-M).norm() ;
+        std::cout<<"Assignment operaton test 3 (AngleAxis) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -57,6 +65,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                 + (ori4.matrix3()-M).norm() ;
+        std::cout<<"Assignment operaton test 3 (Vector3) done. Current error " <<  err << std::endl;
     }
 
 
@@ -66,6 +75,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
                  + (M1 - M).norm();
+        std::cout<<"Cast operaton test 1 (Matrix3) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -73,6 +83,7 @@ int testOrientation(int errcode)
         
         err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
                 + (ori2.matrix3() - M).norm();
+        std::cout<<"copy constructor test 1 (Matrix3) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -80,6 +91,7 @@ int testOrientation(int errcode)
 
         err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
                  + (ori3.matrix3()-M).norm() ;
+        std::cout<<"copy constructor test 2 (AngleAxis) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -87,6 +99,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
+        std::cout<<"copy constructor test 3 (AngleAxis) done. Current error " <<  err << std::endl;
     }
 
     {
@@ -94,6 +107,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
+        std::cout<<"Constructor test 1 (Quaternion, Matrix3) done. Current error " <<  err << std::endl;
     }
 
     {   
@@ -103,6 +117,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
+        std::cout<<"Update Assignement operator test 1 (Matrix3) done. Current error " <<  err << std::endl; 
     }
 
     {   
@@ -112,6 +127,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
                 + (ori4.matrix3()-M).norm() ;
+        std::cout<<"Update Assignement operator test 2 (Quaternion) done. Current error " <<  err << std::endl; 
     }
 
 
@@ -126,6 +142,7 @@ int testOrientation(int errcode)
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - M).norm()  
                  + (M3 - M).norm();
+        std::cout<<"Inverse operator test 1 done. Current error " <<  err << std::endl; 
     }
 
 
@@ -171,6 +188,8 @@ int testOrientation(int errcode)
                 (ori15.matrix3() - Matrix3::Identity()).norm()+
                 (ori16.matrix3() - Matrix3::Identity()).norm()+
                 (ori17.matrix3() - Matrix3::Identity()).norm();
+
+        std::cout<<"Multiplication test  1 done. Current error "<<  err << std::endl;
     }
 
     {
@@ -180,6 +199,7 @@ int testOrientation(int errcode)
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
+        std::cout<<"Multiplication test 2 done. Current error "<<  err << std::endl;
     }
 
     {
@@ -191,6 +211,7 @@ int testOrientation(int errcode)
         Vector3 v2 = ori1.differentiate(ori2) ;
  
         err +=  (v1- v2).norm();
+        std::cout<<"Integration/differentiation test 1 done. Current error "<<  err << std::endl;
     }
 
     if (err>1e-14)
@@ -772,7 +793,7 @@ int main()
 
     if ((returnVal = testKinematics(2))) /// it is not an equality check
     {
-        std::cout<< "Kinematics test failed, code : 1" <<std::endl;
+        std::cout<< "Kinematics test failed, code : 2" <<std::endl;
         return returnVal;
     }
     else
