@@ -15,7 +15,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=3000;
+    const unsigned kmax=1000;
 
     ///sampling period
     const double dt=5e-3;
