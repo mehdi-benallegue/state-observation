@@ -689,7 +689,7 @@ int testKinematics (int errcode)
         }
         if (k0.linVel.isSet())
         {
-            if ((k.linVel()-k0.linVel()).squaredNorm()<1e-8)
+            if ((k.linVel()-k0.linVel()).squaredNorm()<1e-10)
             {
                 err +=  (k.linVel()-k0.linVel()).squaredNorm();
                 std::cout << "Error 2 (3) : " << err <<std::endl;
@@ -702,7 +702,7 @@ int testKinematics (int errcode)
         }
         if (k0.angVel.isSet())
         {
-            if ((k.angVel()-k0.angVel()).squaredNorm()<1e-9)
+            if ((k.angVel()-k0.angVel()).squaredNorm()<1e-10)
             {
                 err +=  (k.angVel()-k0.angVel()).squaredNorm();
                 std::cout << "Error 2 (5) : " << err <<std::endl;
@@ -715,7 +715,7 @@ int testKinematics (int errcode)
         }
         if (k0.linAcc.isSet())
         {
-            if ((k.linAcc()-k0.linAcc()).squaredNorm() < 1e-5)
+            if ((k.linAcc()-k0.linAcc()).squaredNorm() < 1e-10)
             {
                 err +=(k.linAcc()-k0.linAcc()).squaredNorm();
                 std::cout << "Error 2 (7) : " << err <<std::endl;
@@ -728,7 +728,7 @@ int testKinematics (int errcode)
         }
         if (k0.angAcc.isSet())
         {            
-            if ((k.angAcc()-k0.angAcc()).squaredNorm()< 1e-5)
+            if ((k.angAcc()-k0.angAcc()).squaredNorm()< 1e-10)
             {
                 err +=(k.angAcc()-k0.angAcc()).squaredNorm();
                 std::cout << "Error 2 (9) : " << err <<std::endl;
