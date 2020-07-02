@@ -39,9 +39,7 @@ int test()
 
     ///Generation
     {
-        Quaternion q(Vector4::Random());
-        q.normalize();
-        q = Quaternion::Identity();
+        Quaternion q(Quaternion::Identity());
         Vector3 odoti(Vector3::Zero());
         Vector3 oi(Vector3::Zero());
         Vector3 pos;
@@ -62,9 +60,7 @@ int test()
         x.setValue(Xi,0);
 
 
-        Quaternion qCtrl(Vector4::Random());
-        qCtrl.normalize();
-        qCtrl = Quaternion::Identity();
+        Quaternion qCtrl(Quaternion::Identity());
         Vector3 odotCtrl(Vector3::Zero());
         Vector3 oCtrl(Vector3::Zero());
         Vector3 posCtrl(Vector3::Zero());
@@ -80,10 +76,6 @@ int test()
 
 
         AccelerometerGyrometer imu;
-
-
-
-
 
         for (unsigned i=1; i<kmax; ++i)
         {
@@ -161,7 +153,6 @@ int test()
     ///the reconstruction of the state
     for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
     {
-        ///display part, useless
         Vector3 g;
         {
             Matrix3 R;
