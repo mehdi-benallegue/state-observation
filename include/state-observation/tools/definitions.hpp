@@ -383,7 +383,7 @@ namespace detail
    *
    */
 
-  template <typename MatrixType=Matrix>
+  template <typename MatrixType=Matrix, typename Allocator = std::allocator<MatrixType>>
   class IndexedMatrixArrayT
   {
   public:
@@ -392,7 +392,7 @@ namespace detail
 
 
 
-    typedef std::vector< MatrixType > Array;
+    typedef std::vector< MatrixType, Allocator > Array;
 
     ///Sets the vector v at the time index k
     ///It checks the time index, the array must have contiguous indexes
@@ -492,7 +492,7 @@ namespace detail
     void writeInFile(const std::string & filename, bool clear=false, bool append =false);
 
   protected:
-    typedef std::deque< MatrixType > Deque;
+    typedef std::deque< MatrixType, Allocator > Deque;
 
     ///Asserts that the index is present in the array
     ///does nothing in release mode
