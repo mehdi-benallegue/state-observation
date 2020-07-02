@@ -156,19 +156,6 @@ int test()
         stateObservation::examples::offlineEKFFlexibilityEstimation
             (y,u,xh0,1,contactPositions,dt,&ino, &prediMea);
 
-    ///file of output
-    std::ofstream f[10];
-    f[0].open("realState.dat");
-    f[1].open("estimatedState.dat");
-    f[2].open("gravity.dat");
-    f[3].open("estimatedGravity.dat");
-    f[4].open("error.dat");
-    f[5].open("measurement.dat");
-    f[6].open("predictedMeasurement.dat");
-    f[7].open("inovation.dat");
-    f[8].open("stateImu.dat");
-    f[9].open("input.dat");
-
     double error;
 
     ///the reconstruction of the state
@@ -203,17 +190,6 @@ int test()
         }
 
         error = acos(double(g.transpose()*gh)) * 180 / M_PI;
-
-        f[0]<< i<< " \t "<< x[i].transpose()<< std::endl;
-        f[1]<< i<< " \t "<< xh[i].transpose()<< std::endl;
-        f[2]<< i<< " \t "<< g.transpose()<< std::endl;
-        f[3]<< i<< " \t "<< gh.transpose()<< std::endl;
-        f[4]<< i<< " \t "<< error << std::endl;
-        f[5]<< i<< " \t "<< y[i].transpose()<< std::endl;
-        f[6]<< i<< " \t "<< prediMea[i].transpose()<< std::endl;
-        f[7]<< i<< " \t "<< ino[i].transpose()<< std::endl;
-        f[8]<< i<< " \t "<< z[i].transpose()<< std::endl;
-        f[9]<< i<< " \t "<< u[i].transpose()<< std::endl;
     }
 
     std::cout << "Error " << error << ", test: " ;
