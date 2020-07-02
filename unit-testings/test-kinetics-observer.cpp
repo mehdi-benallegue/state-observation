@@ -373,7 +373,7 @@ int testOrientation(int errcode)
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
-        std::cout<<"Multiplication test 49 done. Current error "<<  err << std::endl;
+        std::cout<<"Multiplication test  49 done. Current error "<<  err << std::endl;
     }
 
     {
