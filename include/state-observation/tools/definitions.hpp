@@ -209,21 +209,23 @@ namespace detail
 
   };
 
-  template <typename T, typename defaultValue >
+  ///this specialization contains no object
+    template <typename T, typename defaultValue >
   class DebugItem<T,defaultValue,false>
   {
   public:
     DebugItem() {}
-    explicit DebugItem(T v) {}
+    explicit DebugItem(T ) {}
     inline T& operator=(T v)
     {
-      return defaultValue::v;
+      /// I am not sure what is the best behaviour, is it to return v ot defaultValue::v?
+      return v;
     }
     inline operator T() const
     {
       return defaultValue::v;
     }
-    inline T set(const T& v)
+    inline T set(const T& )
     {
       return defaultValue::v;
     }
