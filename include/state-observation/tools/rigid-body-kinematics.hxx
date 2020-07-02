@@ -375,6 +375,8 @@ namespace stateObservation
     }
 
     ///transforms a rotation into translation given a constraint of a fixed point
+    /// which means the global position of the fixed point is constantly at its 
+    ///constrained position
     inline void fixedPointRotationToTranslation
     (const Matrix3 & R, const Vector3 & rotationVelocity,
      const Vector3 & rotationAcceleration, const Vector3 & fixedPoint,
