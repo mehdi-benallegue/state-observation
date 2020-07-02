@@ -412,7 +412,7 @@ int testKinematics (int errcode)
     Flags::Byte flag1 = BOOST_BINARY(000000);
 
 
-    kine::Kinematics k,l,k2,k3;
+    kine::Kinematics k,l,k2;
 
     
     int count = pow(2,6)*pow(2,6);
@@ -674,7 +674,7 @@ int testKinematics (int errcode)
             flag = flag | kine::Kinematics::Flags::angAcc;
         }
 
-        k3 = k0;
+        
         k0.update(k1,dt,flag);
 
         if (k0.position.isSet())
