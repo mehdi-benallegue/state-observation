@@ -341,7 +341,7 @@ inline long int IndexedMatrixArrayT<MatrixType>::getLastIndex()const
 template <typename MatrixType>
 inline TimeIndex IndexedMatrixArrayT<MatrixType>::getNextIndex()const
 {
-  return k_+v_.size();
+  return k_+TimeIndex(v_.size());
 }
 
 
