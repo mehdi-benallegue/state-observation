@@ -575,8 +575,6 @@ int testKinematics (int errcode)
         k0.reset();
         k1.reset();
 
-        std::cout << "Error 2 : " << i << " " << err <<std::endl;
-
         if (flag0 & Flags::position)
         {
             k0.position = l.position;
@@ -680,24 +678,20 @@ int testKinematics (int errcode)
         if (k0.position.isSet())
         {
             err += (k.position()-k0.position()).squaredNorm();
-            std::cout << "Error 2 (1) : " << err <<std::endl;
         }
         if (k0.orientation.isSet())
         {
             err += (k.orientation.differentiate(k0.orientation)).squaredNorm();
-            std::cout << "Error 2 (2) : " << err <<std::endl;
         }
         if (k0.linVel.isSet())
         {
             if ((k.linVel()-k0.linVel()).squaredNorm()<1e-10)
             {
                 err +=  (k.linVel()-k0.linVel()).squaredNorm();
-                std::cout << "Error 2 (3) : " << err <<std::endl;
             }
             else
             {
                 err += ((k.position()-l.position())/dt-k0.linVel()).squaredNorm();
-                std::cout << "Error 2 (4) : " << err <<std::endl;
             }
         }
         if (k0.angVel.isSet())
@@ -705,12 +699,10 @@ int testKinematics (int errcode)
             if ((k.angVel()-k0.angVel()).squaredNorm()<1e-10)
             {
                 err +=  (k.angVel()-k0.angVel()).squaredNorm();
-                std::cout << "Error 2 (5) : " << err <<std::endl;
             }
             else
             {
                 err += (l.orientation.differentiate(k.orientation)/dt-k0.angVel()).squaredNorm();
-                std::cout << "Error 2 (6) : " << err <<std::endl;
             }
         }
         if (k0.linAcc.isSet())
@@ -718,25 +710,21 @@ int testKinematics (int errcode)
             if ((k.linAcc()-k0.linAcc()).squaredNorm() < 1e-10)
             {
                 err +=(k.linAcc()-k0.linAcc()).squaredNorm();
-                std::cout << "Error 2 (7) : " << err <<std::endl;
             }
             else
             {
                 err +=(k.linAcc()-2*k0.linAcc()).squaredNorm();
-                std::cout << "Error 2 (8) : " << err <<std::endl;
             }            
         }
         if (k0.angAcc.isSet())
         {            
             if ((k.angAcc()-k0.angAcc()).squaredNorm()< 1e-10)
             {
-                err +=(k.angAcc()-k0.angAcc()).squaredNorm();
-                std::cout << "Error 2 (9) : " << err <<std::endl;
+                err +=(k.angAcc()-k0.angAcc()).squaredNorm();                
             }
             else
             {
-                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm();
-                 std::cout << "Error 2 (10) : " << err <<std::endl;
+                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm();                 
             }            
         }
 
