@@ -1323,7 +1323,7 @@ namespace stateObservation
           }
           else
           {
-            BOOST_ASSERT(thisPos.isSet() && "The position is cannot be updated without initial value");
+            BOOST_ASSERT(thisPos.isSet() && "The position cannot be updated without initial value");
             if (thisVel.isSet())
             {
               if (thisAcc.isSet())
@@ -1360,7 +1360,7 @@ namespace stateObservation
             }
             else
             {
-              BOOST_ASSERT(thisVel.isSet() && "The linear velocity is cannot be updated without initial value");
+              BOOST_ASSERT(thisVel.isSet() && "The linear velocity cannot be updated without initial value");
               if (thisAcc.isSet())
               {
                 velMethod = useAcceleration;
