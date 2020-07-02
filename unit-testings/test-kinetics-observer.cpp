@@ -575,10 +575,7 @@ int testKinematics (int errcode)
         k0.reset();
         k1.reset();
 
-        if (i==-1)
-        {
-            std::cout <<"debug me ";
-        }
+        std::cout << "Error 2 : " << i << " " << err <<std::endl;
 
         if (flag0 & Flags::position)
         {
@@ -683,55 +680,63 @@ int testKinematics (int errcode)
         if (k0.position.isSet())
         {
             err += (k.position()-k0.position()).squaredNorm();
+            std::cout << "Error 2 (1) : " << err <<std::endl;
         }
         if (k0.orientation.isSet())
         {
             err += (k.orientation.differentiate(k0.orientation)).squaredNorm();
+            std::cout << "Error 2 (2) : " << err <<std::endl;
         }
         if (k0.linVel.isSet())
         {
             if ((k.linVel()-k0.linVel()).squaredNorm()<1e-8)
             {
                 err +=  (k.linVel()-k0.linVel()).squaredNorm();
+                std::cout << "Error 2 (3) : " << err <<std::endl;
             }
             else
             {
                 err += ((k.position()-l.position())/dt-k0.linVel()).squaredNorm();
+                std::cout << "Error 2 (4) : " << err <<std::endl;
             }
-            
-            
         }
         if (k0.angVel.isSet())
         {
             if ((k.angVel()-k0.angVel()).squaredNorm()<1e-9)
             {
                 err +=  (k.angVel()-k0.angVel()).squaredNorm();
+                std::cout << "Error 2 (5) : " << err <<std::endl;
             }
             else
             {
                 err += (l.orientation.differentiate(k.orientation)/dt-k0.angVel()).squaredNorm();
+                std::cout << "Error 2 (6) : " << err <<std::endl;
             }
         }
         if (k0.linAcc.isSet())
         {
             if ((k.linAcc()-k0.linAcc()).squaredNorm() < 1e-5)
             {
-                err +=(k.linAcc()-k0.linAcc()).squaredNorm() ;
+                err +=(k.linAcc()-k0.linAcc()).squaredNorm();
+                std::cout << "Error 2 (7) : " << err <<std::endl;
             }
             else
             {
-                err +=(k.linAcc()-2*k0.linAcc()).squaredNorm() ;
+                err +=(k.linAcc()-2*k0.linAcc()).squaredNorm();
+                std::cout << "Error 2 (8) : " << err <<std::endl;
             }            
         }
         if (k0.angAcc.isSet())
         {            
             if ((k.angAcc()-k0.angAcc()).squaredNorm()< 1e-5)
             {
-                err +=(k.angAcc()-k0.angAcc()).squaredNorm() ;
+                err +=(k.angAcc()-k0.angAcc()).squaredNorm();
+                std::cout << "Error 2 (9) : " << err <<std::endl;
             }
             else
             {
-                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm() ;
+                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm();
+                 std::cout << "Error 2 (10) : " << err <<std::endl;
             }            
         }
 
@@ -754,12 +759,6 @@ int testKinematics (int errcode)
     
     
     return 0;
-
-
-    
-
-    
-
 }
 
 int testKineticsObserverCodeAccessor(int /*code*/)
@@ -781,12 +780,7 @@ int testKineticsObserverCodeAccessor(int /*code*/)
     stateKine.linVel.set().setZero();
     stateKine.angVel.set().setZero();
 
-
-
-    
-
     o.setStateVector(x0);
-
 
     o.setStateKinematics(stateKine);
     o.setGyroBias(Vector3(1,2,3));
@@ -796,16 +790,12 @@ int testKineticsObserverCodeAccessor(int /*code*/)
 
     o.setStateUnmodeledWrench(wrench);
 
-    
-
     Vector x = o.getStateVector();
     stateObservation::TimeIndex index = o.getStateVectorSampleTime();
 
     Kinematics contactKine;
     contactKine.position.set()<<0,0.1,0;
     contactKine.orientation.setZeroRotation();
-
-
 
     o.addContact(contactKine,0);
 
@@ -842,18 +832,11 @@ int testKineticsObserverCodeAccessor(int /*code*/)
     o.addContact(contactKine,initialCov,processCov,linDamping,
                         linStiffness,angStiffness,angDamping,2);
 
-
-    
-
-
-
     std::cout << index << " " << x.transpose() << std::endl;
 
     o.update();
 
     Kinematics k = o.getKinematics();
-
-    
 
     std::cout << k;
 
