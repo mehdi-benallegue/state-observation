@@ -383,11 +383,11 @@ namespace stateObservation
      Vector3 & outputTranslation, Vector3 & outputLinearVelocity,
      Vector3 & outputLinearAcceleration)
     {
-      Matrix3 omega_x = skewSymmetric(rotationVelocity);
-      outputTranslation = fixedPoint - R * fixedPoint;
-      outputLinearVelocity = -omega_x * R * fixedPoint;
-      outputLinearAcceleration =-(skewSymmetric(rotationAcceleration) + tools::square(omega_x))
-                                * R * fixedPoint;
+      Vector3 localFixed = R * fixedPoint;
+      outputTranslation = fixedPoint - localFixed;
+      outputLinearVelocity = -rotationVelocity.cross(localFixed);
+      outputLinearAcceleration =-rotationVelocity.cross(rotationVelocity.cross(localFixed))
+                                -rotationAcceleration.cross(localFixed);
     }
 
     ///Computes the multiplicative Jacobians for
