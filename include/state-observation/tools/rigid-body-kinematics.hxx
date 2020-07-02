@@ -1073,7 +1073,7 @@ namespace stateObservation
 
     inline Orientation Orientation::zeroRotation()
     {
-      return Orientation(zeroRotation(), Matrix3::Identity());
+      return Orientation(Quaternion::Identity(), Matrix3::Identity());
     }
 
     inline Orientation Orientation::randomRotation()
