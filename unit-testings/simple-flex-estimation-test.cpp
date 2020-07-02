@@ -35,7 +35,7 @@ int test()
     IndexedVectorArray prediMea;
 
     ///Contact vector
-    Vector3 contact(Vector3::Random());
+    Vector3 contact(-1,0,0);
 
     ///Generation
     {
@@ -63,7 +63,7 @@ int test()
         Quaternion qCtrl(Quaternion::Identity());
         Vector3 odotCtrl(Vector3::Zero());
         Vector3 oCtrl(Vector3::Zero());
-        Vector3 posCtrl(Vector3::Zero());
+        Vector3 posCtrl(contact);
         Vector3 velCtrl(Vector3::Zero());
         Vector3 accCtrl(Vector3::Zero());
 
@@ -83,7 +83,7 @@ int test()
             aa=q;
             oi+=odoti*dt;
             odoti << 0.1*sin(0.007*i),  0.2*sin(0.03*i),  0.25*sin(0.02*i);
-            odoti *= 5;
+                        
             kine::fixedPointRotationToTranslation(q.matrix() , oi, odoti,
                                                         contact, pos, vel, acc);
 
@@ -136,7 +136,7 @@ int test()
         }
     }
 
-    ///the initalization of a random estimation of the initial state
+    ///the initalization of an estimation of the initial state
     Vector xh0=Vector::Zero(stateSize,1);
 
     std::vector<Vector3, Eigen::aligned_allocator<Vector3> > contactPositions;
@@ -148,7 +148,7 @@ int test()
         stateObservation::examples::offlineEKFFlexibilityEstimation
             (y,u,xh0,1,contactPositions,dt,&ino, &prediMea);
 
-    double error;
+    double error=0;
 
     ///the reconstruction of the state
     for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
@@ -185,7 +185,7 @@ int test()
 
     std::cout << "Error " << error << ", test: " ;
 
-    if (error > 5.)
+    if (error > 2.)
     {
         std::cout << "FAILED !!!!!!!";
         return 1;
