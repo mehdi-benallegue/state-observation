@@ -237,9 +237,6 @@ namespace detail
      ///no object
   };
 
-
-
-
   ///this is simply a structure allowing for automatically verifying that
   /// the item has been initialized or not. The chckitm_reset() function allows to
   /// set it back to "not initialized" state.
