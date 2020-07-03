@@ -3,6 +3,8 @@ MACRO(ADD_STATE_ESTIMATOR_TEST NAME)
   target_link_libraries(${NAME} PUBLIC state-observation Boost::unit_test_framework) 
   target_compile_definitions(${NAME} PRIVATE -DBOOST_TEST_DYN_LINK -DBOOST_TEST_MAIN)
   add_test(${NAME} ${NAME})
+  # Adding a project configuration file (for MSVC only)
+  generate_msvc_dot_user_file(${NAME})
 ENDMACRO()
 
 ADD_STATE_ESTIMATOR_TEST(test-kalman-filter)

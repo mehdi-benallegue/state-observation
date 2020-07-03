@@ -498,7 +498,7 @@ namespace stateObservation
   }///namespace kine
 }///namespace stateObservation
 
-inline std::ostream& STATE_OBSERVATION_DLLAPI operator<<(std::ostream& os, const stateObservation::kine::Kinematics & k);
+inline STATE_OBSERVATION_DLLAPI std::ostream& operator<<(std::ostream& os, const stateObservation::kine::Kinematics & k);
 
 #include <state-observation/tools/rigid-body-kinematics.hxx>
 

@@ -176,8 +176,8 @@ namespace detail
   typedef DebugItemDefaultError<exception> defaultException;
   typedef DebugItemDefaultError<exceptionAddr> defaultExceptionAddr;
 
-  void defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
-  void defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+  void STATE_OBSERVATION_DLLAPI defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+  void STATE_OBSERVATION_DLLAPI defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
 }
 
