@@ -13,6 +13,7 @@
 #ifndef IMU_DYNAMICAL_SYSTEM_HPP
 #define IMU_DYNAMICAL_SYSTEM_HPP
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
@@ -30,7 +31,7 @@ namespace stateObservation
     *
     *
     */
-    class IMUDynamicalSystem : public DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI IMUDynamicalSystem : public DynamicalSystemFunctorBase
     {
     public:
         ///The constructor

@@ -101,8 +101,9 @@ SET(SRC
 
 SET(LIBRARY_NAME ${PROJECT_NAME})
 ADD_LIBRARY(${LIBRARY_NAME} SHARED ${SRC} ${HEADERS})
+SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS "-DSTATE_OBSERVATION_EXPORTS")
 TARGET_INCLUDE_DIRECTORIES(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
-TARGET_LINK_LIBRARIES(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::system Boost::thread Boost::program_options Boost::timer)
+TARGET_LINK_LIBRARIES(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::system Boost::thread Boost::program_options Boost::timer Boost::disable_autolinking)
 if(TARGET Eigen3::Eigen)
   target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen)
 else()

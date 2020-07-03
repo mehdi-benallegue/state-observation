@@ -14,6 +14,7 @@
 #ifndef FLEXIBILITYESTIMATION_OFFLINEMODELBASEFLEXESTIMATOR_H
 #define FLEXIBILITYESTIMATION_OFFLINEMODELBASEFLEXESTIMATOR_H
 
+#include <state-observation/api.h>
 #include <state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp>
 #include <vector>
 
@@ -53,7 +54,7 @@ namespace stateObservation
          *  \param R measurement noise covariance matrix. Size interpretation is the same
          *         as for Q.
          */
-        stateObservation::IndexedVectorArray offlineModelBaseFlexEstimation(
+        stateObservation::IndexedVectorArray STATE_OBSERVATION_DLLAPI offlineModelBaseFlexEstimation(
             const stateObservation::IndexedVectorArray & y,
             const stateObservation::IndexedVectorArray & u,
             const Matrix & xh0,

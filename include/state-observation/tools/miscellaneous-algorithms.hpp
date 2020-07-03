@@ -15,6 +15,7 @@
 
 #include <boost/utility.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 
@@ -58,7 +59,7 @@ namespace stateObservation
         ///provides an acceleration giving a finite time convergence to zero
         ///the state is the position x and the derivative xd and the output is the
         ///acceleration. The gains kp, kv must be negative
-        inline double finiteTimeAccControl(double x, double xd, double kp=-1, double kv=-1)
+        inline double STATE_OBSERVATION_DLLAPI finiteTimeAccControl(double x, double xd, double kp=-1, double kv=-1)
         {
           double sax = sqrt(fabs(x));
           double xdr = kp*signum(x)*sax;
@@ -69,7 +70,7 @@ namespace stateObservation
 
 
         ///sqme as the scalar version but for every member of the vector
-        inline Vector finiteTimeAccControl(const Vector &x, const Vector &xd, double kp=-1, double kv=-1)
+        inline Vector STATE_OBSERVATION_DLLAPI finiteTimeAccControl(const Vector &x, const Vector &xd, double kp=-1, double kv=-1)
         {
           Vector xdd(x.size());
           for (unsigned i=1;i<x.size();++i)

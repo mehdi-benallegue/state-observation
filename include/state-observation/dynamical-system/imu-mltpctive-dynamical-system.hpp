@@ -13,6 +13,7 @@
 #ifndef IMU_MULTIPLICATIVE_DYNAMICAL_SYSTEM_HPP
 #define IMU_MULTIPLICATIVE_DYNAMICAL_SYSTEM_HPP
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/tools/state-vector-arithmetics.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
@@ -31,7 +32,7 @@ namespace stateObservation
     *
     *
     */
-    class IMUMltpctiveDynamicalSystem :
+    class STATE_OBSERVATION_DLLAPI IMUMltpctiveDynamicalSystem :
       public DynamicalSystemFunctorBase,
       public StateVectorArithmetics
     {

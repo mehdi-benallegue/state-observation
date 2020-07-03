@@ -11,6 +11,7 @@
 
 #include <vector>
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/noise/noise-base.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
@@ -34,7 +35,7 @@ namespace stateObservation
     *         other hypothesis than that the contact points are at constant position
     *
     */
-    class 	IMUElasticLocalFrameDynamicalSystem :
+    class STATE_OBSERVATION_DLLAPI	IMUElasticLocalFrameDynamicalSystem :
       public stateObservation::DynamicalSystemFunctorBase
     {
     public:

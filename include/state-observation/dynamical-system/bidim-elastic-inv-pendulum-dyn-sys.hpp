@@ -13,8 +13,10 @@
 #ifndef BIDIM_ELASTIC_INV_PENDULUM
 #define BIDIM_ELASTIC_INV_PENDULUM
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/noise/noise-base.hpp>
+#include <state-observation/api.h>
 
 namespace stateObservation
 {
@@ -26,7 +28,7 @@ namespace stateObservation
     *         horizontal acceleration.
     *
     */
-    class BidimElasticInvPendulum : public DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI STATE_OBSERVATION_DLLAPI BidimElasticInvPendulum : public DynamicalSystemFunctorBase
     {
     public:
         ///The constructor

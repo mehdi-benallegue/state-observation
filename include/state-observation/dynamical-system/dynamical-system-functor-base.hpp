@@ -13,6 +13,7 @@
 #ifndef STATEOBSERVERDYNAMICALSYSTEMFUNCTORBASE_H
 #define STATEOBSERVERDYNAMICALSYSTEMFUNCTORBASE_H
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -28,7 +29,7 @@ namespace stateObservation
     *
     */
 
-    class DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI DynamicalSystemFunctorBase
     {
     public:
         DynamicalSystemFunctorBase();

@@ -14,6 +14,7 @@
 #ifndef SENSORALGORITHMSMAGNETICFIELDHPP
 #define SENSORALGORITHMSMAGNETICFIELDHPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -26,7 +27,7 @@ namespace stateObservation
          *
          */
 
-        class MagneticField
+        class STATE_OBSERVATION_DLLAPI MagneticField
         {
         public:
 

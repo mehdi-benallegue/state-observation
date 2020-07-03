@@ -21,6 +21,7 @@
 #ifndef STATEOBSERVER_LINEARKALMANFILTERHPP
 #define STATEOBSERVER_LINEARKALMANFILTERHPP
 
+#include <state-observation/api.h>
 #include <state-observation/observer/kalman-filter-base.hpp>
 
 namespace stateObservation
@@ -44,7 +45,7 @@ namespace stateObservation
      *
      */
 
-    class LinearKalmanFilter: public KalmanFilterBase
+    class STATE_OBSERVATION_DLLAPI LinearKalmanFilter: public KalmanFilterBase
     {
     public:
 

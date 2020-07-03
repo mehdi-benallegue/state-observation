@@ -16,12 +16,10 @@
 #include <Eigen/Core>
 #include <boost/assert.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/sensors-simulation/algebraic-sensor.hpp>
-
 #include <state-observation/sensors-simulation/algorithm/linear-acceleration.hpp>
-
 #include <state-observation/sensors-simulation/algorithm/rotation-velocity.hpp>
-
 #include <state-observation/sensors-simulation/algorithm/magnetic-field.hpp>
 
 namespace stateObservation
@@ -36,7 +34,7 @@ namespace stateObservation
      *
      */
 
-    class AccelerometerGyrometerMagnetometer : public AlgebraicSensor,
+    class STATE_OBSERVATION_DLLAPI AccelerometerGyrometerMagnetometer : public AlgebraicSensor,
         protected algorithm::LinearAcceleration,
         protected algorithm::RotationVelocity,
         protected algorithm::MagneticField

@@ -34,6 +34,8 @@
 #  define M_PI boost::math::constants::pi<double>()
 #endif
 
+#include <state-observation/api.h>
+
 
 // basic file operations
 #include <fstream>
@@ -114,13 +116,13 @@ class DebugItemDefaultValue
     static const T v;
 };
 
-template <typename T, const T defaultValue> 
+template <typename T, const T defaultValue>
     const T DebugItemDefaultValue<T,defaultValue>::v=defaultValue;
 
 namespace detail
 {
   typedef DebugItemDefaultValue<bool,true> defaultTrue;
-  
+
   enum errorType
   {
     message,
@@ -160,7 +162,7 @@ namespace detail
        If this happened during initialization then run command chckitm_set() \
        to switch it to set. And if the initialization is incomplete, run \
        chckitm_reset() afterwards.";
-  
+
   template <int dummy>
   const std::runtime_error DebugItemDefaultError< exception, dummy>::v = std::runtime_error(DebugItemDefaultError<message>::v);
 
@@ -517,13 +519,13 @@ namespace detail
 
   namespace cst
   {
-    const double gravityConstant = 9.8;
+    constexpr double gravityConstant = 9.8;
 
     ///Gravity Vector along Z
     const Vector gravity= gravityConstant * Vector3::UnitZ();
 
     ///angles considered Zero
-    const double epsilonAngle=1e-16;
+    constexpr double epsilonAngle=1e-16;
 
   }
 
@@ -533,7 +535,7 @@ namespace detail
 
   namespace tools
   {
-    struct SimplestStopwatch
+    struct STATE_OBSERVATION_DLLAPI SimplestStopwatch
     {
       /** Always pick a steady clock */
       using clock = typename std::conditional<std::chrono::high_resolution_clock::is_steady,
@@ -556,15 +558,15 @@ namespace detail
       }
     };
 
-    std::string matrixToString(const Matrix& mat);
+    std::string STATE_OBSERVATION_DLLAPI matrixToString(const Matrix& mat);
 
-    std::string vectorToString(const Vector& v);
+    std::string STATE_OBSERVATION_DLLAPI vectorToString(const Vector& v);
 
-    Matrix stringToMatrix(const std::string& str, unsigned rows, unsigned cols);
+    Matrix STATE_OBSERVATION_DLLAPI stringToMatrix(const std::string& str, unsigned rows, unsigned cols);
 
-    Vector stringToVector(const std::string& str, unsigned length);
+    Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str, unsigned length);
 
-    Vector stringToVector(const std::string& str);
+    Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str);
   }
 
 #include <state-observation/tools/definitions.hxx>

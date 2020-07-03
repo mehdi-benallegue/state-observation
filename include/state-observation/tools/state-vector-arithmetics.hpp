@@ -1,15 +1,16 @@
 #ifndef STATE_VECTOR_ARITHMETICS_HPP
 #define STATE_VECTOR_ARITHMETICS_HPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
 {
 namespace detail
 {
-void defaultSum(const Vector &stateVector, const Vector &tangentVector, Vector &result);
+void STATE_OBSERVATION_DLLAPI defaultSum(const Vector &stateVector, const Vector &tangentVector, Vector &result);
 
-void defaultDifference(const Vector &stateVector1, const Vector &stateVector2, Vector &difference);
+void STATE_OBSERVATION_DLLAPI defaultDifference(const Vector &stateVector1, const Vector &stateVector2, Vector &difference);
 
 } // namespace detail
 
@@ -17,11 +18,11 @@ void defaultDifference(const Vector &stateVector1, const Vector &stateVector2, V
      * \class  StateArithmetics
      * \brief
      *        This class is used to customize the way the difference between measurements,
-     *        the state update function and the differentiation are performed. 
+     *        the state update function and the differentiation are performed.
      *         default is the usual natual arithmetics. overload any ohter one
      *
      */
-class StateVectorArithmetics
+class STATE_OBSERVATION_DLLAPI StateVectorArithmetics
 {
 public:
     virtual void stateSum(const Vector &stateVector, const Vector &tangentVector, Vector &sum);

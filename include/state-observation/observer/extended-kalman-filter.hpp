@@ -16,6 +16,7 @@
 #ifndef STATEOBSERVER_EXTENDEDKALMANFILTERHPP
 #define STATEOBSERVER_EXTENDEDKALMANFILTERHPP
 
+#include <state-observation/api.h>
 #include <state-observation/observer/kalman-filter-base.hpp>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 
@@ -39,7 +40,7 @@ namespace stateObservation
      *
      */
 
-    class ExtendedKalmanFilter: public KalmanFilterBase
+    class STATE_OBSERVATION_DLLAPI ExtendedKalmanFilter: public KalmanFilterBase
     {
 
     public:
@@ -47,7 +48,7 @@ namespace stateObservation
         /// The constructor.
         ///  \li n : size of the state vector
         ///  \li m : size of the measurements vector
-        
+
         ExtendedKalmanFilter(unsigned n,unsigned m);
 
         /// The constructor.

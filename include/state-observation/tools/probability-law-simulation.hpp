@@ -14,6 +14,7 @@
 
 #include <boost/random.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 
@@ -21,7 +22,7 @@ namespace stateObservation
 {
     namespace tools
     {
-        class ProbabilityLawSimulation
+        class STATE_OBSERVATION_DLLAPI ProbabilityLawSimulation
         {
         public:
             ///gets a scalar Gaussian random variable

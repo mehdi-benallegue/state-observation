@@ -24,6 +24,7 @@
 #ifndef KALMANFILTERBASEHPP
 #define KALMANFILTERBASEHPP
 
+#include <state-observation/api.h>
 #include <state-observation/observer/zero-delay-observer.hpp>
 #include <state-observation/tools/state-vector-arithmetics.hpp>
 
@@ -50,7 +51,7 @@ namespace stateObservation
      *
      *
      */
-    class KalmanFilterBase: public ZeroDelayObserver,
+    class STATE_OBSERVATION_DLLAPI KalmanFilterBase: public ZeroDelayObserver,
                             protected StateVectorArithmetics
     {
     public:
@@ -249,7 +250,7 @@ namespace stateObservation
 
         /// Changes the dimension of the measurement vector:
         /// m is the size of the measurementVector
-        /// mt is the dimension of the measurement tangent space 
+        /// mt is the dimension of the measurement tangent space
         ///resets the internal container for the measurement vectors and
         ///the containers for the matrices C, R
         virtual void setMeasureSize(unsigned m, unsigned mt);

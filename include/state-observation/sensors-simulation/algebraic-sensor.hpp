@@ -15,6 +15,7 @@
 #include <Eigen/Core>
 #include <boost/assert.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/sensors-simulation/sensor-base.hpp>
 
 namespace stateObservation
@@ -32,7 +33,7 @@ namespace stateObservation
      *
      */
 
-    class AlgebraicSensor: public SensorBase
+    class STATE_OBSERVATION_DLLAPI AlgebraicSensor: public SensorBase
     {
     public:
         /// Default constructor

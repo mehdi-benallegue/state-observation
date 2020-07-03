@@ -14,6 +14,7 @@
 #ifndef FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H
 #define FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H
 
+#include <state-observation/api.h>
 #include <state-observation/flexibility-estimation/ekf-flexibility-estimator-base.hpp>
 //#include <state-observation/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp>
 #include <state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp>
@@ -35,7 +36,7 @@ namespace flexibilityEstimation
     *
     */
 
-    class ModelBaseEKFFlexEstimatorIMU :
+    class STATE_OBSERVATION_DLLAPI ModelBaseEKFFlexEstimatorIMU :
                                             public EKFFlexibilityEstimatorBase,
                                             private boost::noncopyable
     {

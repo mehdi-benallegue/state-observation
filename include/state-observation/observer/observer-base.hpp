@@ -24,6 +24,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -39,7 +40,7 @@ namespace stateObservation
      */
 
 
-    class ObserverBase
+    class STATE_OBSERVATION_DLLAPI ObserverBase
     {
     public:
 

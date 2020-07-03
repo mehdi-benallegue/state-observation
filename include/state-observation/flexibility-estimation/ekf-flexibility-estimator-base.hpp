@@ -15,6 +15,7 @@
 
 #include <boost/utility.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/observer/extended-kalman-filter.hpp>
 
 #include <state-observation/flexibility-estimation/flexibility-estimator-base.hpp>
@@ -32,7 +33,7 @@ namespace flexibilityEstimation
     *
     */
 
-    class EKFFlexibilityEstimatorBase:
+    class STATE_OBSERVATION_DLLAPI EKFFlexibilityEstimatorBase:
                 public FlexibilityEstimatorBase
     {
     public:

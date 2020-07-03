@@ -45,7 +45,7 @@ namespace stateObservation
          *  \param contactsPositions a vector of positions of the vector
          *  \param dt the time discretization period
          */
-        stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
+        stateObservation::IndexedVectorArray STATE_OBSERVATION_DLLAPI offlineEKFFlexibilityEstimation(
             const stateObservation::IndexedVectorArray & y,
             const stateObservation::IndexedVectorArray & u,
             const Vector & xh0,
@@ -77,7 +77,7 @@ namespace stateObservation
          *  \param contactsPositions a vector of positions of the vector
          *  \param dt the time discretization period
          */
-        stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
+        stateObservation::IndexedVectorArray STATE_OBSERVATION_DLLAPI offlineEKFFlexibilityEstimation(
             const stateObservation::IndexedVectorArray & y,
             const Vector & xh0,
             unsigned numberOfContacts,

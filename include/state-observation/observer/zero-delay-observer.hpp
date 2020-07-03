@@ -19,6 +19,7 @@
 
 #include <deque>
 
+#include <state-observation/api.h>
 #include <state-observation/observer/observer-base.hpp>
 
 
@@ -41,7 +42,7 @@ namespace stateObservation
      * \details
      *
      */
-    class ZeroDelayObserver: public ObserverBase
+    class STATE_OBSERVATION_DLLAPI ZeroDelayObserver: public ObserverBase
     {
     public:
 

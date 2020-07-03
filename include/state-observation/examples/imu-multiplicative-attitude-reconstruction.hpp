@@ -14,7 +14,7 @@
 #ifndef IMUMULTUPLICATIVEATTITUDETRAJECTORYRECONTRUCTIONHPP
 #define IMUMULTUPLICATIVEATTITUDETRAJECTORYRECONTRUCTIONHPP
 
-
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/imu-mltpctive-dynamical-system.hpp>
 #include <state-observation/dynamical-system/dynamical-system-simulator.hpp>
 #include <state-observation/observer/extended-kalman-filter.hpp>
@@ -52,7 +52,7 @@ namespace stateObservation
          *  \param dt the time discretization period
          */
 
-        IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
+        IndexedVectorArray STATE_OBSERVATION_DLLAPI imuMultiplicativeAttitudeReconstruction(
             const IndexedVectorArray & y,
             const IndexedVectorArray & u,
             const Vector & xh0,
@@ -86,7 +86,7 @@ namespace stateObservation
          *  \param r the covariance matrix of the measurement noise
          *  \param dt the time discretization period
          */
-        IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
+        IndexedVectorArray STATE_OBSERVATION_DLLAPI imuMultiplicativeAttitudeReconstruction(
             const IndexedVectorArray & y,
             const Vector & xh0,
             const Matrix & p,

@@ -14,6 +14,7 @@
 #ifndef SENSORALGORITHMSROTATIONVELOCITYHPP
 #define SENSORALGORITHMSROTATIONVELOCITYHPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -26,7 +27,7 @@ namespace stateObservation
          *
          */
 
-        class RotationVelocity
+        class STATE_OBSERVATION_DLLAPI RotationVelocity
         {
         public:
             ///virtual destructor

@@ -11,6 +11,7 @@
 #ifndef SENSORSIMULATIONGAUSSIANWHITENOISEHPP
 #define SENSORSIMULATIONGAUSSIANWHITENOISEHPP
 
+#include <state-observation/api.h>
 #include <state-observation/noise/noise-base.hpp>
 
 namespace stateObservation
@@ -25,7 +26,7 @@ namespace stateObservation
      *
      */
 
-    class GaussianWhiteNoise : public NoiseBase
+    class STATE_OBSERVATION_DLLAPI GaussianWhiteNoise : public NoiseBase
     {
     public:
 

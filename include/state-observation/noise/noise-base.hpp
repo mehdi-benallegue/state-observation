@@ -13,6 +13,7 @@
 #ifndef SENSORSIMULATIONNOISEBASEHPP
 #define SENSORSIMULATIONNOISEBASEHPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -26,7 +27,7 @@ namespace stateObservation
      *
      */
 
-    class NoiseBase
+    class STATE_OBSERVATION_DLLAPI NoiseBase
     {
     public:
         /// Virtual destructor
@@ -34,7 +35,7 @@ namespace stateObservation
 
         /// The method to overload to produce the noisy version of a given vector
         virtual Vector getNoisy( const Vector &)=0;
-       
+
     protected:
 
     };

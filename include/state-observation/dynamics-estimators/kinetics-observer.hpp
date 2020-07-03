@@ -17,6 +17,7 @@
 
 #include <boost/utility.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 #include <state-observation/observer/extended-kalman-filter.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
@@ -39,7 +40,7 @@ namespace stateObservation
     *
     */
 
-    class KineticsObserver: 
+    class STATE_OBSERVATION_DLLAPI KineticsObserver:
         protected DynamicalSystemFunctorBase,
         protected StateVectorArithmetics
     {
@@ -93,7 +94,7 @@ namespace stateObservation
         Kinematics getKinematicsOf(Kinematics & localKinematics) const;
         Kinematics getKinematicsOf(Kinematics & localKinematics);
 
-        ///get the contact force provided by the estimator 
+        ///get the contact force provided by the estimator
         /// which is different from a contact sensor measurement
         Vector6 getContactWrench(int contactNbr) const;
         Kinematics getContactPosition(int contactNbr) const;
@@ -101,7 +102,7 @@ namespace stateObservation
         /// gets the external unmodeled forces
         Vector6 getUnmodeledWrench() const;
 
-        ///This function allows to estimate the acceleration 
+        ///This function allows to estimate the acceleration
         /// it returns a Kinemactis
         Kinematics estimateAccelerations();
 
@@ -111,16 +112,16 @@ namespace stateObservation
         void setStateKinematics(const Kinematics &, bool resetContactWrenches=true,
                                    bool resetCovariance=true);
 
-        /// Allows to initializa the value of the gyro bias of the IMU 
+        /// Allows to initializa the value of the gyro bias of the IMU
         /// corresponding to the numberOfIMU
         /// reset Covariance allows to reinitialize the gyro bias
         void setGyroBias(const Vector3 &, unsigned numberOfIMU = 1,  bool resetCovariance=true);
 
-        ///if only force or torque is available, set the unavailable value to zero 
+        ///if only force or torque is available, set the unavailable value to zero
         void setStateUnmodeledWrench(const Vector6 &, bool resetCovariance=true);
-        
+
         ///Sets a value of the state x_k provided from another source
-        /// can be used for initialization of the estimator 
+        /// can be used for initialization of the estimator
         void setStateVector(const Vector &,bool resetCovariance=true);
 
         /// Getters for the indexes of the state Vector
@@ -160,8 +161,8 @@ namespace stateObservation
         inline unsigned contactForceIndexTangent(unsigned contactNbr) const;
         inline unsigned contactTorqueIndexTangent(unsigned contactNbr) const;
         inline unsigned contactWrenchIndexTangent(unsigned contactNbr) const;
-        
-      
+
+
 
         /// /////////////////////////////////////////////////////
         /// Setting and getting the state of the estimation
@@ -180,46 +181,46 @@ namespace stateObservation
         /// sets the measurement of the IMU (gyrometer, accelerometer, kinematics and number of the IMU)
         /// accelero and gyrometer are the measurement
         /// localKine gets the kinematics of the IMU expressed in the observed frame
-        /// the best is to provide the position, the orientation, 
-        /// the angular and linear velocities and the linear acceleration 
-        /// Nevertheless if velocities or accelerations are not available they will be 
+        /// the best is to provide the position, the orientation,
+        /// the angular and linear velocities and the linear acceleration
+        /// Nevertheless if velocities or accelerations are not available they will be
         /// automatically computed through finite differences
         /// the acceleroCov and the gyroCov are the covariance matrices of the sensors
         int setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Kinematics &localKine, int num=-1);
-        int setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Matrix3& acceleroCov, 
+        int setIMU(const Vector3 & accelero, const  Vector3 & gyrometer, const Matrix3& acceleroCov,
                                                         const Matrix3 gyroCov, const Kinematics &localKine, int num=-1);
-                
+
         void setIMUDefaultCovarianceMatrix(const Matrix3& acceleroCov, const Matrix3 &gyroCov);
 
         ////////// Contact stters, these are MANDATORY for every contact at every iteration ///
-        /// if the contact is equipped with wrench sensor call setContactWrenchSensor 
+        /// if the contact is equipped with wrench sensor call setContactWrenchSensor
         /// otherwise calls etContactWithoutSensor
 
         /// sets the measurements of a force/torque sensor of the contact numbered contactNumber
         /// wrenchMeasurement is the measurment vector composed with 3D forces and 3D torques
         /// localKine sets the kinematics of the contact expressed in the observed frame
-        /// the best is to provide the position , the orientation, 
-        /// the angular and the linear velocities. 
-        
+        /// the best is to provide the position , the orientation,
+        /// the angular and the linear velocities.
+
         void setContactWrenchSensor(const Vector6& wrenchMeasurement, const Kinematics &localKine, unsigned contactNumber);
-        void setContactWrenchSensor(const Vector6& wrenchMeasurement, const Matrix6 & wrenchCovMatrix, 
+        void setContactWrenchSensor(const Vector6& wrenchMeasurement, const Matrix6 & wrenchCovMatrix,
                                                                                     const Kinematics &localKine, unsigned contactNumber);
 
         void setContactWrenchSensorDefaultCovarianceMatrix(const Matrix6 & wrenchSensorCovMat);
-        
+
         /// sets the the kinematics of the contact expressed in the observed frame
         /// the best is to provide the position, the orientation, the angular and the linear velocities.
-        /// otherwise they will be automatically computed 
+        /// otherwise they will be automatically computed
         void setContactWithNoSensor(const Kinematics &localKine, unsigned contactNumber);
-                                                               
-        /// Set a measurement of the pose. The input is the Measured kinematics 
+
+        /// Set a measurement of the pose. The input is the Measured kinematics
         /// namely position and orientation.
         void setAbsolutePoseSensor(const Kinematics &);
         void setAbsolutePoseSensor(const Kinematics &, const Matrix6 & CovarianceMatrix);
 
         ///TODO
         //void setVelocityGuess(const Kinematics)
- 
+
         void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix & , int contactNumber);
 
         ///////////////////////////////////////////////
@@ -231,7 +232,7 @@ namespace stateObservation
 
         /// sets the mass of the robot
         void setMass(double);
-        
+
         ///Sets the 3x3 inertia matrix expressed in the local frame and  optionally
         ///  its time derivative (computed with finite differences otherwise)
         ///the Vector6 version is a vector containing the diagonal and the three non
@@ -242,7 +243,7 @@ namespace stateObservation
         void setInertiaMatrix(const Vector6& I, const Vector6& I_dot);
         void setInertiaMatrix(const Vector6& I);
 
-        ///Sets the center of mass position expressed in the local frame 
+        ///Sets the center of mass position expressed in the local frame
         /// and optionally its first and second order time derivarives
         /// computed through finite differences otherwise.
         /// it is highly recommended to update these values at every iteration
@@ -250,7 +251,7 @@ namespace stateObservation
         void setCenterOfMass(const Vector3& com, const Vector3& com_dot);
         void setCenterOfMass(const Vector3& com);
 
-        ///Sets the angular momentum expressed in the local frame 
+        ///Sets the angular momentum expressed in the local frame
         /// and optionally its time derivarive
         /// computed through finite differences otherwise.
         /// it is highly recommended to update these values at every iteration
@@ -261,31 +262,31 @@ namespace stateObservation
         /// Contact management
         ///////////////////////////////
         /// Set a new contact
-        /// -pose is the initial guess on the position of the contact. Only position 
+        /// -pose is the initial guess on the position of the contact. Only position
         /// and orientation are enough
-        /// -initialCovarianceMatrix is the covariance matrix expressing the 
-        ///  uncertainty of the initial guess (if no initial guess is available 
+        /// -initialCovarianceMatrix is the covariance matrix expressing the
+        ///  uncertainty of the initial guess (if no initial guess is available
         ///  give a rough position with a high initial covariance matrix)
-        /// -processCovarianceMatrix is the covariance matrix expressing the 
+        /// -processCovarianceMatrix is the covariance matrix expressing the
         ///  rate at which the contact slides (set to zero for no sliding)
         /// -linear, angular stiffness and damping set the flexibility model
         ///  of the contact
         /// set contactNumber to -1 in order to set the number automatically
         /// returns the number of this contact
-        int addContact(const Kinematics & pose, 
-                            const Matrix12 & initialCovarianceMatrix, const Matrix12 & processCovarianceMatrix, 
-                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping, 
-                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping, 
+        int addContact(const Kinematics & pose,
+                            const Matrix12 & initialCovarianceMatrix, const Matrix12 & processCovarianceMatrix,
+                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping,
+                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping,
                             int contactNumber=-1);
         /// version with default stiffness and damping
         /// use when the contact parameters are known
-        int addContact(const Kinematics & pose, 
-                            const Matrix12 & initialCovarianceMatrix, const Matrix12 & processCovarianceMatrix, 
+        int addContact(const Kinematics & pose,
+                            const Matrix12 & initialCovarianceMatrix, const Matrix12 & processCovarianceMatrix,
                             int contactNumber=-1);
         /// version when the contact position is perfectly known
-        int addContact(const Kinematics & pose, 
-                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping, 
-                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping, 
+        int addContact(const Kinematics & pose,
+                            const Matrix3 & linearStiffness,  const Matrix3 & linearDamping,
+                            const Matrix3 & angularStiffness, const Matrix3 & angularDamping,
                             int contactNumber=-1);
         /// version when the position is perfectly known but not the stiffness and damping
         int addContact(const Kinematics & pose, int contactNumber=-1);
@@ -338,16 +339,16 @@ namespace stateObservation
         void resetStateCovarianceMat();
         void resetStateKinematicsCovMat();
         void resetStateGyroBiasCovMat( unsigned i);
-        void resetStateUnmodeledWrenchCovMat();  
+        void resetStateUnmodeledWrenchCovMat();
         void resetStateContactsCovMat();
-        void resetStateContactCovMat(unsigned contactNbr);       
+        void resetStateContactCovMat(unsigned contactNbr);
 
         void resetProcessCovarianceMat();
         void resetProcessKinematicsCovMat();
         void resetProcessGyroBiasCovMat( unsigned i);
         void resetProcessUnmodeledWrenchCovMat();
         void resetProcessContactsCovMat();
-        void resetProcessContactCovMat(unsigned contactNbr); 
+        void resetProcessContactCovMat(unsigned contactNbr);
 
         ///Reset the default values for the covariance matrix
         void resetSensorsDefaultCovMat();
@@ -363,9 +364,9 @@ namespace stateObservation
             int measIndex;
             int size;
             TimeIndex time;
-            
+
             inline Vector extractFromVector(const Vector & v){return v.segment(size,measIndex);}
-        };        
+        };
 
         struct IMU:
         public Sensor
@@ -379,13 +380,13 @@ namespace stateObservation
 
             static int currentNumber;
 
-            EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         };
 
         typedef std::vector<IMU, Eigen::aligned_allocator< IMU > > VectorIMU;
         typedef VectorIMU::iterator VectorIMUIterator;
         typedef VectorIMU::const_iterator VectorIMUConstIterator;
-        
+
         struct Contact:
         public Sensor
         {
@@ -393,7 +394,7 @@ namespace stateObservation
                         stateIndex(-1),stateIndexTangent(-1){}
             virtual ~Contact(){}
 
-            
+
 
             Kinematics absPose;
             Vector6 wrench;
@@ -418,7 +419,7 @@ namespace stateObservation
 
             static int numberOfRealSensors;
 
-            EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         };
 
        typedef std::vector < Contact, Eigen::aligned_allocator < Contact > > VectorContact;
@@ -433,7 +434,7 @@ namespace stateObservation
             Kinematics pose;
             CheckedMatrix6 covMatrix;
         };
-        
+
 protected:
         ///////////// DYNAMICAL SYSTEM IMPLEMENTATION
         virtual Vector stateDynamics(const Vector &x, const Vector &u, TimeIndex k);
@@ -447,7 +448,7 @@ protected:
                                 const Vector3& totalMomentLocal, Vector3 & linAcc, Vector3& angAcc);
 
         ///the kinematics is not const to allow more optimized non const operators to work
-        void computeContactForces_( VectorContactIterator i, Kinematics &stateKine, 
+        void computeContactForces_( VectorContactIterator i, Kinematics &stateKine,
                                             Kinematics &contactPose , Vector3 & Force, Vector3 torque) ;
 
         ///Sets a noise which disturbs the state dynamics
@@ -475,7 +476,7 @@ public:
         virtual void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
         virtual void measurementDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
-        /////////////////////////////////////// 
+        ///////////////////////////////////////
 
         ////////////////////////////
         virtual void setFiniteDifferenceStep(const Vector & dx);
@@ -484,11 +485,11 @@ public:
 protected:
         Vector stateNaNCorrection_();
 
-        ///updates stateKine_ from the stateVector            
+        ///updates stateKine_ from the stateVector
         void updateKine_();
 
-        
-        
+
+
 
 protected:
 
@@ -499,7 +500,7 @@ protected:
         VectorContact contacts_;
         VectorIMU imuSensors_;
 
-        int stateSize_; 
+        int stateSize_;
         int stateTangentSize_;
         int measurementSize_;
         int measurementTangentSize_;
@@ -508,13 +509,13 @@ protected:
 
         Vector stateVector_;
         Vector stateVectorDx_;
-        Vector oldStateVector_; 
+        Vector oldStateVector_;
 
         Vector3 additionalForce_;
         Vector3 additionalTorque_;
 
         Vector measurementVector_;
-        Matrix measurementCovMatrix_;    
+        Matrix measurementCovMatrix_;
 
         stateObservation::ExtendedKalmanFilter ekf_;
         bool finiteDifferencesJacobians_;
@@ -536,14 +537,14 @@ protected:
         NoiseBase * processNoise_;
         NoiseBase * measurementNoise_;
 
-        
+
 
         ///function to call before adding any measurement
         ///detects if there is a new estimation beginning and then
         ///calls the reset of the iteration
         void startNewIteration_();
 
-                
+
         virtual Matrix computeAMatrix_();
         virtual Matrix computeCMatrix_();
 
@@ -569,7 +570,7 @@ protected:
     private:
 
     public:
-        
+
 
         ///////////SIZE OF VECTORS
         static const unsigned sizeAcceleroSignal = 3;
@@ -608,7 +609,7 @@ protected:
                                         sizeOri;
         static const unsigned sizePoseTangent = sizePos+
                                         sizeOriTangent;
-    
+
         static const unsigned sizeContactKine = sizePose;
         static const unsigned sizeContactKineTangent = sizePoseTangent;
 
@@ -656,7 +657,7 @@ protected:
         static const double contactOrientationProcessVarianceDefault ;
         static const double contactForceProcessVarianceDefault ;
         static const double contactTorqueProcessVarianceDefault ;
-        
+
         static const double acceleroVarianceDefault ;
         static const double gyroVarianceDefault ;
         static const double forceSensorVarianceDefault ;
@@ -671,7 +672,7 @@ protected:
 
 
         ////////////
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW        
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
         /// Default Stiffness and damping
