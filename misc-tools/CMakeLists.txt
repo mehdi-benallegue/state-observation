@@ -10,4 +10,5 @@ ADD_STATE_ESTIMATOR_TOOL(file-splitter)
 ADD_STATE_ESTIMATOR_TOOL(real-offline-flexibility-estimator)
 ADD_STATE_ESTIMATOR_TOOL(test_model-base-ekf-flex-estimator-imu_withComBias_withForcesSensors)
 ADD_STATE_ESTIMATOR_TOOL(zmpEstimation)
+ADD_STATE_ESTIMATOR_TOOL(IMU-Observation-tester)
 
