@@ -103,8 +103,8 @@ int test()
 
   /// Initializations
     // Dimensions
-    const unsigned kinit=0;
-    const unsigned kmax=42761;
+    const unsigned long kinit=0;
+    const unsigned long kmax=42761;
     const unsigned measurementSize=6;
 
     const unsigned stateSize=18;
@@ -112,7 +112,7 @@ int test()
     // State initialization => not used here because it is set in model-base-ekf-flex-estimator-imu
 
 
-    const unsigned inputSize=est.getInputSize();
+    const size_t inputSize=est.getInputSize();
 
      // Input initialization
     Vector u0=Vector::Zero(inputSize-6*contactNbr,1);
@@ -269,7 +269,7 @@ int test()
     sensorPosition2Est.resize(4,4);
 
     std::cout << "Beginning reconstruction "<<std::endl;
-    for (unsigned k=kinit+2;k<kmax;++k)
+    for (unsigned long k=kinit+2;k<kmax;++k)
     {
         est.setMeasurement(y[k].transpose());
         est.setMeasurementInput(u[k].transpose());
@@ -357,9 +357,3 @@ int main()
     return test();
 
 }
-
-
-
-
-
-

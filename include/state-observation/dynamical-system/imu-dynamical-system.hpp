@@ -66,11 +66,11 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual size_t getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual size_t getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual size_t getMeasurementSize() const;
 
     protected:
         typedef kine::indexes<kine::rotationVector> indexes;
@@ -86,10 +86,9 @@ namespace stateObservation
 
         Quaternion computeQuaternion_(const Vector3 & x);
 
-        static const unsigned stateSize_=18;
-        static const unsigned inputSize_=6;
-        static const unsigned measurementSize_=6;
-
+        static const size_t stateSize_=18;
+        static const size_t inputSize_=6;
+        static const size_t measurementSize_=6;
 
     private:
 

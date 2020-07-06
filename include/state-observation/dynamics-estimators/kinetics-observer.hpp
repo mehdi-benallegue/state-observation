@@ -51,16 +51,16 @@ namespace stateObservation
         /// The constructor.
         ///  \li maxContacts : maximum number of contacts,
         ///  \li maxNumberOfIMU : the maximumnumber of IMUs
-        KineticsObserver(int maxContacts=4, int maxNumberOfIMU = 1);
+        KineticsObserver(unsigned maxContacts=4, unsigned maxNumberOfIMU = 1);
 
         ///virtual destructor
         virtual ~KineticsObserver();
 
         ///Gets the state size
-        unsigned getStateSize() const;
+        size_t getStateSize() const;
 
         ///Gets the measurement size
-        unsigned getMeasurementSize() const;
+        size_t getMeasurementSize() const;
 
         /// ///////////////////////////////////////////////////////////
         /// Getting, setting the current time and running the estimation
@@ -220,7 +220,7 @@ namespace stateObservation
 
         ///TODO
         //void setVelocityGuess(const Kinematics)
- 
+
         void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix6 &);
 
         ///////////////////////////////////////////////
@@ -467,7 +467,7 @@ protected:
         virtual NoiseBase *getMeasurementNoise() const;
 
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual size_t getInputSize() const;
 
 public:
 
@@ -500,10 +500,10 @@ protected:
         VectorContact contacts_;
         VectorIMU imuSensors_;
 
-        int stateSize_;
-        int stateTangentSize_;
-        int measurementSize_;
-        int measurementTangentSize_;
+        size_t stateSize_;
+        size_t stateTangentSize_;
+        size_t measurementSize_;
+        size_t measurementTangentSize_;
 
         Kinematics stateKinematics_;
 

@@ -53,7 +53,7 @@ namespace stateObservation
 
     Vector DynamicalSystemSimulator::getCurrentState() const
     {
-        return x_[size_t(x_.getLastIndex())];
+        return x_[TimeIndex(x_.getLastIndex())];
     }
 
     TimeIndex DynamicalSystemSimulator::getCurrentTime() const

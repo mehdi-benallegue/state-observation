@@ -22,7 +22,7 @@ namespace stateObservation
     }
 
     Vector IMUMagnetometerDynamicalSystem::stateDynamics
-        (const Vector& x, const Vector& , unsigned)
+        (const Vector& x, const Vector& , TimeIndex)
     {
         assertStateVector_(x);
 
@@ -74,7 +74,7 @@ namespace stateObservation
         return quaternion_;
     }
 
-    Vector IMUMagnetometerDynamicalSystem::measureDynamics (const Vector& x, const Vector& , unsigned k)
+    Vector IMUMagnetometerDynamicalSystem::measureDynamics (const Vector& x, const Vector& , TimeIndex k)
     {
         assertStateVector_(x);
 
@@ -121,17 +121,17 @@ namespace stateObservation
         dt_=dt;
     }
 
-    unsigned IMUMagnetometerDynamicalSystem::getStateSize() const
+    size_t IMUMagnetometerDynamicalSystem::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned IMUMagnetometerDynamicalSystem::getInputSize() const
+    size_t IMUMagnetometerDynamicalSystem::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned IMUMagnetometerDynamicalSystem::getMeasurementSize() const
+    size_t IMUMagnetometerDynamicalSystem::getMeasurementSize() const
     {
         return measurementSize_;
     }

@@ -11,7 +11,7 @@ namespace stateObservation
 
     void AlgebraicSensor::setState(const Vector & state, TimeIndex k)
     {
-        directInputToOutput_ = state.tail(concat_);
+        directInputToOutput_ = state.tail(Index(concat_));
         state_=state.head(Index(getStateSize_()));
         storedNoisyMeasurement_=false;
         storedNoiselessMeasurement_=false;
@@ -84,10 +84,10 @@ namespace stateObservation
     }
 
 
-    unsigned AlgebraicSensor::concatenateWithInput( unsigned n)
+    size_t AlgebraicSensor::concatenateWithInput( size_t n)
     {
         concat_ = n;
-        noiselessMeasurement_.resize(getMeasurementSize());
-        return unsigned(getMeasurementSize());
+        noiselessMeasurement_.resize(Index(getMeasurementSize()));
+        return getMeasurementSize();
     }
 }

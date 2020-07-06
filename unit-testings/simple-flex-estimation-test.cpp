@@ -15,7 +15,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=1000;
+    const size_t kmax=1000;
 
     ///sampling period
     const double dt=5e-3;
@@ -77,13 +77,14 @@ int test()
 
         AccelerometerGyrometer imu;
 
-        for (unsigned i=1; i<kmax; ++i)
+        for (size_t i=1; i<kmax; ++i)
         {
             q = kine::rotationVectorToAngleAxis(oi*dt)*q;
             aa=q;
             oi+=odoti*dt;
-            odoti << 0.1*sin(0.007*i),  0.2*sin(0.03*i),  0.25*sin(0.02*i);
-                        
+            double id = double(i);
+            odoti << 0.1*sin(0.007*id),  0.2*sin(0.03*id),  0.25*sin(0.02*id);
+
             kine::fixedPointRotationToTranslation(q.matrix() , oi, odoti,
                                                         contact, pos, vel, acc);
 
@@ -100,10 +101,11 @@ int test()
             qCtrl = kine::rotationVectorToAngleAxis(oCtrl*dt)*qCtrl;
             AngleAxis aaCtrl(qCtrl);
             oCtrl+=odotCtrl*dt;
-            odotCtrl << 0.15*sin(0.008*i), 0.1*sin(0.023*i), 0.2*sin(0.025*i);
+
+            odotCtrl << 0.15*sin(0.008*id), 0.1*sin(0.023*id), 0.2*sin(0.025*id);
             posCtrl += velCtrl*dt;
             velCtrl += accCtrl*dt;
-            accCtrl << 0.12*sin(0.018*i), 0.08*sin(0.035*i), 0.3*sin(0.027*i);
+            accCtrl << 0.12*sin(0.018*id), 0.08*sin(0.035*id), 0.3*sin(0.027*id);
 
             Vector Ui (Vector::Zero(inputSize,1));
             Ui.segment(indexes::pos,3) = posCtrl;

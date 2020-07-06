@@ -101,17 +101,17 @@ namespace stateObservation
         dt_=dt;
     }
 
-    unsigned BidimElasticInvPendulum::getStateSize() const
+    size_t BidimElasticInvPendulum::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned BidimElasticInvPendulum::getInputSize() const
+    size_t BidimElasticInvPendulum::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned BidimElasticInvPendulum::getMeasurementSize() const
+    size_t BidimElasticInvPendulum::getMeasurementSize() const
     {
         return measurementSize_;
     }

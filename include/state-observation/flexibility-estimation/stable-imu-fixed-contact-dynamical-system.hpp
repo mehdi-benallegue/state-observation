@@ -82,11 +82,11 @@ namespace flexibilityEstimation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize();
+        virtual size_t getStateSize();
         ///Gets the input size
-        virtual unsigned getInputSize();
+        virtual size_t getInputSize();
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize();
+        virtual size_t getMeasurementSize();
 
         ///Sets the number of contacts
         virtual void setContactsNumber(unsigned);
@@ -109,11 +109,11 @@ namespace flexibilityEstimation
 
         Quaternion computeQuaternion_(const Vector3 & x);
 
-        static const unsigned stateSize_=18;
-        static const unsigned inputSize_=15;
-        static const unsigned measurementSizeBase_=6;
+        static const size_t stateSize_=18;
+        static const size_t inputSize_=15;
+        static const size_t measurementSizeBase_=6;
 
-        unsigned measurementSize_;
+        size_t measurementSize_;
 
         std::vector <Vector3,Eigen::aligned_allocator<Vector3> >
             contactPositions_;

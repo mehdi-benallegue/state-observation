@@ -90,7 +90,7 @@ namespace flexibilityEstimation
 
     void FixedContactEKFFlexEstimatorIMU::setMeasurement(const Vector & y)
     {
-        BOOST_ASSERT((getMeasurementSize()==unsigned(y.size())) &&
+        BOOST_ASSERT((getMeasurementSize()==size_t(y.size())) &&
                 "ERROR: The measurement vector has incorrect size");
 
 
@@ -149,8 +149,8 @@ namespace flexibilityEstimation
     void FixedContactEKFFlexEstimatorIMU::setMeasurementNoiseCovariance
                                             (const Matrix & R)
     {
-        BOOST_ASSERT(unsigned(R.rows())==getMeasurementSize() &&
-                     unsigned(R.cols())==getMeasurementSize() &&
+        BOOST_ASSERT(size_t(R.rows())==getMeasurementSize() &&
+                     size_t(R.cols())==getMeasurementSize() &&
                     "ERROR: The measurement noise covariance matrix R has \
                         incorrect size");
 
@@ -182,7 +182,7 @@ namespace flexibilityEstimation
         Matrix R = ekf_.getRmatrixIdentity();
         R.block(0,0, getMeasurementSize() , getMeasurementSize())=R_;
 
-        for (unsigned i= getMeasurementSize() ; i<ekf_.getMeasureSize() ; ++i)
+        for (size_t i= getMeasurementSize() ; i<ekf_.getMeasureSize() ; ++i)
         {
             R(i,i)=virtualMeasurementCovariance_;
         }
@@ -190,17 +190,17 @@ namespace flexibilityEstimation
         ekf_.setR(R);
     }
 
-    unsigned FixedContactEKFFlexEstimatorIMU::getStateSize() const
+    size_t FixedContactEKFFlexEstimatorIMU::getStateSize() const
     {
         return stateSizeConst_;
     }
 
-    unsigned FixedContactEKFFlexEstimatorIMU::getInputSize() const
+    size_t FixedContactEKFFlexEstimatorIMU::getInputSize() const
     {
         return inputSizeConst_;
     }
 
-    unsigned FixedContactEKFFlexEstimatorIMU::getMeasurementSize() const
+    size_t FixedContactEKFFlexEstimatorIMU::getMeasurementSize() const
     {
         return measurementSizeConst_;
     }

@@ -2,7 +2,7 @@
 
 namespace stateObservation
 {
-    ExtendedKalmanFilter::ExtendedKalmanFilter(unsigned n,unsigned m)
+    ExtendedKalmanFilter::ExtendedKalmanFilter(size_t n,size_t m)
         :KalmanFilterBase(n,m,0),
         directInputOutputFeedthrough_(false),
         directInputStateProcessFeedthrough_(false), f_(0x0)
@@ -14,8 +14,8 @@ namespace stateObservation
 
     }
 
-    
-    ExtendedKalmanFilter::ExtendedKalmanFilter(unsigned n,unsigned m,unsigned p,
+
+    ExtendedKalmanFilter::ExtendedKalmanFilter(size_t n,size_t m,size_t p,
             bool directInputOutputFeedthrough,
             bool directInputStateProcessFeedthrough)
         :KalmanFilterBase(n,m,p),
@@ -33,7 +33,7 @@ namespace stateObservation
         }
     }
 
-    ExtendedKalmanFilter::ExtendedKalmanFilter(unsigned n, unsigned nt, unsigned  m, unsigned mt, unsigned p,
+    ExtendedKalmanFilter::ExtendedKalmanFilter(size_t n, size_t nt, size_t  m, size_t mt, size_t p,
             bool directInputOutputFeedthrough,
             bool directInputStateProcessFeedthrough):
         KalmanFilterBase(n,nt,m,mt,p),
@@ -171,7 +171,7 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
                 opt.u_=inputVectorZero();
         }
 
-        for (unsigned i=0;i<nt_;++i)
+        for (size_t i=0;i<nt_;++i)
         {
 
             opt.dx_.setZero();
@@ -205,7 +205,7 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
 
         opt.dx_.resize(nt_);
 
-        for (unsigned i=0;i<nt_;++i)
+        for (size_t i=0;i<nt_;++i)
         {
             opt.dx_.setZero();
             opt.dx_[i]=dx[i];

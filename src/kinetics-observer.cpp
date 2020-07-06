@@ -87,7 +87,7 @@ namespace stateObservation
   int KineticsObserver::Contact::numberOfRealSensors = 0;
   int KineticsObserver::IMU::currentNumber = 0;
 
-  KineticsObserver::KineticsObserver(int maxContacts, int maxNumberOfIMU):
+  KineticsObserver::KineticsObserver(unsigned maxContacts, unsigned maxNumberOfIMU):
     maxContacts_(maxContacts),
     maxImuNumber_(maxNumberOfIMU),
     contacts_(maxContacts_),
@@ -188,14 +188,14 @@ namespace stateObservation
   }
 
 
-  unsigned KineticsObserver::getStateSize() const
+  size_t KineticsObserver::getStateSize() const
   {
     return stateSize_;
   }
 
-  unsigned KineticsObserver::getMeasurementSize() const
+  size_t KineticsObserver::getMeasurementSize() const
   {
-    unsigned size = 0;
+    size_t size = 0;
     if (k_est_!=k_data_) //test if there are new measurements
     {
       for (VectorIMUConstIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i)
@@ -1238,7 +1238,7 @@ namespace stateObservation
     ekf_.setProcessCovariance(P);
   }
 
-  unsigned KineticsObserver::getInputSize() const
+  size_t KineticsObserver::getInputSize() const
   {
     return inputSize;
   }

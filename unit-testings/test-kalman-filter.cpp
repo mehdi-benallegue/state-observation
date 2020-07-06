@@ -20,7 +20,7 @@
 double testExtendedKalmanFilter()
 {
     ///the number of samples
-    const static unsigned kmax=1000;
+    const static size_t kmax=1000;
 
     ///define the type of the extended Kalman filter
     typedef stateObservation::ExtendedKalmanFilter ekf;
@@ -69,17 +69,17 @@ double testExtendedKalmanFilter()
             return yk;
         }
 
-        virtual unsigned getStateSize() const
+        virtual size_t getStateSize() const
         {
             return f.getStateSize();
         }
 
-        virtual unsigned getInputSize() const
+        virtual size_t getInputSize() const
         {
             return f.getInputSize();
         }
 
-        virtual unsigned getMeasurementSize() const
+        virtual size_t getMeasurementSize() const
         {
             return f.getMeasureSize();
         }
@@ -116,7 +116,7 @@ double testExtendedKalmanFilter()
         xk[0]=x;
         uk[0]=f.inputVectorRandom();
 
-        for (unsigned k=1; k<=kmax; ++k)
+        for (size_t k=1; k<=kmax; ++k)
         {
             ///generation of random inputs
             uk[k]=f.inputVectorRandom();
@@ -169,7 +169,7 @@ double testExtendedKalmanFilter()
     ekf::StateVector dx=f.stateVectorConstant(1)*1e-8;
 
 
-    unsigned i;
+    size_t i;
     for (i=1;i<=kmax;++i)
     {
         ///give the measurements and the inputs at instant i to the ekf
@@ -195,7 +195,7 @@ double testExtendedKalmanFilter()
 
 double testExtendedKalmanFilterLTV()
 {
-    const static unsigned kmax=1000;
+    const static size_t kmax=1000;
 
     typedef stateObservation::ExtendedKalmanFilter ekf;
 
@@ -212,7 +212,7 @@ public:
             s_=f.stateVectorRandom();
             n_=f.measureVectorRandom();
 
-            for (unsigned i=0;i<=kmax;++i)
+            for (size_t i=0;i<=kmax;++i)
             {
                 a.push_back( f.getAmatrixRandom()*0.5 );
                 c.push_back( f.getCmatrixRandom() );
@@ -223,7 +223,7 @@ public:
         virtual ekf::StateVector stateDynamics(const ekf::StateVector& x, const ekf::InputVector& u, stateObservation::TimeIndex k)
         {
             ekf::StateVector xk1;
-            unsigned kk=std::min(unsigned(k),kmax);
+            size_t kk=std::min(size_t(k),kmax);
             xk1=a[kk]*x+(u.transpose()*u)(0,0)*s_;
 
             return xk1;
@@ -235,22 +235,22 @@ public:
             (void)u;//unused
 
             ekf::MeasureVector yk;
-            unsigned kk=std::min(unsigned(k),kmax);
+            size_t kk=std::min(size_t(k),kmax);
             yk=c[kk]*x+(u.transpose()*u)(0,0)*n_;
             return yk;
         }
 
-        virtual unsigned getStateSize() const
+        virtual size_t getStateSize() const
         {
             return f.getStateSize();
         }
 
-        virtual unsigned getInputSize() const
+        virtual size_t getInputSize() const
         {
             return f.getInputSize();
         }
 
-        virtual unsigned getMeasurementSize() const
+        virtual size_t getMeasurementSize() const
         {
             return f.getMeasureSize();
         }
@@ -289,7 +289,7 @@ private:
     xk[0]=x;
     uk[0]=f.inputVectorRandom();
 
-    for (unsigned k=1; k<=kmax; ++k)
+    for (size_t k=1; k<=kmax; ++k)
     {
         ekf::StateVector v(f.stateVectorZero());
         for (unsigned i=0;i<f.getStateSize();++i)
@@ -344,7 +344,7 @@ private:
 
     ekf::StateVector dx=f.stateVectorConstant(1)*1e-8;
 
-    unsigned i;
+    size_t i;
     for (i=1;i<=kmax;++i)
     {
         f.setMeasurement(yk[i-1],i);
@@ -368,7 +368,7 @@ private:
 
 double testExtendedKalmanFilterZeroInput()
 {
-    const static unsigned kmax=1000;
+    const static size_t kmax=1000;
 
 
     typedef stateObservation::ExtendedKalmanFilter ekf;
@@ -419,17 +419,17 @@ double testExtendedKalmanFilterZeroInput()
             c_=c;
         }
 
-        virtual unsigned getStateSize() const
+        virtual size_t getStateSize() const
         {
             return f.getStateSize();
         }
 
-        virtual unsigned getInputSize() const
+        virtual size_t getInputSize() const
         {
             return f.getInputSize();
         }
 
-        virtual unsigned getMeasurementSize() const
+        virtual size_t getMeasurementSize() const
         {
             return f.getMeasureSize();
         }
@@ -476,7 +476,7 @@ double testExtendedKalmanFilterZeroInput()
     xk[0]=x;
 
 
-    for (unsigned k=1; k<=kmax; ++k)
+    for (size_t k=1; k<=kmax; ++k)
     {
         ekf::StateVector v(f.stateVectorZero());
         for (unsigned i=0;i<f.getStateSize();++i)
@@ -520,7 +520,7 @@ double testExtendedKalmanFilterZeroInput()
 
     ekf::StateVector dx=f.stateVectorConstant(1)*1e-8;
 
-    unsigned i;
+    size_t i;
     for (i=1;i<=kmax;++i)
     {
         f.setMeasurement(yk[i-1],i);
@@ -559,7 +559,7 @@ double testKalmanFilter()
     filter::Cmatrix c=f.getCmatrixRandom();
     filter::Dmatrix d=f.getDmatrixRandom();
 
-    const unsigned kmax=1000;
+    const size_t kmax=1000;
 
     filter::StateVector xk[kmax+1];
     filter::MeasureVector yk[kmax];
@@ -581,7 +581,7 @@ double testKalmanFilter()
     uk[0]=f.inputVectorRandom();
 
     boost::lagged_fibonacci1279 gen_;
-    for (unsigned k=1; k<=kmax; ++k)
+    for (size_t k=1; k<=kmax; ++k)
     {
 
         filter::StateVector v=f.stateVectorZero();
@@ -633,7 +633,7 @@ double testKalmanFilter()
 
     f.setInput(uk[0],0);
 
-    unsigned i;
+    size_t i;
     for (i=1;i<=kmax;++i)
     {
         f.setMeasurement(yk[i-1],i);
@@ -661,7 +661,7 @@ double testKalmanFilterZeroInput()
     filter::Cmatrix c=f.getCmatrixRandom();
     filter::Dmatrix d=f.getDmatrixRandom();
 
-    const unsigned kmax=1000;
+    const size_t kmax=1000;
 
     filter::StateVector xk[kmax+1];
     filter::MeasureVector yk[kmax];
@@ -681,7 +681,7 @@ double testKalmanFilterZeroInput()
 
     filter::InputVector u=f.inputVectorZero();
 
-    for (unsigned k=1; k<=kmax; ++k)
+    for (size_t k=1; k<=kmax; ++k)
     {
 
         filter::StateVector v = f.stateVectorZero();
@@ -726,7 +726,7 @@ double testKalmanFilterZeroInput()
     f.setR(r);
     f.setQ(q);
 
-    unsigned i;
+    size_t i;
 
     for (i=1;i<=kmax;++i)
     {

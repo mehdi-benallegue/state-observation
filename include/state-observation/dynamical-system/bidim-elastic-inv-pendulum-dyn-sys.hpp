@@ -63,11 +63,11 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual size_t getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual size_t getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual size_t getMeasurementSize() const;
 
         /// set the height of the com of the pendulum
         void setHeight(const double & h);
@@ -86,9 +86,9 @@ namespace stateObservation
 
         double dt_;
 
-        static const unsigned stateSize_=4;
-        static const unsigned inputSize_=1;
-        static const unsigned measurementSize_=0;
+        static const size_t stateSize_=4;
+        static const size_t inputSize_=1;
+        static const size_t measurementSize_=0;
     };
 }
 #endif // BIDIM_ELASTIC_INV_PENDULUM

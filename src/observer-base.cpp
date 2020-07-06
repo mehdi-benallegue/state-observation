@@ -17,7 +17,7 @@ namespace stateObservation
         n_=m_=p_=0;
     }
 
-    ObserverBase::ObserverBase(unsigned n, unsigned m, unsigned p):
+    ObserverBase::ObserverBase(size_t n, size_t m, size_t p):
             n_(n),m_(m),p_(p)
     {
 
@@ -42,7 +42,7 @@ namespace stateObservation
 
     bool ObserverBase::checkStateVector(const StateVector & v) const
     {
-        return (unsigned(v.rows())==n_ && unsigned(v.cols())==1);
+        return (size_t(v.rows())==n_ && size_t(v.cols())==1);
     }
 
 
@@ -63,7 +63,7 @@ namespace stateObservation
 
     bool ObserverBase::checkMeasureVector(const MeasureVector & v) const
     {
-        return (unsigned(v.rows())==m_ && unsigned(v.cols())==1);
+        return (size_t(v.rows())==m_ && size_t(v.cols())==1);
     }
 
 
@@ -84,37 +84,37 @@ namespace stateObservation
 
     bool ObserverBase::checkInputVector(const InputVector & v) const
     {
-        return (unsigned(v.rows())==p_ && unsigned(v.cols())==1);
+        return (size_t(v.rows())==p_ && size_t(v.cols())==1);
     }
 
 
-    void ObserverBase::setStateSize(unsigned n)
+    void ObserverBase::setStateSize(size_t n)
     {
         n_=n;
     }
 
-    unsigned ObserverBase::getStateSize() const
+    size_t ObserverBase::getStateSize() const
     {
         return n_;
     }
 
-    void ObserverBase::setMeasureSize(unsigned m)
+    void ObserverBase::setMeasureSize(size_t m)
     {
         m_=m;
     }
 
-    unsigned ObserverBase::getMeasureSize() const
+    size_t ObserverBase::getMeasureSize() const
     {
         return m_;
     }
 
 
-    void ObserverBase::setInputSize(unsigned p)
+    void ObserverBase::setInputSize(size_t p)
     {
         p_=p;
     }
 
-    unsigned ObserverBase::getInputSize() const
+    size_t ObserverBase::getInputSize() const
     {
         return p_;
     }

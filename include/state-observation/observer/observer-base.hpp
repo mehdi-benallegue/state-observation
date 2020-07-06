@@ -58,7 +58,7 @@ namespace stateObservation
         ///      \li n : size of the state vector
         ///      \li m : size of the measurements vector
         ///      \li p : size of the input vector
-        ObserverBase(unsigned n, unsigned m, unsigned p=0);
+        ObserverBase(size_t n, size_t m, size_t p=0);
 
         ///default constructor (default values for n,m,p are zero)
         ObserverBase();
@@ -67,22 +67,22 @@ namespace stateObservation
         virtual ~ObserverBase(){};
 
         /// Changes the size of the state vector
-        virtual void setStateSize(unsigned n);
+        virtual void setStateSize(size_t n);
 
         /// gets the size of the state vector
-        virtual unsigned getStateSize() const;
+        virtual size_t getStateSize() const;
 
         /// Changes the size of the measurement vector
-        virtual void setMeasureSize(unsigned m);
+        virtual void setMeasureSize(size_t m);
 
         /// gets the size of the measurement vector
-        virtual unsigned getMeasureSize() const;
+        virtual size_t getMeasureSize() const;
 
         /// Changes the size of the input vector
-        virtual void setInputSize(unsigned p);
+        virtual void setInputSize(size_t p);
 
         /// gets the size of the input vector
-        virtual unsigned getInputSize() const;
+        virtual size_t getInputSize() const;
 
         ///Set the value of the state vector at time index k
         virtual void setState(const StateVector& x_k,TimeIndex k)=0;
@@ -151,13 +151,13 @@ namespace stateObservation
     protected:
 
         ///stateSize is the size of the state vector
-        unsigned n_;
+        size_t n_;
 
         ///measureSize is the size of measurements vector
-        unsigned m_;
+        size_t m_;
 
         ///inputSize is the size of the input vector
-        unsigned p_;
+        size_t p_;
 
     };
 

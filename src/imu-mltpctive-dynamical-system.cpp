@@ -165,17 +165,17 @@ namespace stateObservation
     dt_=dt;
   }
 
-  unsigned IMUMltpctiveDynamicalSystem::getStateSize() const
+  size_t IMUMltpctiveDynamicalSystem::getStateSize() const
   {
     return stateSize_;
   }
 
-  unsigned IMUMltpctiveDynamicalSystem::getInputSize() const
+  size_t IMUMltpctiveDynamicalSystem::getInputSize() const
   {
     return inputSize_;
   }
 
-  unsigned IMUMltpctiveDynamicalSystem::getMeasurementSize() const
+  size_t IMUMltpctiveDynamicalSystem::getMeasurementSize() const
   {
     return measurementSize_;
   }

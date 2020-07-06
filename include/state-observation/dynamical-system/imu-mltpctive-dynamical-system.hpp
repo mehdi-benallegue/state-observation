@@ -72,21 +72,21 @@ namespace stateObservation
         virtual Matrix getCMatrix(const Vector &xp);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual size_t getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual size_t getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual size_t getMeasurementSize() const;
 
         void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
 
         void stateDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
     protected:
-        static const unsigned stateSize_=19;
-        static const unsigned stateTangentSize_=18;
-        static const unsigned inputSize_=6;
-        static const unsigned measurementSize_=6;
+        static const size_t stateSize_=19;
+        static const size_t stateTangentSize_=18;
+        static const size_t inputSize_=6;
+        static const size_t measurementSize_=6;
         typedef kine::indexes<kine::quaternion> indexes;
         typedef kine::indexes<kine::rotationVector> indexesTangent;
 

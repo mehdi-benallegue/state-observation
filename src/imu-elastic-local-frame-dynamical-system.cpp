@@ -943,7 +943,7 @@ namespace stateObservation
         op_.contactOriV.setValue(u.segment<3>(input::contacts +12*i+3),i);
       }
       op_.positionCom=u.segment<3>(input::posCom);
-      
+
       if(withComBias_)
       {
         op_.positionComBias <<  x.segment(state::comBias,2),
@@ -1053,9 +1053,9 @@ namespace stateObservation
       op_.xk_fory = xk_fory_;
       op_.yk = yk_;
 
-      unsigned sizeAfterComBias=getStateSize()-state::comBias-2;
+      size_t sizeAfterComBias=getStateSize()-state::comBias-2;
 
-      for (unsigned i=0; i<state::unmodeledForces; ++i)
+      for (size_t i=0; i<state::unmodeledForces; ++i)
       {
         op_.xdx[i]+= dx_[i];
 
@@ -1073,7 +1073,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
+        for (size_t i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1092,7 +1092,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::comBias; i<state::comBias+2; ++i)
+        for (size_t i=state::comBias; i<state::comBias+2; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1111,7 +1111,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::comBias+2; i<state::comBias+2+sizeAfterComBias; ++i)
+        for (size_t i=state::comBias+2; i<state::comBias+2+sizeAfterComBias; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1143,10 +1143,10 @@ namespace stateObservation
       op_.xk = xk_;
       op_.xk1 = xk1_;
 
-      unsigned sizeAfterComBias=getStateSize()-state::comBias-2;
-      unsigned sizeAfterUnmodeledForces=getStateSize()-state::unmodeledForces-6;
+      size_t sizeAfterComBias=getStateSize()-state::comBias-2;
+      size_t sizeAfterUnmodeledForces=getStateSize()-state::unmodeledForces-6;
 
-      for (unsigned i=0; i<state::unmodeledForces; ++i)
+      for (size_t i=0; i<state::unmodeledForces; ++i)
       {
         op_.xdx[i]+= dx_[i];
 
@@ -1166,7 +1166,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
+        for (size_t i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1187,7 +1187,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::comBias; i<state::comBias+2; ++i)
+        for (size_t i=state::comBias; i<state::comBias+2; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1207,7 +1207,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::drift; i<state::drift+3; ++i)
+        for (size_t i=state::drift; i<state::drift+3; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1255,22 +1255,22 @@ namespace stateObservation
       dt_=dt;
     }
 
-    unsigned IMUElasticLocalFrameDynamicalSystem::getStateSize() const
+    size_t IMUElasticLocalFrameDynamicalSystem::getStateSize() const
     {
       return stateSize_;
     }
 
-    unsigned IMUElasticLocalFrameDynamicalSystem::getInputSize() const
+    size_t IMUElasticLocalFrameDynamicalSystem::getInputSize() const
     {
       return inputSize_;
     }
 
-    void IMUElasticLocalFrameDynamicalSystem::setInputSize(unsigned i)
+    void IMUElasticLocalFrameDynamicalSystem::setInputSize(size_t i)
     {
       inputSize_=i;
     }
 
-    unsigned IMUElasticLocalFrameDynamicalSystem::getMeasurementSize() const
+    size_t IMUElasticLocalFrameDynamicalSystem::getMeasurementSize() const
     {
       return measurementSize_;
     }
@@ -1417,5 +1417,3 @@ namespace stateObservation
     }
   }
 }
-
-

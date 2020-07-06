@@ -33,7 +33,7 @@ namespace stateObservation
             ///gets vector Gaussian random variable
             ///having a given bias and standard deviation(std)
             static Matrix getGaussianVector( const Matrix & std, const Matrix & bias,
-                unsigned rows, unsigned cols=1);
+                size_t rows, size_t cols=1);
 
         protected:
             static boost::lagged_fibonacci1279 gen_;

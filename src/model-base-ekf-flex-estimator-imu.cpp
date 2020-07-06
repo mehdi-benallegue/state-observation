@@ -158,10 +158,9 @@ namespace stateObservation
       functor_.setContactModel(nb);
     }
 
-
     void ModelBaseEKFFlexEstimatorIMU::setMeasurement(const Vector & y)
     {
-      BOOST_ASSERT((getMeasurementSize()==unsigned(y.size())) &&
+      BOOST_ASSERT((getMeasurementSize()==size_t(y.size())) &&
                    "ERROR: The measurement vector has incorrect size");
 
 
@@ -214,7 +213,7 @@ namespace stateObservation
     (const Matrix & R)
     {
       BOOST_ASSERT(R.rows()==R.cols() &&
-                    unsigned(R.rows()) >0 &&
+                    R.rows() >0 &&
                     (R.rows() % 6) ==0 &&
                    "ERROR: The measurement noise covariance matrix R has \
                         incorrect size");
@@ -286,7 +285,7 @@ namespace stateObservation
     void ModelBaseEKFFlexEstimatorIMU::updateMeasurementCovarianceMatrix_()
     {
 
-      if (R_.rows()!=getMeasurementSize())
+      if (size_t(R_.rows())!=getMeasurementSize())
       {
 
         size_t realIndex = R_.rows();
@@ -325,18 +324,18 @@ namespace stateObservation
       ekf_.setR(R_);
     }
 
-    unsigned ModelBaseEKFFlexEstimatorIMU::getStateSize() const
+    size_t ModelBaseEKFFlexEstimatorIMU::getStateSize() const
     {
       return stateSize;
     }
 
 
-    unsigned ModelBaseEKFFlexEstimatorIMU::getInputSize() const
+    size_t ModelBaseEKFFlexEstimatorIMU::getInputSize() const
     {
       return ekf_.getInputSize();
     }
 
-    unsigned ModelBaseEKFFlexEstimatorIMU::getMeasurementSize() const
+    size_t ModelBaseEKFFlexEstimatorIMU::getMeasurementSize() const
     {
       return functor_.getMeasurementSize();
     }

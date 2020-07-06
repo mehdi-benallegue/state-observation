@@ -35,13 +35,13 @@ int test()
 
   /// Initializations
     // Dimensions
-    const unsigned kinit=0;
-    const unsigned kmax=1400;
+    const size_t kinit=0;
+    const size_t kmax=1400;
     const unsigned measurementSize=6;
     (void) measurementSize; ///avoid warning
     const unsigned inputSize=60;
     const unsigned stateSize=18;
-    (void) stateSize;    
+    (void) stateSize;
     unsigned contactNbr = 2;
     // State initialization => not used here because it is set in model-base-ekf-flex-estimator-imu
 
@@ -172,12 +172,12 @@ int test()
     //     uk.segment<6>(42+12*i)=u[k].segment<6>(42+6*i);
     //     uk.segment<6>(42+12*i+6)<<0,0,0,0,0,0;
     //   }
-      
+
     //   u[k]=uk;
     // }
 
     std::cout << "Beginning reconstruction "<<std::endl;
-    for (unsigned k=kinit+2;k<kmax;++k)
+    for (size_t k=kinit+2;k<kmax;++k)
     {
         est.setMeasurement(y[k]);
         est.setMeasurementInput(u[k]);
@@ -220,21 +220,21 @@ int test()
     error(1) = sqrt((errorsum(State::linVel) + errorsum(State::linVel+1) + errorsum(State::linVel+2)));
     error(2) = sqrt((errorsum(State::ori) + errorsum(State::ori+1) + errorsum(State::ori+2)));
     error(3) = sqrt((errorsum(State::angVel) + errorsum(State::angVel+1) + errorsum(State::angVel+2)));
-    
+
     std::cout << "Mean computation time " << computeTime[0] <<std::endl;
 
     std::cout << "Mean error " << error.transpose() <<std::endl;
 
     double posgain = 40000;
     double linvelgain = 600;
-    
+
     double origain = 10;
     double angvelgain = 1;
 
 
     double syntherror = posgain*error(0)+ linvelgain*error(1) + origain*error(2) + angvelgain*error(3);
-    
-    std::cout << "Synthetic error " << posgain*error(0) << " + " << linvelgain*error(1) 
+
+    std::cout << "Synthetic error " << posgain*error(0) << " + " << linvelgain*error(1)
                           << " + " << origain*error(2) << " + " << angvelgain*error(3)
                           << " = " << syntherror << std::endl;
 
@@ -275,8 +275,3 @@ int main()
     return test();
 
 }
-
-
-
-
-

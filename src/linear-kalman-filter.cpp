@@ -102,7 +102,7 @@ namespace stateObservation
 
     bool LinearKalmanFilter::checkBmatrix(const Bmatrix & a) const
     {
-        return (unsigned(a.rows())==n_ && unsigned(a.cols())==p_);
+        return (size_t(a.rows())==n_ && size_t(a.cols())==p_);
     }
 
     LinearKalmanFilter::Dmatrix LinearKalmanFilter::getDmatrixConstant(double c) const
@@ -122,11 +122,11 @@ namespace stateObservation
 
     bool LinearKalmanFilter::checkDmatrix(const Dmatrix & a) const
     {
-        return (unsigned(a.rows())==m_ && unsigned(a.cols())==p_);
+        return (size_t(a.rows())==m_ && size_t(a.cols())==p_);
     }
 
 
-    void LinearKalmanFilter::setStateSize(unsigned n)
+    void LinearKalmanFilter::setStateSize(size_t n)
     {
         if (n!=n_)
         {
@@ -135,7 +135,7 @@ namespace stateObservation
         }
     }
 
-    void LinearKalmanFilter::setMeasureSize(unsigned m)
+    void LinearKalmanFilter::setMeasureSize(size_t m)
     {
         if (m!=m_)
         {
@@ -144,7 +144,7 @@ namespace stateObservation
         }
     }
 
-    void LinearKalmanFilter::setInputSize(unsigned p)
+    void LinearKalmanFilter::setInputSize(size_t p)
     {
         if (p!=p_)
         {

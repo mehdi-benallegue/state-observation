@@ -170,13 +170,13 @@ namespace stateObservation
       virtual void setSamplingPeriod(double dt);
 
       ///Gets the state size
-      virtual unsigned getStateSize() const;
+      virtual size_t getStateSize() const;
 
       ///Gets the input size
-      virtual unsigned getInputSize() const;
+      virtual size_t getInputSize() const;
 
       ///Sets the input size
-      virtual void setInputSize(unsigned i);
+      virtual void setInputSize(size_t i);
 
       ///Gets the contact number
       ///virtual
@@ -184,7 +184,7 @@ namespace stateObservation
       ///Gets the contacts position
 
       ///Gets the measurement size
-      virtual unsigned getMeasurementSize() const;
+      virtual size_t getMeasurementSize() const;
 
       ///Sets the number of contacts
       virtual void setContactsNumber(unsigned);
@@ -320,9 +320,9 @@ namespace stateObservation
 
       Matrix3& computeRotation_(const Vector3 & x, int i);
 
-      static const unsigned stateSize_=state::size;
-      unsigned inputSize_;
-      static const unsigned measurementSizeBase_=6;
+      static const size_t stateSize_=state::size;
+      size_t inputSize_;
+      static const size_t measurementSizeBase_=6;
       unsigned nbContacts_;
       unsigned contactModel_;
 
@@ -340,7 +340,7 @@ namespace stateObservation
       Vector uk_fory_;
 
 
-      unsigned measurementSize_;
+      size_t measurementSize_;
 
       std::vector <Vector3,Eigen::aligned_allocator<Vector3> > contactPositions_;
 
@@ -543,4 +543,3 @@ namespace stateObservation
 
 
 #endif /* DYNAMICAL_SYSTEM_HPP_ */
-

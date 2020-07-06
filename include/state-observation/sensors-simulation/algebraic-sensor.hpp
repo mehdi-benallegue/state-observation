@@ -61,7 +61,7 @@ namespace stateObservation
         ///concatenates the n last components of the state in the measurement
         ///(useful when the measurements are already computed or
         ///when they come from external source)
-        virtual unsigned concatenateWithInput( unsigned n);
+        virtual size_t concatenateWithInput( size_t n);
 
     protected:
         ///the actual algorithm for the computation of the measurements, must

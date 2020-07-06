@@ -232,7 +232,8 @@ int test()
     stateObservation::Vector input, measurement;
     Vector x; x.resize(stateSize);
     Vector xPredicted; xPredicted.resize(stateSize);
-    unsigned contactNbr, inputSize, measurementSize;
+    unsigned contactNbr;
+    size_t inputSize, measurementSize;
 
     stateObservation::IndexedMatrixArray measurementForces, filteredForces, inputFeetPositions;
     stateObservation::Vector sensorZmp, filteredZmp;
@@ -284,8 +285,8 @@ int test()
 
             measurementForces.setValue(measurementForcesk,i);
             filteredForces.setValue(filteredForcesk,i);
-            stateObservation::Matrix4 identity; identity.setIdentity();
-            inputFeetPositions.setValue(identity,i);
+            stateObservation::Matrix4 identity(stateObservation::Matrix4::Identity());
+            inputFeetPositions.setValue(identity,TimeIndex(i));
         }
         sensorZmp=computeZmp(contactNbr, measurementForces, inputFeetPositions);
         filteredZmp=computeZmp(contactNbr, filteredForces, inputFeetPositions);
@@ -316,4 +317,3 @@ int main()
 {
     return test();
 }
-

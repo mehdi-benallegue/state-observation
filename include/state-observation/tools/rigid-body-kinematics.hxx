@@ -228,7 +228,7 @@ namespace stateObservation
     {
       return q.coeffs()(3);
     }
-    
+
     /// vector part of the quaternion
     inline Vector3 vectorComponent(const Quaternion & q)
     {
@@ -352,7 +352,7 @@ namespace stateObservation
         ///mxez = Vector3::UnitY().cross(ez);
         ///ezxmxez = ez.cross(mxez);
         ///R_temp1 << mxez, ezxmxez, ez;
-        
+
         mlxv1 = (R2.transpose()*Vector3::UnitY()).cross(v1).normalized();
 
         R_temp2 << mlxv1.transpose(), v1.cross(mlxv1).transpose(), v1.transpose();
@@ -360,13 +360,13 @@ namespace stateObservation
         ///R_temp1.setIdentity();
         ///return R_temp1*R_temp2.transpose();
         return R_temp2.transpose();
-      }          
-      
+      }
+
     }
 
     inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2)
     {
-      return mergeTiltWithYaw(R1.transpose()*Vector3::UnitZ(),R2);     
+      return mergeTiltWithYaw(R1.transpose()*Vector3::UnitZ(),R2);
     }
 
     inline Quaternion zeroRotationQuaternion()
@@ -375,7 +375,7 @@ namespace stateObservation
     }
 
     ///transforms a rotation into translation given a constraint of a fixed point
-    /// which means the global position of the fixed point is constantly at its 
+    /// which means the global position of the fixed point is constantly at its
     ///constrained position
     inline void fixedPointRotationToTranslation
     (const Matrix3 & R, const Vector3 & rotationVelocity,
@@ -778,8 +778,7 @@ namespace stateObservation
       {
         quaternionToMatrix_();
       }
-      else
-        return kine::rotationMatrixToRollPitchYaw(m_());
+      return kine::rotationMatrixToRollPitchYaw(m_());
 
     }
 
@@ -838,7 +837,7 @@ namespace stateObservation
       return templateSetToProductNoAlias_(R1,R2);
     }
 
-    inline Orientation Orientation::setToProductNoAlias(  const Orientation& R1, Orientation& R2) 
+    inline Orientation Orientation::setToProductNoAlias(  const Orientation& R1, Orientation& R2)
     {
       return templateSetToProductNoAlias_(R1,R2);
     }
@@ -850,7 +849,7 @@ namespace stateObservation
 
     inline Orientation Orientation::operator*( Orientation& R2)
     {
-      return Orientation(*this,R2);     
+      return Orientation(*this,R2);
     }
 
     inline Orientation Orientation::operator*(const Orientation& R2)
@@ -860,12 +859,12 @@ namespace stateObservation
 
     inline Orientation Orientation::operator*( Orientation& R2) const
     {
-      return Orientation(*this,R2); 
+      return Orientation(*this,R2);
     }
 
     inline Orientation Orientation::operator*(const Orientation& R2) const
     {
-      return Orientation(*this,R2);   
+      return Orientation(*this,R2);
     }
 
     inline Orientation Orientation::inverse() const
@@ -1050,7 +1049,7 @@ namespace stateObservation
         }
         q_ = R1.q_()*R2.q_();
       }
-      else 
+      else
       {
         m_.set(true); /// we set the matrix as initialized before giving the value
         if (!R1.isMatrixSet() )
@@ -1141,7 +1140,7 @@ namespace stateObservation
           position = v.segment<3>(index);
           index+=3;
         }
-        
+
       }
 
       if (flagOri )
@@ -1151,7 +1150,7 @@ namespace stateObservation
         {
           orientation.fromVector4(v.segment<4>(index));
           index+=4;
-        }       
+        }
       }
 
       if (flagLinVel )
@@ -1161,7 +1160,7 @@ namespace stateObservation
         {
           linVel = v.segment<3>(index);
           index+=3;
-        }        
+        }
       }
 
       if (flagAngVel )
@@ -1182,7 +1181,7 @@ namespace stateObservation
         {
           linAcc = v.segment<3>(index);
           index+=3;
-        }       
+        }
       }
 
       if (flagAngAcc )
@@ -1227,7 +1226,7 @@ namespace stateObservation
 
       if (flagAngVel )
       {
-        angVel.set().setZero();  
+        angVel.set().setZero();
       }
 
       if (flagLinAcc )
@@ -1335,7 +1334,7 @@ namespace stateObservation
               else
               {
                 posMethod = useVelocity;
-              }              
+              }
             }
             else
             {
@@ -1343,9 +1342,9 @@ namespace stateObservation
               {
                 posMethod = useAcceleration;
               }
-            }            
+            }
           }
-          
+
         }
 
         if (flagLinVel)
@@ -1368,9 +1367,9 @@ namespace stateObservation
                 velMethod = useAcceleration;
               }
             }
-            
+
           }
-          
+
         }
 
         if (flagLinAcc)
@@ -1391,7 +1390,7 @@ namespace stateObservation
               {
                 accMethod = usePosAndVel;
               }
-            
+
               else ///velocity is not available
               {
                 if (thisPos.isSet() && newPos.isSet())
@@ -1403,9 +1402,9 @@ namespace stateObservation
                   BOOST_ASSERT (thisAcc.isSet() && "The linear accleration cannot be updated without initial value");
                 }
               }
-            } 
+            }
           }
-          
+
         }
 
         if (accMethod == useVelocity) //then velocity cannot use accelerations
@@ -1419,7 +1418,7 @@ namespace stateObservation
             thisAcc = 2*(newPos()-thisPos())/(dt*dt);
           }
         }
-        
+
         if (velMethod == usePosition) //then position cannot use velocity
         {
           if (accMethod == usePosAndVel) //use position and velocity to get the accelerations
@@ -1433,7 +1432,7 @@ namespace stateObservation
           {
             thisVel = (newPos()-thisPos())/ dt;
           }
-        } 
+        }
 
         if (posMethod == usePosition)
         {
@@ -1457,12 +1456,12 @@ namespace stateObservation
               {
                 thisPos() += thisAcc() * dt * dt / 0.5;
               }
-              
+
             }
-            
+
           }
         }
-        
+
         if (velMethod == useVelocity)
         {
           thisVel = newVel;
@@ -1471,7 +1470,7 @@ namespace stateObservation
         {
           if ( velMethod == useAcceleration )
           {
-            thisVel() += thisAcc()*dt;            
+            thisVel() += thisAcc()*dt;
           }
         }
 
@@ -1492,14 +1491,14 @@ namespace stateObservation
         {
           thisAcc.reset();
         }
-      }       
+      }
 
-      
+
       {
         bool flagOri = flags & Flags::orientation;
         bool flagAngVel = flags & Flags::angVel;
         bool flagAngAcc = flags & Flags::angAcc;
-       
+
         Orientation & thisOri = orientation;
         CheckedVector3 & thisVel = angVel;
         CheckedVector3 & thisAcc = angAcc;
@@ -1533,7 +1532,7 @@ namespace stateObservation
               else
               {
                 posMethod = useVelocity;
-              }              
+              }
             }
             else
             {
@@ -1541,9 +1540,9 @@ namespace stateObservation
               {
                 posMethod = useAcceleration;
               }
-            }            
+            }
           }
-          
+
         }
 
         if (flagAngVel)
@@ -1561,15 +1560,15 @@ namespace stateObservation
             else
             {
               BOOST_ASSERT(thisVel.isSet() && "The angular velocity is trying to be updated without initial value");
-            
+
               if (thisAcc.isSet())
               {
                 velMethod = useAcceleration;
               }
-            } 
-            
+            }
+
           }
-          
+
         }
 
         if (flagAngAcc)
@@ -1603,7 +1602,7 @@ namespace stateObservation
               }
             }
           }
-          
+
         }
 
         if (accMethod == useVelocity) //then velocity cannot use accelerations
@@ -1617,7 +1616,7 @@ namespace stateObservation
             thisAcc = 2*newOri.differentiate(thisOri)/(dt*dt);
           }
         }
-        
+
         if (velMethod == useOrientation) //then position cannot use velocity
         {
           if (accMethod==useVelAndAcc)
@@ -1630,8 +1629,8 @@ namespace stateObservation
           else
           {
             thisVel = thisOri.differentiate(newOri)/ dt;
-          }          
-        } 
+          }
+        }
 
         if (posMethod == useOrientation)
         {
@@ -1654,11 +1653,11 @@ namespace stateObservation
               if (posMethod == useAcceleration)
               {
                 thisOri.integrate(thisAcc() * dt * dt / 0.5);
-              }              
-            }            
+              }
+            }
           }
         }
-        
+
         if (velMethod == useVelocity)
         {
           thisVel = newVel;
@@ -1667,7 +1666,7 @@ namespace stateObservation
         {
           if ( velMethod == useAcceleration )
           {
-            thisVel() += thisAcc()*dt;            
+            thisVel() += thisAcc()*dt;
           }
         }
 
@@ -1675,7 +1674,7 @@ namespace stateObservation
         {
           thisAcc = newAcc();
         }
-        
+
         if (!flagOri)
         {
           thisOri.reset();
@@ -1724,13 +1723,13 @@ namespace stateObservation
           if (linAcc.isSet() && (angAcc.isSet()))
           {
 
-            inverted.linAcc = r2 * (angVel().cross(2 * linVel - omegaxp) 
+            inverted.linAcc = r2 * (angVel().cross(2 * linVel - omegaxp)
                           - linAcc() + angAcc().cross(position())); //t2dotdot
           }
         }
       }
-      
-     
+
+
       return inverted;
 
     }
@@ -1804,7 +1803,7 @@ namespace stateObservation
       }
 
       Vector output(size);
-      
+
       int curIndex = 0;
       if ((flags & Flags::position))
       {
@@ -1825,16 +1824,16 @@ namespace stateObservation
       {
         output.segment<3>(curIndex)=angVel();
         curIndex+=3;
-      }      
+      }
       if ((flags & Flags::linAcc))
       {
         output.segment<3>(curIndex)=linAcc();
         curIndex+=3;
-      }      
+      }
       if ((flags & Flags::angAcc))
       {
         output.segment<3>(curIndex)=angAcc();
-      }      
+      }
 
       return output;
     }
@@ -1865,10 +1864,10 @@ namespace stateObservation
       if (angAcc.isSet())
       {
         size+=3;
-      }      
+      }
 
       Vector output(size);
-     
+
       int curIndex = 0;
       if (position.isSet())
       {
@@ -1889,16 +1888,16 @@ namespace stateObservation
       {
         output.segment<3>(curIndex)=angVel();
         curIndex+=3;
-      }      
+      }
       if (linAcc.isSet())
       {
         output.segment<3>(curIndex)=linAcc();
         curIndex+=3;
-      }      
+      }
       if (angAcc.isSet())
       {
         output.segment<3>(curIndex)=angAcc();
-      }      
+      }
 
       return output;
     }
@@ -1932,12 +1931,12 @@ namespace stateObservation
         if (multiplier2.linVel.isSet() && multiplier1.linVel.isSet() && multiplier1.angVel.isSet())
         {
           Vector3& R1p2d = tempVec_; /// reference
-          R1p2d.noalias() = multiplier1.orientation*multiplier2.linVel();       
-          
+          R1p2d.noalias() = multiplier1.orientation*multiplier2.linVel();
+
           linVel.set(true);
           Vector3& w1xR1p2 = linVel(); /// reference
           w1xR1p2.noalias() = multiplier1.angVel().cross(R1p2);
-          
+
           Vector3& w1xR1p2_R1p2d = w1xR1p2; ///  reference ( =linVel() )
           w1xR1p2_R1p2d += R1p2d;
 
@@ -1953,7 +1952,7 @@ namespace stateObservation
           {
             linAcc.reset();
           }
-          
+
 
 
           linVel() += multiplier1.linVel();
@@ -1963,7 +1962,7 @@ namespace stateObservation
           linVel.reset();
           linAcc.reset();
         }
-        
+
         position() += multiplier1.position();
       }
       else
@@ -1972,7 +1971,7 @@ namespace stateObservation
         linVel.reset();
         linAcc.reset();
       }
-      
+
 
       if (multiplier2.orientation.isSet())
       {
@@ -1982,7 +1981,7 @@ namespace stateObservation
         {
           angVel.set(true);
           Vector3& R1w2 = angVel(); ///reference
-          R1w2.noalias() = multiplier1.orientation * multiplier2.angVel();          
+          R1w2.noalias() = multiplier1.orientation * multiplier2.angVel();
 
           if (multiplier2.angAcc.isSet() && multiplier1.angAcc.isSet())
           {
@@ -1994,8 +1993,8 @@ namespace stateObservation
           else
           {
             angAcc.reset();
-          }          
-          
+          }
+
           angVel() +=  multiplier1.angVel();
         }
         else
@@ -2252,7 +2251,7 @@ namespace stateObservation
 
       return *this;
     }
-    
+
 
   }
 
@@ -2278,8 +2277,8 @@ inline std::ostream &operator<<(std::ostream &os, const stateObservation::kine::
     {
       os << "pos   :                                  ";
     }
-    
-                                  
+
+
     if (k.orientation.isSet())
     {
       os << "ori   : " << k.orientation.toRotationVector().transpose() << std::endl;

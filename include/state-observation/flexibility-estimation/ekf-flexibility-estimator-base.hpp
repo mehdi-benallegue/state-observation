@@ -45,9 +45,9 @@ namespace flexibilityEstimation
         ///  \li inputSize : size of the input vector
         ///  \li dx gives the derivation step for a finite differences derivation method
 
-        EKFFlexibilityEstimatorBase(unsigned stateSize,
-                                    unsigned measurementSize,
-                                    unsigned inputSize,
+        EKFFlexibilityEstimatorBase(size_t stateSize,
+                                    size_t measurementSize,
+                                    size_t inputSize,
                                     const Vector & dx=Vector::Zero(0) );
 
 
@@ -111,15 +111,15 @@ namespace flexibilityEstimation
 
         /// Gets the state size
         /// this method is pure virtual and reauires to be overloaded in implementation
-        virtual unsigned getStateSize() const =0;
+        virtual size_t getStateSize() const =0;
 
         /// Gets the measurements size
         /// this method is pure virtual and reauires to be overloaded in implementation
-        virtual unsigned getMeasurementSize() const =0;
+        virtual size_t getMeasurementSize() const =0;
 
         /// Gets the input size
         /// this method is pure virtual and reauires to be overloaded in implementation
-        virtual unsigned getInputSize() const =0;
+        virtual size_t getInputSize() const =0;
 
         /// Gets a simulation of the
         virtual Vector getSimulatedMeasurement();

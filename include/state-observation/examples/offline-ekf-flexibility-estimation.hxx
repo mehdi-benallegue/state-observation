@@ -79,7 +79,7 @@ stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
             const std::vector<Vector3, Eigen::aligned_allocator<Vector3> > & contactsPositions,
             double dt)
 {
-    const unsigned inputSize=15;
+    const size_t inputSize=15;
 
     ///initialization of a zero input
     stateObservation::IndexedVectorArray u;
@@ -91,4 +91,3 @@ stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
     return offlineEKFFlexibilityEstimation
                         (y, u, xh0, numberOfContacts, contactsPositions, dt);
 }
-

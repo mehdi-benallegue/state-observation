@@ -163,17 +163,17 @@ namespace flexibilityEstimation
         dt_=dt;
     }
 
-    unsigned IMUFixedContactDynamicalSystem::getStateSize() const
+    size_t IMUFixedContactDynamicalSystem::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned IMUFixedContactDynamicalSystem::getInputSize() const
+    size_t IMUFixedContactDynamicalSystem::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned IMUFixedContactDynamicalSystem::getMeasurementSize() const
+    size_t IMUFixedContactDynamicalSystem::getMeasurementSize() const
     {
         return measurementSize_;
     }

@@ -127,17 +127,17 @@ namespace stateObservation
         dt_=dt;
     }
 
-    unsigned IMUDynamicalSystem::getStateSize() const
+    size_t IMUDynamicalSystem::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned IMUDynamicalSystem::getInputSize() const
+    size_t IMUDynamicalSystem::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned IMUDynamicalSystem::getMeasurementSize() const
+    size_t IMUDynamicalSystem::getMeasurementSize() const
     {
         return measurementSize_;
     }

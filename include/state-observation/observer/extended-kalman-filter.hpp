@@ -49,7 +49,7 @@ namespace stateObservation
         ///  \li n : size of the state vector
         ///  \li m : size of the measurements vector
 
-        ExtendedKalmanFilter(unsigned n,unsigned m);
+        ExtendedKalmanFilter(size_t n,size_t m);
 
         /// The constructor.
         ///  \li n : size of the state vector
@@ -58,7 +58,7 @@ namespace stateObservation
         ///  \li The parameter directInputOutputFeedthrough defines whether (true) or not (false) the measurement y_k requires the input u_k
         ///  \li The parameter directInputStateProcessFeedthrough defines whether (true) or not (false) the state x_{k+1} requires the input u_k
 
-        ExtendedKalmanFilter(unsigned n,unsigned m,unsigned p,
+        ExtendedKalmanFilter(size_t n,size_t m,size_t p,
                 bool directInputOutputFeedthrough=true,
                 bool directInputStateProcessFeedthrough=true);
 
@@ -70,7 +70,7 @@ namespace stateObservation
         ///  \li The parameter directInputOutputFeedthrough defines whether (true) or not (false) the measurement y_k requires the input u_k
         ///  \li The parameter directInputStateProcessFeedthrough defines whether (true) or not (false) the state x_{k+1} requires the input u_k
 
-        ExtendedKalmanFilter(unsigned n, unsigned nt, unsigned  m, unsigned mt, unsigned p,
+        ExtendedKalmanFilter(size_t n, size_t nt, size_t  m, size_t mt, size_t p,
                 bool directInputOutputFeedthrough,
                 bool directInputStateProcessFeedthrough);
 

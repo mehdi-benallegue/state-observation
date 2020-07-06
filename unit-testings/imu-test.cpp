@@ -11,7 +11,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=10000;
+    const size_t kmax=10000;
 
     ///sampling period
     const double dt=1e-3;
@@ -59,17 +59,18 @@ int test()
 
         ///construction of the input
         /// the input is constant over 10 time samples
-        for (unsigned i=0;i<kmax/10;++i)
+        for (size_t i=0;i<kmax/10;++i)
         {
             Vector uk=Vector::Zero(imu.getInputSize(),1);
+            double id = double(i);
 
-            uk[0]=0.4 * sin(M_PI/10*i);
-            uk[1]=0.6 * sin(M_PI/12*i);
-            uk[2]=0.2 * sin(M_PI/5*i);
+            uk[0]=0.4 * sin(M_PI/10*id);
+            uk[1]=0.6 * sin(M_PI/12*id);
+            uk[2]=0.2 * sin(M_PI/5*id);
 
-            uk[3]=10  * sin(M_PI/12*i);
-            uk[4]=0.07  * sin(M_PI/15*i);
-            uk[5]=0.05 * sin(M_PI/5*i);
+            uk[3]=10  * sin(M_PI/12*id);
+            uk[4]=0.07  * sin(M_PI/15*id);
+            uk[5]=0.05 * sin(M_PI/5*id);
 
             ///filling the 10 time samples of the constant input
             for (int j=0;j<10;++j)
@@ -105,7 +106,7 @@ int test()
 
     ///computation and initialization of the covariance matrix of the initial state
     Matrix p=Matrix::Zero(stateSize,stateSize);
-    for (unsigned i=0;i<filter.getStateSize();++i)
+    for (size_t i=0;i<filter.getStateSize();++i)
     {
         p(i,i)=xh0[i];
     }

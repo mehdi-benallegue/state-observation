@@ -44,11 +44,11 @@ namespace stateObservation
 
         ///Description of the state dynamics
         virtual Vector stateDynamics
-        (const Vector& x, const Vector& u, unsigned k);
+        (const Vector& x, const Vector& u, TimeIndex k);
 
         ///Description of the sensor's dynamics
         virtual Vector measureDynamics
-        (const Vector& x, const Vector& u, unsigned k);
+        (const Vector& x, const Vector& u, TimeIndex k);
 
         ///Sets a noise which disturbs the state dynamics
         virtual void setProcessNoise( NoiseBase * );
@@ -68,11 +68,11 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual size_t getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual size_t getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual size_t getMeasurementSize() const;
 
     protected:
 
@@ -89,9 +89,9 @@ namespace stateObservation
 
         Quaternion computeQuaternion_(const Vector3 & x);
 
-        static const unsigned stateSize_=18;
-        static const unsigned inputSize_=0;
-        static const unsigned measurementSize_=9;
+        static const size_t stateSize_=18;
+        static const size_t inputSize_=0;
+        static const size_t measurementSize_=9;
 
 
     private:

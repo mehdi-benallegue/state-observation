@@ -34,7 +34,7 @@ namespace stateObservation
         virtual ~GaussianWhiteNoise(){}
 
         ///The constructor that provides the dimension of the noise vector
-        GaussianWhiteNoise(unsigned dimension);
+        GaussianWhiteNoise(size_t dimension);
 
         ///The default constructor
         GaussianWhiteNoise();
@@ -57,10 +57,10 @@ namespace stateObservation
         virtual void setBias(const Vector & bias);
 
         ///sets the dimension of the noise vector
-        virtual void setDimension(unsigned dim_);
+        virtual void setDimension(size_t dim_);
 
         ///Gets the dimension of the noise vector
-        virtual unsigned getDimension() const;
+        virtual size_t getDimension() const;
 
         ///set update functions for sum for a vector
         /// (used in case of lie group vectors)
@@ -71,7 +71,7 @@ namespace stateObservation
 
         virtual void checkVector_(const Vector & v) const;
 
-        unsigned dim_;
+        size_t dim_;
 
 
 

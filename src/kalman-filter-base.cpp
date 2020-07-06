@@ -18,7 +18,7 @@ namespace stateObservation
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(unsigned n,unsigned m,unsigned p)
+    KalmanFilterBase::KalmanFilterBase(size_t n,size_t m,size_t p)
             :ZeroDelayObserver(n,m,p),
             nt_(n),
             mt_(m),
@@ -26,7 +26,7 @@ namespace stateObservation
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(unsigned n, unsigned nt, unsigned m, unsigned mt, unsigned p)
+    KalmanFilterBase::KalmanFilterBase(size_t n, size_t nt, size_t m, size_t mt, size_t p)
             :ZeroDelayObserver(n,m,p),
             nt_(nt),
             mt_(mt),
@@ -131,7 +131,7 @@ namespace stateObservation
         arithm_->measurementDifference(this->y_[k+1], ybar_(),oc_.inoMeas);
         oc_.inoMeasCov.noalias() = r_ +  c_ * (oc_.pbar * c_.transpose());
 
-        unsigned &  measurementTangentSize =mt_;
+        size_t &  measurementTangentSize =mt_;
         //inversing innovation measurement covariance matrix
         oc_.inoMeasCovLLT.compute(oc_.inoMeasCov);
         oc_.inoMeasCovInverse.resize(measurementTangentSize,measurementTangentSize);
@@ -213,7 +213,7 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkAmatrix(const Amatrix & a) const
     {
-        return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
+        return (size_t(a.rows())==nt_ && size_t(a.cols())==nt_);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixConstant(double c) const
@@ -233,7 +233,7 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkCmatrix(const Cmatrix & a) const
     {
-        return (unsigned(a.rows())==mt_ && unsigned(a.cols())==nt_);
+        return (size_t(a.rows())==mt_ && size_t(a.cols())==nt_);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixConstant(double c) const
@@ -258,7 +258,7 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkQmatrix(const Qmatrix & a) const
     {
-        return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
+        return (size_t(a.rows())==nt_ && size_t(a.cols())==nt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixConstant(double c) const
@@ -283,7 +283,7 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkRmatrix(const Rmatrix & a) const
     {
-        return (unsigned(a.rows())==mt_ && (unsigned(a.cols()))==mt_);
+        return (size_t(a.rows())==mt_ && (size_t(a.cols()))==mt_);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixConstant(double c) const
@@ -308,7 +308,7 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkPmatrix(const Pmatrix & a) const
     {
-        return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
+        return (size_t(a.rows())==nt_ && size_t(a.cols())==nt_);
     }
 
 
@@ -330,7 +330,7 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkStateTangentVector(const KalmanFilterBase::StateVectorTan & v) const
     {
-        return (unsigned(v.rows())==nt_ && unsigned(v.cols())==1);
+        return (size_t(v.rows())==nt_ && size_t(v.cols())==1);
     }
 
 
@@ -351,16 +351,16 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkMeasureTangentVector(const KalmanFilterBase::MeasureVectorTan & v) const
     {
-        return (unsigned(v.rows())==mt_ && unsigned(v.cols())==1);
+        return (size_t(v.rows())==mt_ && size_t(v.cols())==1);
     }
 
 
-    void KalmanFilterBase::setStateSize(unsigned n)
+    void KalmanFilterBase::setStateSize(size_t n)
     {
         setStateSize(n,n);
     }
 
-    void KalmanFilterBase::setStateSize(unsigned n, unsigned nt)
+    void KalmanFilterBase::setStateSize(size_t n, size_t nt)
     {
         if ((n!=n_) || (nt_ !=nt))
         {
@@ -376,12 +376,12 @@ namespace stateObservation
         }
     }
 
-    void KalmanFilterBase::setMeasureSize(unsigned m)
+    void KalmanFilterBase::setMeasureSize(size_t m)
     {
         setMeasureSize(m,m);
     }
 
-    void KalmanFilterBase::setMeasureSize(unsigned m, unsigned mt)
+    void KalmanFilterBase::setMeasureSize(size_t m, size_t mt)
     {
         if ((m!=m_) || mt!=mt_)
         {

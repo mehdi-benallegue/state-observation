@@ -143,11 +143,11 @@ namespace stateObservation
 
     TimeSize ZeroDelayObserver::getMeasurementsNumber()const
     {
-        return unsigned(y_.size());
+        return TimeSize(y_.size());
     }
 
 
-    void ZeroDelayObserver::setStateSize(unsigned n)
+    void ZeroDelayObserver::setStateSize(size_t n)
     {
         if (n!=n_)
         {
@@ -156,7 +156,7 @@ namespace stateObservation
         }
     }
 
-    void ZeroDelayObserver::setMeasureSize(unsigned m)
+    void ZeroDelayObserver::setMeasureSize(size_t m)
     {
         if (m!=m_)
         {
@@ -165,7 +165,7 @@ namespace stateObservation
         }
     }
 
-    void ZeroDelayObserver::setInputSize(unsigned p)
+    void ZeroDelayObserver::setInputSize(size_t p)
     {
         if (p!=p_)
         {
@@ -174,4 +174,3 @@ namespace stateObservation
         }
     }
 }
-
