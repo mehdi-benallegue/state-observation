@@ -311,6 +311,50 @@ namespace stateObservation
         return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
     }
 
+
+
+    KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorConstant( double c ) const
+    {
+        return StateVectorTan::Constant(nt_,1,c);
+    }
+
+    KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorRandom() const
+    {
+        return StateVectorTan::Random(nt_,1);
+    }
+
+    KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorZero() const
+    {
+        return StateVectorTan::Zero(nt_,1);
+    }
+
+    bool KalmanFilterBase::checkStateTangentVector(const KalmanFilterBase::StateVectorTan & v) const
+    {
+        return (unsigned(v.rows())==nt_ && unsigned(v.cols())==1);
+    }
+
+
+    KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorConstant( double c ) const
+    {
+        return MeasureVectorTan::Constant(mt_,1,c);
+    }
+
+    KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorRandom() const
+    {
+        return MeasureVectorTan::Random(mt_,1);
+    }
+
+    KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorZero() const
+    {
+        return MeasureVectorTan::Zero(mt_,1);
+    }
+
+    bool KalmanFilterBase::checkMeasureTangentVector(const KalmanFilterBase::MeasureVectorTan & v) const
+    {
+        return (unsigned(v.rows())==mt_ && unsigned(v.cols())==1);
+    }
+
+
     void KalmanFilterBase::setStateSize(unsigned n)
     {
         setStateSize(n,n);

@@ -73,6 +73,13 @@ namespace stateObservation
 
         typedef Eigen::LLT<Pmatrix> LLTPMatrix;
 
+        ///StateVector is the type of state tangent vector
+        typedef Vector StateVectorTan;
+
+        ///MeasureVector is the type of measurement tanegnt vector
+        typedef Vector MeasureVectorTan;
+
+
         /// Default constructor
         KalmanFilterBase();
 
@@ -230,6 +237,30 @@ namespace stateObservation
 
         /// Checks whether or not a matrix has the dimensions of the P matrix
         bool checkPmatrix(const Pmatrix & ) const;
+
+        ///Gives a vector of state tangent vector size having duplicated "c" value
+        virtual StateVectorTan stateTangentVectorConstant( double c ) const;
+
+        ///Gives a vector of state  tangent vector size having random values
+        virtual StateVectorTan stateTangentVectorRandom() const;
+
+        ///Gives a vector of state  tangent vector size having zero values
+        virtual StateVectorTan stateTangentVectorZero() const;
+
+        ///Tells whether or not the vector has the dimensions of a state tangent vector
+        virtual bool checkStateTangentVector(const StateVectorTan & v ) const;
+
+        ///Gives a vector of measurement tangent vector size having duplicated "c" value
+        virtual MeasureVectorTan measureTangentVectorConstant( double c ) const;
+
+        ///Gives a vector of measurement tangent vector size having random values
+        virtual MeasureVectorTan measureTangentVectorRandom() const;
+
+        ///Gives a vector of measurement tangent vector size having zero values
+        virtual MeasureVectorTan measureTangentVectorZero() const;
+
+        ///Tells whether or not the vector has the dimensions of a measurement tangent vector
+        virtual bool checkMeasureTangentVector(const MeasureVectorTan &) const;
 
         /// Changes the dimension of the state vector:
         ///resets the internal container for the state vector and
