@@ -1,0 +1,6 @@
+namespace stateObservation
+{
+	constexpr bool Release_BUILD=$<CONFIG:Release>;
+	constexpr bool Debug_BUILD=$<CONFIG:Debug>;
+	constexpr bool RelWithDebInfo_BUILD=$<CONFIG:RelWithDebInfo>;
+}

@@ -57,6 +57,10 @@ else()
   add_project_dependency(Eigen3 MODULE REQUIRED)
 endif()
 
+file(GENERATE
+     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/$<CONFIG>/state-observation/config.h"
+     INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/include/state-observation/config.h.in")
+
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(unit-testings)
 ADD_SUBDIRECTORY(misc-tools)

@@ -7,7 +7,7 @@
 //#include <state-observation/tools/miscellaneous-algorithms.hpp>
 
 #include <state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp>
-
+#include <state-observation/config.h>
 #include <time.h>
 
 
@@ -256,14 +256,14 @@ int test()
       }
     }
     
-#ifdef NDEBUG
-    if (computeTime[0]>2e5)
-     {
-      std::cout << "Failed : Computation time is too long !!"<< std::endl <<"The end" << std::endl;
-      return 2;
+    if (Release_BUILD)
+    {
+        if (computeTime[0] > 2e5)
+        {
+            std::cout << "Failed : Computation time is too long !!" << std::endl << "The end" << std::endl;
+            return 2;
+        }
     }
-#endif
-
 
     std::cout << "Succeed !!"<< std::endl <<"The end" << std::endl;
     return 0;
