@@ -14,13 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-16.04, ubuntu-18.04, macos-latest, windows-latest]
-        build-type: [Debug, RelWithDebInfo]
+        build-type: [Debug, RelWithDebInfo, script]
         compiler: [gcc, clang]
         exclude:
           # Only default compiler on macos-latest and windows-latest
           - os: macos-latest
             compiler: clang
           - os: windows-latest
+            compiler: clang
+          - build-type: script
             compiler: clang
 
     runs-on: ${{ matrix.os }}
@@ -52,6 +54,16 @@ jobs:
       with:
         compiler: ${{ matrix.compiler }}
         build-type: ${{ matrix.build-type }}
+    - name: Build with script
+      if: matrix.build-type == 'script'
+      shell: bash
+      run: |
+        set -x
+        cd utils
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]
+        then
+          ./build_and_install-windows.sh
+        fi
     - name: Upload documentation
       # Only run on master branch and for one configuration
       if: matrix.os == 'ubuntu-18.04' && matrix.build-type == 'RelWithDebInfo' && matrix.compiler == 'gcc' && github.ref == 'refs/heads/head'
