@@ -44,8 +44,8 @@ int testOrientation(int errcode)
     {
         kine::Orientation ori2;
         ori2 = M;
-        
-        err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
+
+        err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                 + (ori2.matrix3() - M).norm();
         std::cout<<"Assignment operaton test 2 (Matrix3) done. Current error " <<  err << std::endl;
     }
@@ -73,15 +73,15 @@ int testOrientation(int errcode)
         kine::Orientation ori1(q);
         Matrix3 M1 = ori1;
 
-        err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
+        err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                  + (M1 - M).norm();
         std::cout<<"Cast operaton test 1 (Matrix3) done. Current error " <<  err << std::endl;
     }
 
     {
         kine::Orientation ori2(M);
-        
-        err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() ;
+
+        err +=  (Quaternion(ori2.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                 + (ori2.matrix3() - M).norm();
         std::cout<<"copy constructor test 1 (Matrix3) done. Current error " <<  err << std::endl;
     }
