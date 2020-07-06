@@ -110,38 +110,40 @@ namespace stateObservation
         ///default behavior is to call the three "ObserverBase::clear*" methods
         virtual void reset();
 
+        ///These are initializer  for vectors
+        /// We do not use the get prefix to be consistent with eigen initializers
         ///Gives a vector of state vector size having duplicated "c" value
-        virtual Vector stateVectorConstant( double c ) const;
+        virtual StateVector stateVectorConstant( double c ) const;
 
         ///Gives a vector of state vector size having random values
-        virtual Vector stateVectorRandom() const;
+        virtual StateVector stateVectorRandom() const;
 
         ///Gives a vector of state vector size having zero values
-        virtual Vector stateVectorZero() const;
+        virtual StateVector stateVectorZero() const;
 
         ///Tells whether or not the vector has the dimensions of a state vector
         virtual bool checkStateVector(const StateVector & v ) const;
 
         ///Gives a vector of measurement vector size having duplicated "c" value
-        virtual Vector measureVectorConstant( double c ) const;
+        virtual MeasureVector measureVectorConstant( double c ) const;
 
         ///Gives a vector of measurement vector size having random values
-        virtual Vector measureVectorRandom() const;
+        virtual MeasureVector measureVectorRandom() const;
 
         ///Gives a vector of measurement vector size having zero values
-        virtual Vector measureVectorZero() const;
+        virtual MeasureVector measureVectorZero() const;
 
         ///Tells whether or not the vector has the dimensions of a measurement vector
         virtual bool checkMeasureVector(const MeasureVector &) const;
 
         ///Gives a vector of input vector size having duplicated "c" value
-        virtual Vector inputVectorConstant( double c ) const;
+        virtual InputVector inputVectorConstant( double c ) const;
 
         ///Gives a vector of input vector size having random values
-        virtual Vector inputVectorRandom() const;
+        virtual InputVector inputVectorRandom() const;
 
         ///Gives a vector of input vector size having zero values
-        virtual Vector inputVectorZero() const;
+        virtual InputVector inputVectorZero() const;
 
         ///Tells whether or not the vector has the dimensions of a input vector
         virtual bool checkInputVector(const InputVector &) const;

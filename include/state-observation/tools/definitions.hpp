@@ -322,7 +322,7 @@ namespace detail
    * \class    IndexedMatrixT
    * \brief    This class describes a structure composed by a matrix
    *           of a given size and a time-index parameter. It can tell also if
-   *           it initialized or not.
+   *           it is initialized or not.
    *
    *
    */
