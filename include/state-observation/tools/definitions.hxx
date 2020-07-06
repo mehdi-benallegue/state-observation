@@ -381,7 +381,7 @@ inline void IndexedMatrixArrayT<MatrixType, Allocator>::reset()
 template <typename MatrixType, typename Allocator>
 void IndexedMatrixArrayT<MatrixType, Allocator>::clear()
 {
-  k_=k_+v_.size();
+  k_=k_+TimeIndex(v_.size());
   v_.clear();
 }
 
@@ -414,7 +414,7 @@ template <typename MatrixType, typename Allocator>
 inline void IndexedMatrixArrayT<MatrixType, Allocator>::checkNext_(TimeIndex time)const
 {
     (void)time;//avoid warning
-    BOOST_ASSERT( (v_.size()==0 || TimeIndex( k_+v_.size()) == time )&&
+    BOOST_ASSERT( (v_.size()==0 || k_+ TimeIndex(v_.size()) == time )&&
                   "Error: New time instants must be consecutive to existing ones");
 }
 

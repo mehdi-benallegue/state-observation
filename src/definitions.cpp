@@ -6,8 +6,6 @@
 
 namespace stateObservation
 {
-
-
   namespace tools
   {
     std::string matrixToString(const Matrix& mat)
@@ -19,10 +17,10 @@ namespace stateObservation
 
     namespace detail
     {
-      
- 
+
+
     } // namespace detail
-    
+
 
     std::string vectorToString(const Vector& v)
     {
@@ -35,9 +33,9 @@ namespace stateObservation
       std::stringstream ss;
       ss << str;
 
-      for (size_t i = 0 ; i<rows; ++i)
+      for (Index i = 0 ; i<rows; ++i)
       {
-        for (size_t j = 0 ; j<cols; ++j)
+        for (Index j = 0 ; j<cols; ++j)
         {
           ss >> m(i,j);
         }

@@ -52,10 +52,10 @@ namespace stateObservation
 
     protected:
         ///Gets the state vector Size
-        virtual unsigned getStateSize_() const;
+        virtual size_t getStateSize_() const;
 
         ///Gets the measurements vector size
-        virtual unsigned getMeasurementSize_() const;
+        virtual size_t getMeasurementSize_() const;
 
 
         virtual Vector computeNoiselessMeasurement_();

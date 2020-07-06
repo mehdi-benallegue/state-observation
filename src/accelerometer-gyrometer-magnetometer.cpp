@@ -23,12 +23,12 @@ namespace stateObservation
     }
 
 
-    unsigned AccelerometerGyrometerMagnetometer::getStateSize_() const
+    size_t AccelerometerGyrometerMagnetometer::getStateSize_() const
     {
         return currentStateSize_;
     }
 
-    unsigned AccelerometerGyrometerMagnetometer::getMeasurementSize_() const
+    size_t AccelerometerGyrometerMagnetometer::getMeasurementSize_() const
     {
         return measurementSize_;
     }

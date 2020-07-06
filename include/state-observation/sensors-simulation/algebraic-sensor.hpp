@@ -68,9 +68,9 @@ namespace stateObservation
         ///be overloaded to implement any sensor
         virtual Vector computeNoiselessMeasurement_()=0;
 
-        virtual unsigned getStateSize_() const=0;
+        virtual size_t getStateSize_() const=0;
 
-        virtual unsigned getMeasurementSize_() const=0;
+        virtual size_t getMeasurementSize_() const=0;
 
 
         Vector computeNoisyMeasurement_();
