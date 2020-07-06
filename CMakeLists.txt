@@ -58,8 +58,9 @@ else()
 endif()
 
 file(GENERATE
-     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/$<CONFIG>/state-observation/config.h"
+     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h"
      INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/include/state-observation/config.h.in")
+INSTALL(FILES "${CMAKE_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h" DESTINATION ${INCLUDE_INSTALL_DESTINATION})
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(unit-testings)
