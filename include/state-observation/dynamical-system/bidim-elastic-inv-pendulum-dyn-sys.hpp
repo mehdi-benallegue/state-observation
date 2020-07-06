@@ -28,7 +28,7 @@ namespace stateObservation
     *         horizontal acceleration.
     *
     */
-    class STATE_OBSERVATION_DLLAPI STATE_OBSERVATION_DLLAPI BidimElasticInvPendulum : public DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI BidimElasticInvPendulum : public DynamicalSystemFunctorBase
     {
     public:
         ///The constructor

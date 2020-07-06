@@ -54,7 +54,7 @@ namespace stateObservation
          *  \param R measurement noise covariance matrix. Size interpretation is the same
          *         as for Q.
          */
-        stateObservation::IndexedVectorArray STATE_OBSERVATION_DLLAPI offlineModelBaseFlexEstimation(
+        stateObservation::IndexedVectorArray offlineModelBaseFlexEstimation(
             const stateObservation::IndexedVectorArray & y,
             const stateObservation::IndexedVectorArray & u,
             const Matrix & xh0,

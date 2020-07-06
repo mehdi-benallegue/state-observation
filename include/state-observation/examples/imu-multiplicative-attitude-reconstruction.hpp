@@ -52,7 +52,7 @@ namespace stateObservation
          *  \param dt the time discretization period
          */
 
-        IndexedVectorArray STATE_OBSERVATION_DLLAPI imuMultiplicativeAttitudeReconstruction(
+        IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
             const IndexedVectorArray & y,
             const IndexedVectorArray & u,
             const Vector & xh0,
@@ -86,7 +86,7 @@ namespace stateObservation
          *  \param r the covariance matrix of the measurement noise
          *  \param dt the time discretization period
          */
-        IndexedVectorArray STATE_OBSERVATION_DLLAPI imuMultiplicativeAttitudeReconstruction(
+        IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
             const IndexedVectorArray & y,
             const Vector & xh0,
             const Matrix & p,

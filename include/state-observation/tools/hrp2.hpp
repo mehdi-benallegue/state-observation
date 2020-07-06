@@ -43,7 +43,7 @@ namespace stateObservation
         constexpr double linKv=600;
         constexpr double angKv=10;
 
-        struct STATE_OBSERVATION_DLLAPI contact
+        struct contact
         {
           static const unsigned nbMax=4;
           static const unsigned nbModeledMax=2;

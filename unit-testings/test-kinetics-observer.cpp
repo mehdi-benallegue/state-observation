@@ -7,18 +7,18 @@ using namespace stateObservation;
 using namespace kine;
 
 int testOrientation(int errcode)
-{   
+{
 
-    
 
-    
-    
+
+
+
     Vector4 q_i;
 
     tools::ProbabilityLawSimulation s;
 
     ///random orientation
-    q_i = s.getGaussianVector(Matrix4::Identity(),Vector4::Zero(),4); 
+    q_i = s.getGaussianVector(Matrix4::Identity(),Vector4::Zero(),4);
     q_i.normalize();
 
     ///several representations of the orientation
@@ -30,13 +30,13 @@ int testOrientation(int errcode)
 
     std::cout<<"Orientation test started " <<  err << std::endl;
 
- 
+
     {
         kine::Orientation ori1;
         ori1 = q;
         Matrix3 M1 = ori1;
 
-        err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
+        err +=  (Quaternion(ori1.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                  + (M1 - M).norm();
         std::cout<<"Assignment operaton test 1 (Quaternion) done. Current error " <<  err << std::endl;
     }
@@ -54,7 +54,7 @@ int testOrientation(int errcode)
         kine::Orientation ori3;
         ori3 = aa;
 
-        err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
+        err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                  + (ori3.matrix3()-M).norm() ;
         std::cout<<"Assignment operaton test 3 (AngleAxis) done. Current error " <<  err << std::endl;
     }
@@ -63,7 +63,7 @@ int testOrientation(int errcode)
         kine::Orientation ori4;
         ori4 = Vector3(aa.angle()*aa.axis());
 
-        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                 + (ori4.matrix3()-M).norm() ;
         std::cout<<"Assignment operaton test 3 (Vector3) done. Current error " <<  err << std::endl;
     }
@@ -89,7 +89,7 @@ int testOrientation(int errcode)
     {
         kine::Orientation ori3(aa);
 
-        err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm() 
+        err +=   (Quaternion(ori3.toVector4()).toRotationMatrix() - Quaternion(q_i).toRotationMatrix()).norm()
                  + (ori3.matrix3()-M).norm() ;
         std::cout<<"copy constructor test 2 (AngleAxis) done. Current error " <<  err << std::endl;
     }
@@ -97,7 +97,7 @@ int testOrientation(int errcode)
     {
         kine::Orientation ori4(Vector3(aa.angle()*aa.axis()));
 
-        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()
                 + (ori4.matrix3()-M).norm() ;
         std::cout<<"copy constructor test 3 (AngleAxis) done. Current error " <<  err << std::endl;
     }
@@ -105,44 +105,44 @@ int testOrientation(int errcode)
     {
         kine::Orientation ori4(q,M);
 
-        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()
                 + (ori4.matrix3()-M).norm() ;
         std::cout<<"Constructor test 1 (Quaternion, Matrix3) done. Current error " <<  err << std::endl;
     }
 
-    {   
+    {
         kine::Orientation ori4;
         ori4.setRandom();
         ori4 = M;
 
-        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()
                 + (ori4.matrix3()-M).norm() ;
-        std::cout<<"Update Assignement operator test 1 (Matrix3) done. Current error " <<  err << std::endl; 
+        std::cout<<"Update Assignement operator test 1 (Matrix3) done. Current error " <<  err << std::endl;
     }
 
-    {   
+    {
         kine::Orientation ori4;
         ori4.setRandom();
         ori4 = q;
 
-        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori4.toVector4()).toRotationMatrix() - M).norm()
                 + (ori4.matrix3()-M).norm() ;
-        std::cout<<"Update Assignement operator test 2 (Quaternion) done. Current error " <<  err << std::endl; 
+        std::cout<<"Update Assignement operator test 2 (Quaternion) done. Current error " <<  err << std::endl;
     }
 
 
 
     {
         kine::Orientation ori1(q);
-        
+
         kine::Orientation ori2 = ori1.inverse();
         kine::Orientation ori3 = ori2.inverse();
 
         Matrix3 M3 = ori1;
 
-        err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - M).norm()  
+        err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - M).norm()
                  + (M3 - M).norm();
-        std::cout<<"Inverse operator test 1 done. Current error " <<  err << std::endl; 
+        std::cout<<"Inverse operator test 1 done. Current error " <<  err << std::endl;
     }
 
 
@@ -153,12 +153,12 @@ int testOrientation(int errcode)
         ori1=ori1.inverse();
         const kine::Orientation & ori2=ori0;
         const kine::Orientation & ori3=ori1;
-        
+
         kine::Orientation ori00 = ori0*ori1;
         ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori01 = ori1*ori0;
         ori0=q;ori1=M;ori1=ori1.inverse();
-        kine::Orientation ori02 = ori0*ori3; 
+        kine::Orientation ori02 = ori0*ori3;
         ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori03 = ori3*ori0;
         ori0=q;ori1=M;ori1=ori1.inverse();
@@ -168,13 +168,13 @@ int testOrientation(int errcode)
         ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori06 = ori2*ori3;
         kine::Orientation ori07 = ori3*ori2;
-        
+
 
         kine::Orientation ori10 (ori0,ori1);
         ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori11 (ori1,ori0);
         ori0=q;ori1=M;ori1=ori1.inverse();
-        kine::Orientation ori12 (ori0,ori3); 
+        kine::Orientation ori12 (ori0,ori3);
         ori0=q;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori13 (ori3,ori0);
         ori0=q;ori1=M;ori1=ori1.inverse();
@@ -226,12 +226,12 @@ int testOrientation(int errcode)
         ori1=ori1.inverse();
         const kine::Orientation & ori2=ori0;
         const kine::Orientation & ori3=ori1;
-        
+
         kine::Orientation ori00 = ori0*ori1;
         ori0=q;ori1=q;ori1=ori1.inverse();
         kine::Orientation ori01 = ori1*ori0;
         ori0=q;ori1=q;ori1=ori1.inverse();
-        kine::Orientation ori02 = ori0*ori3; 
+        kine::Orientation ori02 = ori0*ori3;
         ori0=q;ori1=q;ori1=ori1.inverse();
         kine::Orientation ori03 = ori3*ori0;
         ori0=q;ori1=q;ori1=ori1.inverse();
@@ -241,13 +241,13 @@ int testOrientation(int errcode)
         ori0=q;ori1=q;ori1=ori1.inverse();
         kine::Orientation ori06 = ori2*ori3;
         kine::Orientation ori07 = ori3*ori2;
-        
+
 
         kine::Orientation ori10 (ori0,ori1);
         ori0=q;ori1=q;ori1=ori1.inverse();
         kine::Orientation ori11 (ori1,ori0);
         ori0=q;ori1=q;ori1=ori1.inverse();
-        kine::Orientation ori12 (ori0,ori3); 
+        kine::Orientation ori12 (ori0,ori3);
         ori0=q;ori1=q;ori1=ori1.inverse();
         kine::Orientation ori13 (ori3,ori0);
         ori0=q;ori1=q;ori1=ori1.inverse();
@@ -300,12 +300,12 @@ int testOrientation(int errcode)
         const kine::Orientation & ori2=ori0;
         const kine::Orientation & ori3=ori1;
 
-        ori0=M;ori1=M;ori1=ori1.inverse();        
+        ori0=M;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori00 = ori0*ori1;
         ori0=M;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori01 = ori1*ori0;
         ori0=M;ori1=M;ori1=ori1.inverse();
-        kine::Orientation ori02 = ori0*ori3; 
+        kine::Orientation ori02 = ori0*ori3;
         ori0=M;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori03 = ori3*ori0;
         ori0=M;ori1=M;ori1=ori1.inverse();
@@ -315,13 +315,13 @@ int testOrientation(int errcode)
         ori0=M;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori06 = ori2*ori3;
         kine::Orientation ori07 = ori3*ori2;
-        
+
 
         kine::Orientation ori10 (ori0,ori1);
         ori0=M;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori11 (ori1,ori0);
         ori0=M;ori1=M;ori1=ori1.inverse();
-        kine::Orientation ori12 (ori0,ori3); 
+        kine::Orientation ori12 (ori0,ori3);
         ori0=M;ori1=M;ori1=ori1.inverse();
         kine::Orientation ori13 (ori3,ori0);
         ori0=M;ori1=M;ori1=ori1.inverse();
@@ -369,7 +369,7 @@ int testOrientation(int errcode)
     {
         kine::Orientation ori1(q);
         kine::Orientation ori2(M);
- 
+
         kine::Orientation ori3 = ori2.inverse()*ori1;
 
         err +=  (Quaternion(ori3.toVector4()).toRotationMatrix() - Matrix3::Identity()).norm();
@@ -383,7 +383,7 @@ int testOrientation(int errcode)
         ori2.integrate(v1);
 
         Vector3 v2 = ori1.differentiate(ori2) ;
- 
+
         err +=  (v1- v2).norm();
         std::cout<<"Integration/differentiation test 1 done. Current error "<<  err << std::endl;
     }
@@ -405,8 +405,8 @@ int testKinematics (int errcode)
     kine::Kinematics k0;
     kine::Kinematics k1;
 
- 
-    
+
+
 
     Flags::Byte flag0 = BOOST_BINARY(000000);
     Flags::Byte flag1 = BOOST_BINARY(000000);
@@ -414,7 +414,7 @@ int testKinematics (int errcode)
 
     kine::Kinematics k,l,k2;
 
-    
+
     int count = pow(2,6)*pow(2,6);
     double err=0;
     double threshold=1e-30*count;
@@ -444,7 +444,7 @@ int testKinematics (int errcode)
         {
             k0.position = pos0;
         }
-        if (true) ///the orientation has to be set 
+        if (true) ///the orientation has to be set
         {
             k0.orientation = ori0;
         }
@@ -469,7 +469,7 @@ int testKinematics (int errcode)
         {
             k1.position = pos1;
         }
-        if (! k1.position.isSet() || flag1 & Flags::orientation)///the orientation has to be set 
+        if (! k1.position.isSet() || flag1 & Flags::orientation)///the orientation has to be set
         {
             k1.orientation = ori1;
         }
@@ -499,8 +499,8 @@ int testKinematics (int errcode)
             k2.orientation.setZeroRotation();
         }
 
-        k = ((k0 
-            * k2) 
+        k = ((k0
+            * k2)
             * k2.getInverse() )
             * k0.getInverse();
 
@@ -528,7 +528,7 @@ int testKinematics (int errcode)
         {
             err += k.angAcc().squaredNorm();
         }
-        
+
     }
 
     std::cout << "Error 1 : " << err <<std::endl;
@@ -538,7 +538,7 @@ int testKinematics (int errcode)
         std::cout << "Error too large : " << err <<std::endl;
         return errcode;
     }
-    
+
     err =0;
 
     threshold = 1e-19*count;
@@ -548,7 +548,7 @@ int testKinematics (int errcode)
     flag0 = BOOST_BINARY(000000);
     flag1 = BOOST_BINARY(000000);
 
-     
+
     for (int i = 0; i < count; i++)
     {
         Vector3 pos0 = Vector3::Random();
@@ -579,7 +579,7 @@ int testKinematics (int errcode)
         {
             k0.position = l.position;
         }
-        if (flag0 & Flags::orientation)  
+        if (flag0 & Flags::orientation)
         {
             k0.orientation = l.orientation;
         }
@@ -631,27 +631,27 @@ int testKinematics (int errcode)
 
         kine::Kinematics::Flags::Byte flag =BOOST_BINARY(000000);
 
-        if (k1.position.isSet() || 
+        if (k1.position.isSet() ||
             (k0.position.isSet() && k0.linVel.isSet() && k0.linAcc.isSet())
            )
         {
             flag = flag | kine::Kinematics::Flags::position;
         }
-        if (k1.orientation.isSet() || 
+        if (k1.orientation.isSet() ||
             (k0.orientation.isSet() && k0.angVel.isSet() && k0.angAcc.isSet())
             )
         {
             flag = flag | kine::Kinematics::Flags::orientation;
         }
-        if (k1.linVel.isSet() || 
-            (k0.position.isSet() && k1.position.isSet()) || 
+        if (k1.linVel.isSet() ||
+            (k0.position.isSet() && k1.position.isSet()) ||
             (k0.linAcc.isSet() && k0.linVel.isSet())
             )
         {
             flag = flag | kine::Kinematics::Flags::linVel;
         }
         if (k1.angVel.isSet() ||
-            (k0.orientation.isSet() && k1.orientation.isSet()) || 
+            (k0.orientation.isSet() && k1.orientation.isSet()) ||
             (k0.angVel.isSet() && k0.angAcc.isSet())
            )
         {
@@ -672,7 +672,7 @@ int testKinematics (int errcode)
             flag = flag | kine::Kinematics::Flags::angAcc;
         }
 
-        
+
         k0.update(k1,dt,flag);
 
         if (k0.position.isSet())
@@ -714,18 +714,18 @@ int testKinematics (int errcode)
             else
             {
                 err +=(k.linAcc()-2*k0.linAcc()).squaredNorm();
-            }            
+            }
         }
         if (k0.angAcc.isSet())
-        {            
+        {
             if ((k.angAcc()-k0.angAcc()).squaredNorm()< 1e-10)
             {
-                err +=(k.angAcc()-k0.angAcc()).squaredNorm();                
+                err +=(k.angAcc()-k0.angAcc()).squaredNorm();
             }
             else
             {
-                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm();                 
-            }            
+                 err +=(k.angAcc()-2*k0.angAcc()).squaredNorm();
+            }
         }
 
 //        std::cout<< i<<" "<<err << std::endl;
@@ -734,18 +734,18 @@ int testKinematics (int errcode)
         {
             break;
         }
-        
+
     }
 
     std::cout << "Error 2 : " << err <<std::endl;
-    
+
     if (err>threshold )
     {
         std::cout << "Error too large !" <<std::endl;
         return errcode;
     }
-    
-    
+
+
     return 0;
 }
 
@@ -799,7 +799,7 @@ int testKineticsObserverCodeAccessor(int /*code*/)
 
     angDamping.setZero();
     angDamping.diagonal().setConstant(20);
-    
+
     contactKine.position.set()<<0,-0.1,0;
     o.addContact(contactKine,linStiffness,linDamping,angStiffness,angDamping,3);
 
@@ -874,8 +874,8 @@ int testKineticsObserverCodeAccessor(int /*code*/)
      o.contactForceIndex(3) << " " <<
      o.contactTorqueIndex(3) << " " <<
      o.contactWrenchIndex(3) << " " << std::endl;
-    
-    
+
+
     std::cout << o.kineIndexTangent() << " " <<
      o.posIndexTangent() << " " <<
      o.oriIndexTangent() << " " <<
@@ -903,7 +903,7 @@ int testKineticsObserverCodeAccessor(int /*code*/)
      o.contactForceIndexTangent( 1 ) << " " <<
      o.contactTorqueIndexTangent( 1 ) << " " <<
      o.contactWrenchIndexTangent( 1 ) << " " <<
-     
+
      o.contactIndexTangent( 2 ) << " " <<
      o.contactKineIndexTangent( 2 ) << " " <<
      o.contactPosIndexTangent( 2 ) << " " <<
@@ -919,7 +919,7 @@ int testKineticsObserverCodeAccessor(int /*code*/)
      o.contactForceIndexTangent( 3 ) << " " <<
      o.contactTorqueIndexTangent( 3 ) << " " <<
      o.contactWrenchIndexTangent( 3 ) << " " << std::endl;
-     
+
     o.setWithUnmodeledWrench(true );
     o.setWithAccelerationEstimation(true );
     o.setWithGyroBias(true);
@@ -940,7 +940,7 @@ int main()
     {
         std::cout << "Orientation test succeeded" << std::endl;
     }
-    
+
 
 
     if ((returnVal = testKinematics(2))) /// it is not an equality check
@@ -964,7 +964,7 @@ int main()
     }
 
 
-    
+
 
     std::cout<< "test succeeded" <<std::endl;
     return 0;
