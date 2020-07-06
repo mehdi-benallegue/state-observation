@@ -77,8 +77,8 @@ namespace stateObservation
     /// sets the velocity of the control origin in the world frame
     void setControlOriginVelocityInW(const Vector3& v) { v_C_ = v; }
     Vector3 getControlOriginVelocityInW() { return v_C_; }
-    
-/// prevent c++ overloaded virtual function warning 
+
+/// prevent c++ overloaded virtual function warning
 #if defined(__clang__)
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Woverloaded-virtual"
@@ -91,7 +91,7 @@ namespace stateObservation
 
     /// sets ths measurement (accelero and gyro stacked in one vector)
     void setMeasurement(const Vector3 ya_k, const Vector3 yg_k, TimeIndex k);
-    
+
 #if defined(__clang__)
 #pragma clang diagnostic pop
     #else
