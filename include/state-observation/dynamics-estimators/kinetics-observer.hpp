@@ -220,8 +220,8 @@ namespace stateObservation
 
         ///TODO
         //void setVelocityGuess(const Kinematics)
-
-        void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix & , int contactNumber);
+ 
+        void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix6 &);
 
         ///////////////////////////////////////////////
         /// Setting inputs to the dynamical system

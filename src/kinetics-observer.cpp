@@ -767,6 +767,11 @@ namespace stateObservation
     absPoseSensor_.covMatrix = CovarianceMatrix;
   }
 
+  void KineticsObserver::setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix6& newdefault)
+  {
+    absPoseSensorCovMatDefault_ = newdefault;
+  }
+
   void KineticsObserver::setInertiaMatrix(const Matrix3& I, const Matrix3& I_dot)
   {
     startNewIteration_();
