@@ -134,7 +134,7 @@ namespace stateObservation
         size_t &  measurementTangentSize =mt_;
         //inversing innovation measurement covariance matrix
         oc_.inoMeasCovLLT.compute(oc_.inoMeasCov);
-        oc_.inoMeasCovInverse.resize(measurementTangentSize,measurementTangentSize);
+        oc_.inoMeasCovInverse.resize(Index(measurementTangentSize),Index(measurementTangentSize));
         oc_.inoMeasCovInverse.setIdentity();
         oc_.inoMeasCovLLT.matrixL().solveInPlace(oc_.inoMeasCovInverse);
         oc_.inoMeasCovLLT.matrixL().transpose().solveInPlace(oc_.inoMeasCovInverse);
@@ -193,22 +193,22 @@ namespace stateObservation
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixConstant(double c) const
     {
-        return Amatrix::Constant(nt_,nt_,c);
+        return Amatrix::Constant(Index(nt_),Index(nt_),c);
     }
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixRandom() const
     {
-        return Amatrix::Random(nt_,nt_);
+        return Amatrix::Random(Index(nt_),Index(nt_));
     }
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixZero() const
     {
-        return Amatrix::Zero(nt_,nt_);
+        return Amatrix::Zero(Index(nt_),Index(nt_));
     }
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixIdentity() const
     {
-        return Amatrix::Identity(nt_,nt_);
+        return Amatrix::Identity(Index(nt_),Index(nt_));
     }
 
     bool KalmanFilterBase::checkAmatrix(const Amatrix & a) const
@@ -218,17 +218,17 @@ namespace stateObservation
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(mt_,nt_,c);
+        return Cmatrix::Constant(Index(mt_),Index(nt_),c);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixRandom() const
     {
-        return Cmatrix::Random(mt_,nt_);
+        return Cmatrix::Random(Index(mt_),Index(nt_));
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixZero() const
     {
-        return Cmatrix::Zero(mt_,nt_);
+        return Cmatrix::Zero(Index(mt_),Index(nt_));
     }
 
     bool KalmanFilterBase::checkCmatrix(const Cmatrix & a) const
@@ -238,22 +238,22 @@ namespace stateObservation
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixConstant(double c) const
     {
-        return Qmatrix::Constant(nt_,nt_,c);
+        return Qmatrix::Constant(Index(nt_),Index(nt_),c);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixRandom() const
     {
-        return Qmatrix::Random(nt_,nt_);
+        return Qmatrix::Random(Index(nt_),Index(nt_));
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixZero() const
     {
-        return Qmatrix::Zero(nt_,nt_);
+        return Qmatrix::Zero(Index(nt_),Index(nt_));
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixIdentity() const
     {
-        return Qmatrix::Identity(nt_,nt_);
+        return Qmatrix::Identity(Index(nt_),Index(nt_));
     }
 
     bool KalmanFilterBase::checkQmatrix(const Qmatrix & a) const
@@ -263,22 +263,22 @@ namespace stateObservation
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(mt_,mt_,c);
+        return Cmatrix::Constant(Index(mt_),Index(mt_),c);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixRandom() const
     {
-        return Cmatrix::Random(mt_,mt_);
+        return Cmatrix::Random(Index(mt_),Index(mt_));
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixZero() const
     {
-        return Rmatrix::Zero(mt_,mt_);
+        return Rmatrix::Zero(Index(mt_),Index(mt_));
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixIdentity() const
     {
-        return Rmatrix::Identity(mt_,mt_);
+        return Rmatrix::Identity(Index(mt_),Index(mt_));
     }
 
     bool KalmanFilterBase::checkRmatrix(const Rmatrix & a) const
@@ -288,22 +288,22 @@ namespace stateObservation
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixConstant(double c) const
     {
-        return Pmatrix::Constant(nt_,nt_,c);
+        return Pmatrix::Constant(Index(nt_),Index(nt_),c);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixRandom() const
     {
-        return Pmatrix::Random(nt_,nt_);
+        return Pmatrix::Random(Index(nt_),Index(nt_));
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixZero() const
     {
-        return Pmatrix::Zero(nt_,nt_);
+        return Pmatrix::Zero(Index(nt_),Index(nt_));
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixIdentity() const
     {
-        return Pmatrix::Identity(nt_,nt_);
+        return Pmatrix::Identity(Index(nt_),Index(nt_));
     }
 
     bool KalmanFilterBase::checkPmatrix(const Pmatrix & a) const
@@ -315,17 +315,17 @@ namespace stateObservation
 
     KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorConstant( double c ) const
     {
-        return StateVectorTan::Constant(nt_,1,c);
+        return StateVectorTan::Constant(Index(nt_),1,c);
     }
 
     KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorRandom() const
     {
-        return StateVectorTan::Random(nt_,1);
+        return StateVectorTan::Random(Index(nt_),1);
     }
 
     KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorZero() const
     {
-        return StateVectorTan::Zero(nt_,1);
+        return StateVectorTan::Zero(Index(nt_),1);
     }
 
     bool KalmanFilterBase::checkStateTangentVector(const KalmanFilterBase::StateVectorTan & v) const
@@ -336,17 +336,17 @@ namespace stateObservation
 
     KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorConstant( double c ) const
     {
-        return MeasureVectorTan::Constant(mt_,1,c);
+        return MeasureVectorTan::Constant(Index(mt_),1,c);
     }
 
     KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorRandom() const
     {
-        return MeasureVectorTan::Random(mt_,1);
+        return MeasureVectorTan::Random(Index(mt_),1);
     }
 
     KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorZero() const
     {
-        return MeasureVectorTan::Zero(mt_,1);
+        return MeasureVectorTan::Zero(Index(mt_),1);
     }
 
     bool KalmanFilterBase::checkMeasureTangentVector(const KalmanFilterBase::MeasureVectorTan & v) const

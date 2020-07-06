@@ -596,7 +596,7 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::readVectorsFromFile(const char 
         v.resize(Index(doublecontainer.size()));
         for (size_t i=0 ; i<doublecontainer.size() ; ++i)
         {
-          v(i)=doublecontainer[i];
+          v(Index(i))=doublecontainer[i];
         }
         setValue(v,k);
         ++k;
