@@ -1,7 +1,7 @@
 
 MACRO(ADD_STATE_ESTIMATOR_TOOL NAME)
 add_executable(${NAME} ${NAME}.cpp)
-target_link_libraries(${NAME} PUBLIC state-observation Boost::unit_test_framework) 
+target_link_libraries(${NAME} PUBLIC state-observation)
 ENDMACRO()
 
 

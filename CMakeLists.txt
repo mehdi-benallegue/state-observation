@@ -21,6 +21,7 @@ if(POLICY CMP0063)
 endif()
 
 
+
 SET(PROJECT_NAME state-observation)
 SET(PROJECT_DESCRIPTION "General implementation of observers.")
 SET(PROJECT_URL "")
@@ -30,11 +31,13 @@ set(CMAKE_CXX_STANDARD 11)
 SET(CXX_DISABLE_WERROR TRUE)
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY USE_FOLDERS OFF)
 
 INCLUDE(cmake/base.cmake)
-INCLUDE(cmake/eigen.cmake)
+#INCLUDE(cmake/eigen.cmake)
 INCLUDE(cmake/msvc-specific.cmake)
+list(APPEND CMAKE_MODULE_PATH "C:/devel/install/share/eigen3/cmake")
+message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
 PROJECT(${PROJECT_NAME} LANGUAGES CXX)
 
@@ -44,8 +47,9 @@ if(MSVC)
   set(CMAKE_MSVCIDE_RUN_PATH "\$(SolutionDir)/src/\$(Configuration)")
 endif(MSVC)
 
-add_project_dependency(Boost REQUIRED COMPONENTS filesystem system thread program_options unit_test_framework timer)
+add_project_dependency(Boost REQUIRED COMPONENTS filesystem system thread program_options timer random)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+add_project_dependency(Boost REQUIRED COMPONENTS filesystem system thread program_options timer random)
 add_project_dependency(Eigen3 QUIET NO_CMAKE_PACKAGE_REGISTRY)
 if(Eigen3_FOUND)
   add_project_dependency(Eigen3 REQUIRED NO_CMAKE_PACKAGE_REGISTRY)

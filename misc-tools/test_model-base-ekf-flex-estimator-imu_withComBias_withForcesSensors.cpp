@@ -4,7 +4,6 @@
 #include <state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp>
 #include <state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp>
 
-#include <time.h>
 
 using namespace stateObservation;
 
