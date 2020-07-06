@@ -77,9 +77,28 @@ namespace stateObservation
     /// sets the velocity of the control origin in the world frame
     void setControlOriginVelocityInW(const Vector3& v) { v_C_ = v; }
     Vector3 getControlOriginVelocityInW() { return v_C_; }
+    
+/// prevent c++ overloaded virtual function warning 
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Woverloaded-virtual"
+#else
+# if defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Woverloaded-virtual"
+# endif
+#endif
 
     /// sets ths measurement (accelero and gyro stacked in one vector)
     void setMeasurement(const Vector3 ya_k, const Vector3 yg_k, TimeIndex k);
+    
+#if defined(__clang__)
+#pragma clang diagnostic pop
+    #else
+# if defined(__GNUC__)
+#   pragma GCC diagnostic pop
+# endif
+#endif
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -113,9 +132,6 @@ namespace stateObservation
     Vector3 x2_hat_prime_;
     Vector3 x2_hat_;
     Vector3 dx1_hat;
-
-
-
 
     /// The tilt estimator loop
     StateVector oneStepEstimation_();

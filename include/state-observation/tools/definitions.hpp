@@ -96,6 +96,8 @@ namespace stateObservation
   ///Euler Axis/Angle representation of orientation
   typedef Eigen::AngleAxis<double> AngleAxis;
 
+  
+  typedef Eigen::Index Index;
   typedef long int TimeIndex;
   typedef size_t TimeSize;
 
@@ -468,8 +470,8 @@ namespace detail
     ///the line starts with the time index and then the matrix is read
     ///row by row
     ///WARNING: this resets the array
-    void readFromFile(const char * filename, size_t rows, size_t cols=1, bool withTimeStamp = true);
-    void readFromFile(const std::string &  filename, size_t rows, size_t cols=1, bool withTimeStamp = true);
+    void readFromFile(const char * filename, Index rows, Index cols=1, bool withTimeStamp = true);
+    void readFromFile(const std::string &  filename, Index rows, Index cols=1, bool withTimeStamp = true);
 
     ///gets the array from a file
     ///the line starts with the time index and then every line of the file

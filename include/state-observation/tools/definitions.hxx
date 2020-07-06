@@ -298,7 +298,7 @@ template <typename MatrixType, typename Allocator>
 inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)
 {
     check_(time);
-    return v_[time - k_];
+    return v_[size_t(time - k_)];
 }
 
 
@@ -390,7 +390,7 @@ inline bool IndexedMatrixArrayT<MatrixType, Allocator>::checkIndex(TimeIndex tim
 {
     return (v_.size()>0 &&
             k_<=time &&
-            TimeIndex(k_+v_.size()) > time);
+            k_ + TimeIndex(v_.size()) > time);
 }
 
 ///Checks whether the matrix is set or not (assert)
@@ -486,13 +486,13 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::truncateBefore(TimeIndex time)
 }
 
 template <typename MatrixType, typename Allocator>
-void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const std::string & filename, size_t rows, size_t cols, bool withTimeStamp)
+void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const std::string & filename, Index rows, Index cols, bool withTimeStamp)
 {
   readFromFile(filename.c_str(),rows, cols, withTimeStamp);
 }
 
 template <typename MatrixType, typename Allocator>
-void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const char * filename, size_t rows, size_t cols, bool withTimeStamp)
+void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const char * filename, Index rows, Index cols, bool withTimeStamp)
 {
   reset();
 
@@ -522,9 +522,9 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const char * filen
         continuation=false;
       else
       {
-        for (size_t i = 0 ; i<rows; ++i)
+        for (Index i = 0 ; i<rows; ++i)
         {
-          for (size_t j = 0 ; j<cols; ++j)
+          for (Index j = 0 ; j<cols; ++j)
           {
             f >> m(i,j);
           }
@@ -593,7 +593,7 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::readVectorsFromFile(const char 
             doublecontainer.push_back(component);
           }
         }
-        v.resize(doublecontainer.size());
+        v.resize(Index(doublecontainer.size()));
         for (unsigned i=0 ; i<doublecontainer.size() ; ++i)
         {
           v(i)=doublecontainer[i];
