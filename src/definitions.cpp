@@ -71,7 +71,7 @@ namespace stateObservation
           doublecontainer.push_back(component);
         }
       }
-      v.resize(doublecontainer.size());
+      v.resize(Index(doublecontainer.size()));
       for (unsigned i=0 ; i<doublecontainer.size() ; ++i)
       {
         v(i)=doublecontainer[i];

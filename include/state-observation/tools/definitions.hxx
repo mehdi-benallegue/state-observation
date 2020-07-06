@@ -290,7 +290,7 @@ template <typename MatrixType, typename Allocator>
 inline MatrixType IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)const
 {
     check_(time);
-    return v_[time - k_];
+    return v_[size_t(time - k_)];
 }
 
 ///Get the matrix value
@@ -332,9 +332,9 @@ inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::back()
 
 ///Get the time index
 template <typename MatrixType, typename Allocator>
-inline long int IndexedMatrixArrayT<MatrixType, Allocator>::getLastIndex()const
+inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::getLastIndex()const
 {
-  return long(k_+v_.size())-1;
+  return long(k_+ TimeIndex(v_.size()))-1;
 }
 
 ///Get the time index
@@ -454,7 +454,7 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::truncateAfter(TimeIndex time)
     {
       if (time < getLastIndex())
       {
-        resize (time-getFirstIndex()+1);
+        resize (TimeSize(time-getFirstIndex()+1));
       }
     }
     else

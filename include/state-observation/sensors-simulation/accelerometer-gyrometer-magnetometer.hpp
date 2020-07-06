@@ -68,12 +68,12 @@ namespace stateObservation
 
         bool matrixMode_;
 
-        static const int stateSize_= 10;
-        static const int stateSizeMatrix_= 15;
+        static const size_t stateSize_= 10;
+        static const size_t stateSizeMatrix_= 15;
 
-        static const int measurementSize_=9;
+        static const size_t measurementSize_=9;
 
-        int currentStateSize_;
+        size_t currentStateSize_;
 
     };
 

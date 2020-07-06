@@ -45,7 +45,7 @@ namespace stateObservation
     {
         BOOST_ASSERT((x_.size()==0 || x_.getFirstIndex()<=k) &&
             "ERROR: Only future measurements can be obtained");
-        if (x_.getLastIndex()<long(k))
+        if (x_.getLastIndex()<TimeIndex(k))
             simulateDynamicsTo(k-1);
 
         return x_[k];
@@ -53,7 +53,7 @@ namespace stateObservation
 
     Vector DynamicalSystemSimulator::getCurrentState() const
     {
-        return x_[x_.getLastIndex()];
+        return x_[size_t(x_.getLastIndex())];
     }
 
     TimeIndex DynamicalSystemSimulator::getCurrentTime() const

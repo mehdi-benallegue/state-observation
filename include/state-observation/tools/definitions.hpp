@@ -96,7 +96,7 @@ namespace stateObservation
   ///Euler Axis/Angle representation of orientation
   typedef Eigen::AngleAxis<double> AngleAxis;
 
-  
+
   typedef Eigen::Index Index;
   typedef long int TimeIndex;
   typedef size_t TimeSize;
@@ -436,7 +436,7 @@ namespace detail
     inline void resize(TimeSize i, const MatrixType & m= MatrixType());
 
     ///Get the time index
-    inline long int getLastIndex() const;
+    inline TimeIndex getLastIndex() const;
 
     ///Get the time index of the next value that will be pushed back
     /// Can be used in for loops

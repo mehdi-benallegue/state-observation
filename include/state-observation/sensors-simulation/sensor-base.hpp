@@ -59,10 +59,10 @@ namespace stateObservation
         virtual TimeIndex getTime() const=0;
 
         ///gets the state vector size. Pure virtual method.
-        virtual unsigned getStateSize() const=0;
+        virtual size_t getStateSize() const=0;
 
         ///get the size of the measurements. Pure virtual method.
-        virtual unsigned getMeasurementSize() const=0;
+        virtual size_t getMeasurementSize() const=0;
 
         ///gets a zero vector of the size of a state vector
         virtual Vector stateVectorZero() const;
