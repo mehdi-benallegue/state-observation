@@ -160,7 +160,7 @@ namespace stateObservation
 
     void ModelBaseEKFFlexEstimatorIMU::setMeasurement(const Vector & y)
     {
-      BOOST_ASSERT((getMeasurementSize()==size_t(y.size())) &&
+      BOOST_ASSERT((getMeasurementSize()==y.size()) &&
                    "ERROR: The measurement vector has incorrect size");
 
 
@@ -285,13 +285,13 @@ namespace stateObservation
     void ModelBaseEKFFlexEstimatorIMU::updateMeasurementCovarianceMatrix_()
     {
 
-      if (size_t(R_.rows())!=getMeasurementSize())
+      if (R_.rows()!=getMeasurementSize())
       {
 
-        size_t realIndex = R_.rows();
+        Index realIndex = R_.rows();
         R_.conservativeResize(getMeasurementSize(),getMeasurementSize());
 
-        size_t currIndex = 6;
+        Index currIndex = 6;
         if(useFTSensors_)
         {
           ///if the force part of the matrix is not filled
@@ -299,7 +299,7 @@ namespace stateObservation
           {
             R_.block(currIndex,0,functor_.getContactsNumber()*6,currIndex).setZero();
             R_.block(0,currIndex,currIndex,functor_.getContactsNumber()*6).setZero();
-            for (size_t i=0; i<functor_.getContactsNumber(); ++i)
+            for (Index i=0; i<functor_.getContactsNumber(); ++i)
             {
               R_.block(currIndex,currIndex,6,6) = forceVariance_;
               currIndex +=6;
@@ -324,18 +324,18 @@ namespace stateObservation
       ekf_.setR(R_);
     }
 
-    size_t ModelBaseEKFFlexEstimatorIMU::getStateSize() const
+    Index ModelBaseEKFFlexEstimatorIMU::getStateSize() const
     {
       return stateSize;
     }
 
 
-    size_t ModelBaseEKFFlexEstimatorIMU::getInputSize() const
+    Index ModelBaseEKFFlexEstimatorIMU::getInputSize() const
     {
       return ekf_.getInputSize();
     }
 
-    size_t ModelBaseEKFFlexEstimatorIMU::getMeasurementSize() const
+    Index ModelBaseEKFFlexEstimatorIMU::getMeasurementSize() const
     {
       return functor_.getMeasurementSize();
     }

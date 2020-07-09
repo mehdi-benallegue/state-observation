@@ -119,9 +119,9 @@ namespace stateObservation
       {
         scalar_(0,0)=double(*static_cast<const long *>(i->first));
       }
-      else if (*i->second.type == typeid(size_t))
+      else if (*i->second.type == typeid(Index))
       {
-        scalar_(0,0)=double(*static_cast<const size_t *>(i->first));
+        scalar_(0,0)=double(*static_cast<const Index *>(i->first));
       }
       else if (*i->second.type == typeid(double))
       {

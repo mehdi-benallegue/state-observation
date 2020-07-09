@@ -57,10 +57,10 @@ namespace stateObservation
         virtual ~KineticsObserver();
 
         ///Gets the state size
-        size_t getStateSize() const;
+        Index getStateSize() const;
 
         ///Gets the measurement size
-        size_t getMeasurementSize() const;
+        Index getMeasurementSize() const;
 
         /// ///////////////////////////////////////////////////////////
         /// Getting, setting the current time and running the estimation
@@ -295,7 +295,7 @@ namespace stateObservation
 
         void clearContacts();
 
-        size_t getNumberOfContacts() const;
+        Index getNumberOfContacts() const;
 
         std::vector<int> getListOfContacts() const;
 
@@ -467,7 +467,7 @@ protected:
         virtual NoiseBase *getMeasurementNoise() const;
 
         ///Gets the input size
-        virtual size_t getInputSize() const;
+        virtual Index getInputSize() const;
 
 public:
 
@@ -500,10 +500,10 @@ protected:
         VectorContact contacts_;
         VectorIMU imuSensors_;
 
-        size_t stateSize_;
-        size_t stateTangentSize_;
-        size_t measurementSize_;
-        size_t measurementTangentSize_;
+        Index stateSize_;
+        Index stateTangentSize_;
+        Index measurementSize_;
+        Index measurementTangentSize_;
 
         Kinematics stateKinematics_;
 

@@ -68,11 +68,11 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual size_t getStateSize() const;
+        virtual Index getStateSize() const;
         ///Gets the input size
-        virtual size_t getInputSize() const;
+        virtual Index getInputSize() const;
         ///Gets the measurement size
-        virtual size_t getMeasurementSize() const;
+        virtual Index getMeasurementSize() const;
 
     protected:
 
@@ -89,9 +89,9 @@ namespace stateObservation
 
         Quaternion computeQuaternion_(const Vector3 & x);
 
-        static const size_t stateSize_=18;
-        static const size_t inputSize_=0;
-        static const size_t measurementSize_=9;
+        static const Index stateSize_=18;
+        static const Index inputSize_=0;
+        static const Index measurementSize_=9;
 
 
     private:

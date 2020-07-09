@@ -170,13 +170,13 @@ namespace stateObservation
       virtual void setSamplingPeriod(double dt);
 
       ///Gets the state size
-      virtual size_t getStateSize() const;
+      virtual Index getStateSize() const;
 
       ///Gets the input size
-      virtual size_t getInputSize() const;
+      virtual Index getInputSize() const;
 
       ///Sets the input size
-      virtual void setInputSize(size_t i);
+      virtual void setInputSize(Index i);
 
       ///Gets the contact number
       ///virtual
@@ -184,7 +184,7 @@ namespace stateObservation
       ///Gets the contacts position
 
       ///Gets the measurement size
-      virtual size_t getMeasurementSize() const;
+      virtual Index getMeasurementSize() const;
 
       ///Sets the number of contacts
       virtual void setContactsNumber(unsigned);
@@ -320,9 +320,9 @@ namespace stateObservation
 
       Matrix3& computeRotation_(const Vector3 & x, int i);
 
-      static const size_t stateSize_=state::size;
-      size_t inputSize_;
-      static const size_t measurementSizeBase_=6;
+      static const Index stateSize_=state::size;
+      Index inputSize_;
+      static const Index measurementSizeBase_=6;
       unsigned nbContacts_;
       unsigned contactModel_;
 
@@ -340,7 +340,7 @@ namespace stateObservation
       Vector uk_fory_;
 
 
-      size_t measurementSize_;
+      Index measurementSize_;
 
       std::vector <Vector3,Eigen::aligned_allocator<Vector3> > contactPositions_;
 

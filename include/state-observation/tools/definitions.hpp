@@ -99,7 +99,7 @@ namespace stateObservation
 
   typedef Eigen::Index Index;
   typedef long int TimeIndex;
-  typedef size_t TimeSize;
+  typedef Index TimeSize;
 
 
 #ifndef NDEBUG
@@ -564,9 +564,9 @@ namespace detail
 
     std::string STATE_OBSERVATION_DLLAPI vectorToString(const Vector& v);
 
-    Matrix STATE_OBSERVATION_DLLAPI stringToMatrix(const std::string& str, size_t rows, size_t cols);
+    Matrix STATE_OBSERVATION_DLLAPI stringToMatrix(const std::string& str, Index rows, Index cols);
 
-    Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str, size_t length);
+    Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str, Index length);
 
     Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str);
   }

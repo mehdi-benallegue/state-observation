@@ -100,7 +100,7 @@ namespace flexibilityEstimation
         {
             stateObservation::Matrix P(ekf_.getStateCovariance());
             stateObservation::Vector Pvec(ekf_.getStateSize());
-            for(size_t i=0;i<ekf_.getStateSize();++i) Pvec(i)=P(i,i);
+            for(Index i=0;i<ekf_.getStateSize();++i) Pvec(i)=P(i,i);
             return Pvec;
         }
 
@@ -128,11 +128,11 @@ namespace flexibilityEstimation
         }
 
 
-        virtual size_t getMeasurementSize() const ;
+        virtual Index getMeasurementSize() const ;
 
-        virtual size_t getStateSize() const ;
+        virtual Index getStateSize() const ;
 
-        virtual size_t getInputSize() const ;
+        virtual Index getInputSize() const ;
 
 
         ///sets to whether or not the force mesurements are taken into account
@@ -255,13 +255,13 @@ namespace flexibilityEstimation
 
         Matrix R_,Q_,P_;
 
-        const size_t stateSize_;
+        const Index stateSize_;
 
-        static const size_t measurementSizeBase_=12;
+        static const Index measurementSizeBase_=12;
 
-        static const size_t inputSizeBase_=
+        static const Index inputSizeBase_=
                     IMUElasticLocalFrameDynamicalSystem::input::sizeBase;
-        size_t inputSize_;
+        Index inputSize_;
 
         double dt_;//sampling period
         bool on_;

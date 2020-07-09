@@ -73,7 +73,7 @@ namespace stateObservation
         inline Vector STATE_OBSERVATION_DLLAPI finiteTimeAccControl(const Vector &x, const Vector &xd, double kp=-1, double kv=-1)
         {
           Vector xdd(x.size());
-          for (size_t i=1;i<size_t(x.size());++i)
+          for (Index i=1;i<x.size();++i)
           {
             xdd(i)= finiteTimeAccControl(x(i),xd(i),kp,kv);
           }

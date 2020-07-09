@@ -233,7 +233,7 @@ int test()
     Vector x; x.resize(stateSize);
     Vector xPredicted; xPredicted.resize(stateSize);
     unsigned contactNbr;
-    size_t inputSize, measurementSize;
+    Index inputSize, measurementSize;
 
     stateObservation::IndexedMatrixArray measurementForces, filteredForces, inputFeetPositions;
     stateObservation::Vector sensorZmp, filteredZmp;

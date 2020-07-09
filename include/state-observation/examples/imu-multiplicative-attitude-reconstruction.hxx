@@ -9,9 +9,9 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   double dt)
 {
   ///Sizes of the states for the state, the measurement, and the input vector
-  const size_t stateSize=19;
-  const size_t measurementSize=6;
-  const size_t inputSize=6;
+  const Index stateSize=19;
+  const Index measurementSize=6;
+  const Index inputSize=6;
 
   typedef kine::indexes<kine::rotationVector> indexesTangent;
 
@@ -95,7 +95,7 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
   const Matrix & r,
   double dt)
 {
-  const size_t inputSize=6;
+  const Index inputSize=6;
 
   ///initialization of a zero input
   IndexedVectorArray u;

@@ -112,7 +112,7 @@ int test()
     // State initialization => not used here because it is set in model-base-ekf-flex-estimator-imu
 
 
-    const size_t inputSize=est.getInputSize();
+    const Index inputSize=est.getInputSize();
 
      // Input initialization
     Vector u0=Vector::Zero(inputSize-6*contactNbr,1);

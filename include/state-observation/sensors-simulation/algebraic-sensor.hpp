@@ -53,24 +53,24 @@ namespace stateObservation
         virtual TimeIndex getTime() const;
 
         ///gets the state vector size. Pure virtual method.
-        virtual size_t getStateSize() const;
+        virtual Index getStateSize() const;
 
         ///get the size of the measurements. Pure virtual method.
-        virtual size_t getMeasurementSize() const;
+        virtual Index getMeasurementSize() const;
 
         ///concatenates the n last components of the state in the measurement
         ///(useful when the measurements are already computed or
         ///when they come from external source)
-        virtual size_t concatenateWithInput( size_t n);
+        virtual Index concatenateWithInput( Index n);
 
     protected:
         ///the actual algorithm for the computation of the measurements, must
         ///be overloaded to implement any sensor
         virtual Vector computeNoiselessMeasurement_()=0;
 
-        virtual size_t getStateSize_() const=0;
+        virtual Index getStateSize_() const=0;
 
-        virtual size_t getMeasurementSize_() const=0;
+        virtual Index getMeasurementSize_() const=0;
 
 
         Vector computeNoisyMeasurement_();
@@ -79,7 +79,7 @@ namespace stateObservation
 
         TimeIndex time_;
 
-        size_t concat_;
+        Index concat_;
 
         Vector state_;
 

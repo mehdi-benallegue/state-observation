@@ -52,10 +52,10 @@ namespace stateObservation
 
     protected:
         ///Gets the state vector Size
-        virtual size_t getStateSize_() const;
+        virtual Index getStateSize_() const;
 
         ///Gets the measurements vector size
-        virtual size_t getMeasurementSize_() const;
+        virtual Index getMeasurementSize_() const;
 
 
         virtual Vector computeNoiselessMeasurement_();
@@ -68,12 +68,12 @@ namespace stateObservation
 
         bool matrixMode_;
 
-        static const size_t stateSize_= 10;
-        static const size_t stateSizeMatrix_= 15;
+        static const Index stateSize_= 10;
+        static const Index stateSizeMatrix_= 15;
 
-        static const size_t measurementSize_=9;
+        static const Index measurementSize_=9;
 
-        size_t currentStateSize_;
+        Index currentStateSize_;
 
     };
 

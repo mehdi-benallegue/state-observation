@@ -9,7 +9,7 @@ namespace stateObservation
 
     bool SensorBase::checkStateVector(const Vector & state) const
     {
-        return (size_t(state.rows())==getStateSize() && size_t(state.cols())==1);
+        return (state.rows()==getStateSize() && state.cols()==1);
     }
 
     void SensorBase::setNoise(NoiseBase * noise)
@@ -24,7 +24,7 @@ namespace stateObservation
 
     Vector SensorBase::stateVectorZero()const
     {
-        return Vector::Zero(Index(getStateSize()),1);
+        return Vector::Zero(getStateSize(),1);
     }
 
     NoiseBase * SensorBase::getNoise() const

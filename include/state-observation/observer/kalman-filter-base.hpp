@@ -87,7 +87,7 @@ namespace stateObservation
         ///  \li n : size of the state vector
         ///  \li m : size of the measurements vector
         ///  \li p : size of the input vector
-        KalmanFilterBase(size_t n,size_t m,size_t p=0);
+        KalmanFilterBase(Index n,Index m,Index p=0);
 
         /// The constructor to use in case the dimension of the state space
         /// is smaller that its vector representation. For example
@@ -103,7 +103,7 @@ namespace stateObservation
         ///  \li m : size of the measurements vector
         ///  \li mt : dimension of the tangent space to the measurement space
         ///  \li p : size of the input vector
-        KalmanFilterBase(size_t n, size_t nt, size_t m, size_t mt, size_t p);
+        KalmanFilterBase(Index n, Index nt, Index m, Index mt, Index p);
 
         /// Set the value of the jacobian df/dx
         virtual void setA(const Amatrix& A);
@@ -265,26 +265,26 @@ namespace stateObservation
         /// Changes the dimension of the state vector:
         ///resets the internal container for the state vector and
         ///the containers for the matrices A, C, Q, P
-        virtual void setStateSize(size_t n);
+        virtual void setStateSize(Index n);
 
         /// Changes the dimension of the state vector:
         /// n is the dimension of the state representation
         /// and nt is the dimension of the tangent vector representation
         ///resets the internal container for the state vector and
         ///the containers for the matrices A, C, Q, P
-        virtual void setStateSize(size_t n, size_t nt);
+        virtual void setStateSize(Index n, Index nt);
 
         /// Changes the dimension of the measurement vector:
         ///resets the internal container for the measurement vectors and
         ///the containers for the matrices C, R
-        virtual void setMeasureSize(size_t m);
+        virtual void setMeasureSize(Index m);
 
         /// Changes the dimension of the measurement vector:
         /// m is the size of the measurementVector
         /// mt is the dimension of the measurement tangent space
         ///resets the internal container for the measurement vectors and
         ///the containers for the matrices C, R
-        virtual void setMeasureSize(size_t m, size_t mt);
+        virtual void setMeasureSize(Index m, Index mt);
 
         /// Get simulation of the measurement y_k using the state estimation
         virtual MeasureVector getSimulatedMeasurement(TimeIndex k);
@@ -320,10 +320,10 @@ namespace stateObservation
     protected:
 
         /// the size of tangent space of the state space
-        size_t nt_;
+        Index nt_;
 
         /// the size of tangent space of the measurement space
-        size_t mt_;
+        Index mt_;
 
         /// The type of Kalman gain matrix
         typedef Matrix Kmatrix;

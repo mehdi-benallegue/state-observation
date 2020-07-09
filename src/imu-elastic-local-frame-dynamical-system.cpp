@@ -1053,9 +1053,9 @@ namespace stateObservation
       op_.xk_fory = xk_fory_;
       op_.yk = yk_;
 
-      size_t sizeAfterComBias=getStateSize()-state::comBias-2;
+      Index sizeAfterComBias=getStateSize()-state::comBias-2;
 
-      for (size_t i=0; i<state::unmodeledForces; ++i)
+      for (Index i=0; i<state::unmodeledForces; ++i)
       {
         op_.xdx[i]+= dx_[i];
 
@@ -1073,7 +1073,7 @@ namespace stateObservation
       }
       else
       {
-        for (size_t i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
+        for (Index i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1092,7 +1092,7 @@ namespace stateObservation
       }
       else
       {
-        for (size_t i=state::comBias; i<state::comBias+2; ++i)
+        for (Index i=state::comBias; i<state::comBias+2; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1111,7 +1111,7 @@ namespace stateObservation
       }
       else
       {
-        for (size_t i=state::comBias+2; i<state::comBias+2+sizeAfterComBias; ++i)
+        for (Index i=state::comBias+2; i<state::comBias+2+sizeAfterComBias; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1143,10 +1143,10 @@ namespace stateObservation
       op_.xk = xk_;
       op_.xk1 = xk1_;
 
-      size_t sizeAfterComBias=getStateSize()-state::comBias-2;
-      size_t sizeAfterUnmodeledForces=getStateSize()-state::unmodeledForces-6;
+      Index sizeAfterComBias=getStateSize()-state::comBias-2;
+      Index sizeAfterUnmodeledForces=getStateSize()-state::unmodeledForces-6;
 
-      for (size_t i=0; i<state::unmodeledForces; ++i)
+      for (Index i=0; i<state::unmodeledForces; ++i)
       {
         op_.xdx[i]+= dx_[i];
 
@@ -1166,7 +1166,7 @@ namespace stateObservation
       }
       else
       {
-        for (size_t i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
+        for (Index i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1187,7 +1187,7 @@ namespace stateObservation
       }
       else
       {
-        for (size_t i=state::comBias; i<state::comBias+2; ++i)
+        for (Index i=state::comBias; i<state::comBias+2; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1207,7 +1207,7 @@ namespace stateObservation
       }
       else
       {
-        for (size_t i=state::drift; i<state::drift+3; ++i)
+        for (Index i=state::drift; i<state::drift+3; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1255,22 +1255,22 @@ namespace stateObservation
       dt_=dt;
     }
 
-    size_t IMUElasticLocalFrameDynamicalSystem::getStateSize() const
+    Index IMUElasticLocalFrameDynamicalSystem::getStateSize() const
     {
       return stateSize_;
     }
 
-    size_t IMUElasticLocalFrameDynamicalSystem::getInputSize() const
+    Index IMUElasticLocalFrameDynamicalSystem::getInputSize() const
     {
       return inputSize_;
     }
 
-    void IMUElasticLocalFrameDynamicalSystem::setInputSize(size_t i)
+    void IMUElasticLocalFrameDynamicalSystem::setInputSize(Index i)
     {
       inputSize_=i;
     }
 
-    size_t IMUElasticLocalFrameDynamicalSystem::getMeasurementSize() const
+    Index IMUElasticLocalFrameDynamicalSystem::getMeasurementSize() const
     {
       return measurementSize_;
     }

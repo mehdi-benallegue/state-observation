@@ -27,15 +27,15 @@ namespace stateObservation
       return matrixToString(v.transpose());
     }
 
-    Matrix stringToMatrix(const std::string& str, size_t rows, size_t cols)
+    Matrix stringToMatrix(const std::string& str, Index rows, Index cols)
     {
       Matrix m(Matrix::Zero(rows,cols));
       std::stringstream ss;
       ss << str;
 
-      for (Index i = 0 ; i<Index(rows); ++i)
+      for (Index i = 0 ; i<rows; ++i)
       {
-        for (Index j = 0 ; j<Index(cols); ++j)
+        for (Index j = 0 ; j<cols; ++j)
         {
           ss >> m(i,j);
         }
@@ -44,7 +44,7 @@ namespace stateObservation
       return m;
     }
 
-    Vector stringToVector(const std::string& str, size_t length)
+    Vector stringToVector(const std::string& str, Index length)
     {
       return stringToMatrix(str,length,1);
     }
@@ -71,8 +71,8 @@ namespace stateObservation
           doublecontainer.push_back(component);
         }
       }
-      v.resize(Index(doublecontainer.size()));
-      for (size_t i=0 ; i<doublecontainer.size() ; ++i)
+      v.resize(doublecontainer.size());
+      for (Index i=0 ; i<Index(doublecontainer.size()) ; ++i)
       {
         v(i)=doublecontainer[i];
       }

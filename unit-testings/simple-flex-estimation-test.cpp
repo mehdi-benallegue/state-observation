@@ -15,7 +15,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const size_t kmax=1000;
+    const Index kmax=1000;
 
     ///sampling period
     const double dt=5e-3;
@@ -77,7 +77,7 @@ int test()
 
         AccelerometerGyrometer imu;
 
-        for (size_t i=1; i<kmax; ++i)
+        for (Index i=1; i<kmax; ++i)
         {
             q = kine::rotationVectorToAngleAxis(oi*dt)*q;
             aa=q;

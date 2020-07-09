@@ -13,7 +13,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int testConstant()
 {
     /// The number of samples
-    const size_t kmax=5000;
+    const Index kmax=5000;
 
     ///sampling period
     const double dt=1e-3;
@@ -42,7 +42,7 @@ int testConstant()
     uConstant[2]=1.8;
 
     {
-        for ( size_t i=1 ; i<kmax+1 ; ++i )
+        for ( Index i=1 ; i<kmax+1 ; ++i )
         {
             y.setValue(yConstant,i);
             u.setValue(uConstant,i);
@@ -96,7 +96,7 @@ int testConstant()
 int test()
 {
     /// The number of samples
-    const size_t kmax=3000;
+    const Index kmax=3000;
 
     ///sampling period
     const double dt=1e-3;
@@ -208,7 +208,7 @@ int test()
         imu.setSamplingPeriod(dt);
 
         ///launched the simulation to the time kmax+1
-        for (size_t i=0; i<kmax+1; ++i)
+        for (Index i=0; i<kmax+1; ++i)
         {
             Vector x=sim.getState(i);
 

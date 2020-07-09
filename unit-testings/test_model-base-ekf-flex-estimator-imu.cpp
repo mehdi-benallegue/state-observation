@@ -35,8 +35,8 @@ int test()
 
   /// Initializations
     // Dimensions
-    const size_t kinit=0;
-    const size_t kmax=1400;
+    const Index kinit=0;
+    const Index kmax=1400;
     const unsigned measurementSize=6;
     (void) measurementSize; ///avoid warning
     const unsigned inputSize=60;
@@ -177,7 +177,7 @@ int test()
     // }
 
     std::cout << "Beginning reconstruction "<<std::endl;
-    for (size_t k=kinit+2;k<kmax;++k)
+    for (Index k=kinit+2;k<kmax;++k)
     {
         est.setMeasurement(y[k]);
         est.setMeasurementInput(u[k]);

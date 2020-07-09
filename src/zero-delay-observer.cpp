@@ -147,7 +147,7 @@ namespace stateObservation
     }
 
 
-    void ZeroDelayObserver::setStateSize(size_t n)
+    void ZeroDelayObserver::setStateSize(Index n)
     {
         if (n!=n_)
         {
@@ -156,7 +156,7 @@ namespace stateObservation
         }
     }
 
-    void ZeroDelayObserver::setMeasureSize(size_t m)
+    void ZeroDelayObserver::setMeasureSize(Index m)
     {
         if (m!=m_)
         {
@@ -165,7 +165,7 @@ namespace stateObservation
         }
     }
 
-    void ZeroDelayObserver::setInputSize(size_t p)
+    void ZeroDelayObserver::setInputSize(Index p)
     {
         if (p!=p_)
         {

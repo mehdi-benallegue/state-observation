@@ -188,14 +188,14 @@ namespace stateObservation
   }
 
 
-  size_t KineticsObserver::getStateSize() const
+  Index KineticsObserver::getStateSize() const
   {
     return stateSize_;
   }
 
-  size_t KineticsObserver::getMeasurementSize() const
+  Index KineticsObserver::getMeasurementSize() const
   {
-    size_t size = 0;
+    Index size = 0;
     if (k_est_!=k_data_) //test if there are new measurements
     {
       for (VectorIMUConstIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i)
@@ -997,7 +997,7 @@ namespace stateObservation
     Contact::numberOfRealSensors=0;
   }
 
-  size_t KineticsObserver::getNumberOfContacts() const
+  Index KineticsObserver::getNumberOfContacts() const
   {
     return contacts_.size();
   }
@@ -1105,7 +1105,7 @@ namespace stateObservation
   Vector KineticsObserver::getMeasurementVector()
   {
     Vector measurement(getMeasurementSize());
-    size_t currIndex = 0;
+    Index currIndex = 0;
     if (k_est_!=k_data_)
     {
       for (VectorIMUIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i)
@@ -1238,7 +1238,7 @@ namespace stateObservation
     ekf_.setProcessCovariance(P);
   }
 
-  size_t KineticsObserver::getInputSize() const
+  Index KineticsObserver::getInputSize() const
   {
     return inputSize;
   }

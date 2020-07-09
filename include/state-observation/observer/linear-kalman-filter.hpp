@@ -55,7 +55,7 @@ namespace stateObservation
         ///  \li n : size of the state vector
         ///  \li m : size of the measurements vector
         ///  \li p : size of the input vector
-        LinearKalmanFilter(size_t n,size_t m,size_t p=0)
+        LinearKalmanFilter(Index n,Index m,Index p=0)
             :KalmanFilterBase(n,m,p){}
 
         /// Default constructor
@@ -112,17 +112,17 @@ namespace stateObservation
         ///changes the dimension of the state vector:
         ///resets the internal container for the state vector and
         ///the containers for the matrices A, B, C, Q, P
-        virtual void setStateSize(size_t n);
+        virtual void setStateSize(Index n);
 
         ///changes the dimension of the measurement vector:
         ///resets the internal container for the measurement vectors and
         ///the containers for the matrices C, D, R
-        virtual void setMeasureSize(size_t m);
+        virtual void setMeasureSize(Index m);
 
         ///changes the dimension of the input vector:
         ///resets the internal container for the input vectors and
         ///the containers for the matrices B, D
-        virtual void setInputSize(size_t p);
+        virtual void setInputSize(Index p);
 
     protected:
         /// The implementation of the (linear) prediction (state dynamics)

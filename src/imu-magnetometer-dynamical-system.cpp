@@ -121,17 +121,17 @@ namespace stateObservation
         dt_=dt;
     }
 
-    size_t IMUMagnetometerDynamicalSystem::getStateSize() const
+    Index IMUMagnetometerDynamicalSystem::getStateSize() const
     {
         return stateSize_;
     }
 
-    size_t IMUMagnetometerDynamicalSystem::getInputSize() const
+    Index IMUMagnetometerDynamicalSystem::getInputSize() const
     {
         return inputSize_;
     }
 
-    size_t IMUMagnetometerDynamicalSystem::getMeasurementSize() const
+    Index IMUMagnetometerDynamicalSystem::getMeasurementSize() const
     {
         return measurementSize_;
     }

@@ -290,7 +290,7 @@ template <typename MatrixType, typename Allocator>
 inline MatrixType IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)const
 {
     check_(time);
-    return v_[size_t(time - k_)];
+    return v_[Index(time - k_)];
 }
 
 ///Get the matrix value
@@ -298,7 +298,7 @@ template <typename MatrixType, typename Allocator>
 inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)
 {
     check_(time);
-    return v_[size_t(time - k_)];
+    return v_[Index(time - k_)];
 }
 
 
@@ -593,10 +593,10 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::readVectorsFromFile(const char 
             doublecontainer.push_back(component);
           }
         }
-        v.resize(Index(doublecontainer.size()));
-        for (size_t i=0 ; i<doublecontainer.size() ; ++i)
+        v.resize(doublecontainer.size());
+        for (Index i=0 ; i<Index(doublecontainer.size()) ; ++i)
         {
-          v(Index(i))=doublecontainer[i];
+          v(i)=doublecontainer[i];
         }
         setValue(v,k);
         ++k;

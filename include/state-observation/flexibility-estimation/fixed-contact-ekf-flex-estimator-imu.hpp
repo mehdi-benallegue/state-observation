@@ -84,11 +84,11 @@ namespace flexibilityEstimation
         virtual const Vector& getFlexibilityVector();
 
 
-        virtual size_t getMeasurementSize() const ;
+        virtual Index getMeasurementSize() const ;
 
-        virtual size_t getStateSize() const ;
+        virtual Index getStateSize() const ;
 
-        virtual size_t getInputSize() const ;
+        virtual Index getInputSize() const ;
 
         /// sets the sampling period
         virtual void setSamplingPeriod(double);
@@ -109,9 +109,9 @@ namespace flexibilityEstimation
 
         Matrix R_,Q_;
 
-        static const size_t stateSizeConst_=18;
-        static const size_t measurementSizeConst_=6;
-        static const size_t inputSizeConst_=15;
+        static const Index stateSizeConst_=18;
+        static const Index measurementSizeConst_=6;
+        static const Index inputSizeConst_=15;
 
         double dt_;//sampling period
 

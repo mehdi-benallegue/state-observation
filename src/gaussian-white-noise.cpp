@@ -8,7 +8,7 @@ namespace stateObservation
 {
 
 
-    GaussianWhiteNoise::GaussianWhiteNoise(size_t dimension):
+    GaussianWhiteNoise::GaussianWhiteNoise(Index dimension):
             dim_(dimension),
             std_(Matrix::Identity(dimension, dimension)),
             bias_(Vector::Zero(dimension,1)),
@@ -51,12 +51,12 @@ namespace stateObservation
         bias_=bias;
     }
 
-    size_t GaussianWhiteNoise::getDimension() const
+    Index GaussianWhiteNoise::getDimension() const
     {
         return dim_;
     }
 
-    void GaussianWhiteNoise::setDimension(size_t dim)
+    void GaussianWhiteNoise::setDimension(Index dim)
     {
         dim_=dim;
         bias_=Vector::Zero(dim,1);
@@ -66,13 +66,13 @@ namespace stateObservation
     void GaussianWhiteNoise::checkMatrix_(const Matrix & m) const
     {
         (void)m;//avoid warning
-        BOOST_ASSERT(size_t(m.rows())==dim_ && size_t(m.cols())==dim_ && "ERROR: Matrix incorrecly dimemsioned");
+        BOOST_ASSERT(m.rows()==dim_ && m.cols()==dim_ && "ERROR: Matrix incorrecly dimemsioned");
     }
 
     void GaussianWhiteNoise::checkVector_(const Vector & v) const
     {
         (void)v;//avoid warning
-        BOOST_ASSERT(size_t(v.rows())==dim_ && size_t(v.cols())==1 && "ERROR: Vector incorrecly dimemsioned");
+        BOOST_ASSERT(v.rows()==dim_ && v.cols()==1 && "ERROR: Vector incorrecly dimemsioned");
     }
 
     void GaussianWhiteNoise::setSumFunction(void (* sum)(const  Vector& stateVector, const Vector& tangentVector, Vector& result))

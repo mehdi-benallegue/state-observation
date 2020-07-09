@@ -749,9 +749,12 @@ int testKinematics (int errcode)
     return 0;
 }
 
-int testKineticsObserverCodeAccessor(int /*code*/)
+int testKineticsObserverCodeAccessor(int errorcode)
 {
+    double error =0;
     double dt = 0.001;
+
+    double mass = 100;
     KineticsObserver o(4,2);
 
     Vector x0(o.getStateSize());
@@ -819,6 +822,8 @@ int testKineticsObserverCodeAccessor(int /*code*/)
     contactKine.position.set() << 1,-0.1,0;
     o.addContact(contactKine,initialCov,processCov,linDamping,
                         linStiffness,angStiffness,angDamping,2);
+
+    o.clearContacts();
 
     std::cout << index << " " << x.transpose() << std::endl;
 
@@ -919,10 +924,58 @@ int testKineticsObserverCodeAccessor(int /*code*/)
      o.contactForceIndexTangent( 3 ) << " " <<
      o.contactTorqueIndexTangent( 3 ) << " " <<
      o.contactWrenchIndexTangent( 3 ) << " " << std::endl;
-
-    o.setWithUnmodeledWrench(true );
+     
+    o.setWithUnmodeledWrench(true);
     o.setWithAccelerationEstimation(true );
     o.setWithGyroBias(true);
+
+    Matrix3 acceleroCov, gyroCov;
+
+    acceleroCov =  Matrix3::Identity()*1e-4;
+    gyroCov = Matrix3::Identity()*1e-8;
+
+    o.setIMUDefaultCovarianceMatrix(acceleroCov,gyroCov);
+
+    Matrix6 wrenchCov;
+
+    wrenchCov <<   Matrix3::Identity()*1e-0,        Matrix3::Zero(),
+                        Matrix3::Zero(),                 Matrix3::Identity()*1e-4;
+    
+    o.setContactWrenchSensorDefaultCovarianceMatrix(wrenchCov);
+
+    o.setMass(mass);
+
+    Vector state1 = o.getEKF().stateVectorRandom();
+    Vector state2 = o.getEKF().stateVectorRandom();
+    Vector statediff ;
+    o.stateDifference(state1, state2, statediff );
+    Vector state3;
+    o.stateSum(state2, statediff,state3);
+
+    std::cout << state1.transpose() <<std::endl;
+    std::cout << state3.transpose() <<std::endl;
+
+    std::cout <<  "Sum error" <<(error = (state1 - state3).norm()) << std::endl;
+    
+
+    state2 = o.getEKF().stateVectorRandom();
+    statediff = o.getEKF().stateTangentVectorRandom();
+
+    Vector statediff_bis;
+    o.stateSum(state2,statediff,state1);
+    o.stateDifference(state1,state2,statediff_bis);
+
+    std::cout << statediff.transpose() <<std::endl;
+    std::cout << statediff_bis.transpose() <<std::endl;
+
+    std::cout <<"DIff error" << (error +=  (statediff-statediff_bis).norm())<<std::endl;
+
+
+    if (error > 1e-8)
+    {
+    //    return errorcode;
+    }
+    
 
     return 0;
 }

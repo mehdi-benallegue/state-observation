@@ -18,7 +18,7 @@ namespace stateObservation
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(size_t n,size_t m,size_t p)
+    KalmanFilterBase::KalmanFilterBase(Index n,Index m,Index p)
             :ZeroDelayObserver(n,m,p),
             nt_(n),
             mt_(m),
@@ -26,7 +26,7 @@ namespace stateObservation
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(size_t n, size_t nt, size_t m, size_t mt, size_t p)
+    KalmanFilterBase::KalmanFilterBase(Index n, Index nt, Index m, Index mt, Index p)
             :ZeroDelayObserver(n,m,p),
             nt_(nt),
             mt_(mt),
@@ -131,10 +131,10 @@ namespace stateObservation
         arithm_->measurementDifference(this->y_[k+1], ybar_(),oc_.inoMeas);
         oc_.inoMeasCov.noalias() = r_ +  c_ * (oc_.pbar * c_.transpose());
 
-        size_t &  measurementTangentSize =mt_;
+        Index &  measurementTangentSize =mt_;
         //inversing innovation measurement covariance matrix
         oc_.inoMeasCovLLT.compute(oc_.inoMeasCov);
-        oc_.inoMeasCovInverse.resize(Index(measurementTangentSize),Index(measurementTangentSize));
+        oc_.inoMeasCovInverse.resize(measurementTangentSize,measurementTangentSize);
         oc_.inoMeasCovInverse.setIdentity();
         oc_.inoMeasCovLLT.matrixL().solveInPlace(oc_.inoMeasCovInverse);
         oc_.inoMeasCovLLT.matrixL().transpose().solveInPlace(oc_.inoMeasCovInverse);
@@ -193,174 +193,174 @@ namespace stateObservation
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixConstant(double c) const
     {
-        return Amatrix::Constant(Index(nt_),Index(nt_),c);
+        return Amatrix::Constant(nt_,nt_,c);
     }
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixRandom() const
     {
-        return Amatrix::Random(Index(nt_),Index(nt_));
+        return Amatrix::Random(nt_,nt_);
     }
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixZero() const
     {
-        return Amatrix::Zero(Index(nt_),Index(nt_));
+        return Amatrix::Zero(nt_,nt_);
     }
 
     KalmanFilterBase::Amatrix KalmanFilterBase::getAmatrixIdentity() const
     {
-        return Amatrix::Identity(Index(nt_),Index(nt_));
+        return Amatrix::Identity(nt_,nt_);
     }
 
     bool KalmanFilterBase::checkAmatrix(const Amatrix & a) const
     {
-        return (size_t(a.rows())==nt_ && size_t(a.cols())==nt_);
+        return (a.rows()==nt_ && a.cols()==nt_);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(Index(mt_),Index(nt_),c);
+        return Cmatrix::Constant(mt_,nt_,c);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixRandom() const
     {
-        return Cmatrix::Random(Index(mt_),Index(nt_));
+        return Cmatrix::Random(mt_,nt_);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixZero() const
     {
-        return Cmatrix::Zero(Index(mt_),Index(nt_));
+        return Cmatrix::Zero(mt_,nt_);
     }
 
     bool KalmanFilterBase::checkCmatrix(const Cmatrix & a) const
     {
-        return (size_t(a.rows())==mt_ && size_t(a.cols())==nt_);
+        return (a.rows()==mt_ && a.cols()==nt_);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixConstant(double c) const
     {
-        return Qmatrix::Constant(Index(nt_),Index(nt_),c);
+        return Qmatrix::Constant(nt_,nt_,c);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixRandom() const
     {
-        return Qmatrix::Random(Index(nt_),Index(nt_));
+        return Qmatrix::Random(nt_,nt_);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixZero() const
     {
-        return Qmatrix::Zero(Index(nt_),Index(nt_));
+        return Qmatrix::Zero(nt_,nt_);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixIdentity() const
     {
-        return Qmatrix::Identity(Index(nt_),Index(nt_));
+        return Qmatrix::Identity(nt_,nt_);
     }
 
     bool KalmanFilterBase::checkQmatrix(const Qmatrix & a) const
     {
-        return (size_t(a.rows())==nt_ && size_t(a.cols())==nt_);
+        return (a.rows()==nt_ && a.cols()==nt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(Index(mt_),Index(mt_),c);
+        return Cmatrix::Constant(mt_,mt_,c);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixRandom() const
     {
-        return Cmatrix::Random(Index(mt_),Index(mt_));
+        return Cmatrix::Random(mt_,mt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixZero() const
     {
-        return Rmatrix::Zero(Index(mt_),Index(mt_));
+        return Rmatrix::Zero(mt_,mt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixIdentity() const
     {
-        return Rmatrix::Identity(Index(mt_),Index(mt_));
+        return Rmatrix::Identity(mt_,mt_);
     }
 
     bool KalmanFilterBase::checkRmatrix(const Rmatrix & a) const
     {
-        return (size_t(a.rows())==mt_ && (size_t(a.cols()))==mt_);
+        return (a.rows()==mt_ && a.cols()==mt_);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixConstant(double c) const
     {
-        return Pmatrix::Constant(Index(nt_),Index(nt_),c);
+        return Pmatrix::Constant(nt_,nt_,c);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixRandom() const
     {
-        return Pmatrix::Random(Index(nt_),Index(nt_));
+        return Pmatrix::Random(nt_,nt_);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixZero() const
     {
-        return Pmatrix::Zero(Index(nt_),Index(nt_));
+        return Pmatrix::Zero(nt_,nt_);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixIdentity() const
     {
-        return Pmatrix::Identity(Index(nt_),Index(nt_));
+        return Pmatrix::Identity(nt_,nt_);
     }
 
     bool KalmanFilterBase::checkPmatrix(const Pmatrix & a) const
     {
-        return (size_t(a.rows())==nt_ && size_t(a.cols())==nt_);
+        return (a.rows()==nt_ && a.cols()==nt_);
     }
 
 
 
     KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorConstant( double c ) const
     {
-        return StateVectorTan::Constant(Index(nt_),1,c);
+        return StateVectorTan::Constant(nt_,1,c);
     }
 
     KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorRandom() const
     {
-        return StateVectorTan::Random(Index(nt_),1);
+        return StateVectorTan::Random(nt_,1);
     }
 
     KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorZero() const
     {
-        return StateVectorTan::Zero(Index(nt_),1);
+        return StateVectorTan::Zero(nt_,1);
     }
 
     bool KalmanFilterBase::checkStateTangentVector(const KalmanFilterBase::StateVectorTan & v) const
     {
-        return (size_t(v.rows())==nt_ && size_t(v.cols())==1);
+        return (v.rows()==nt_ && v.cols()==1);
     }
 
 
     KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorConstant( double c ) const
     {
-        return MeasureVectorTan::Constant(Index(mt_),1,c);
+        return MeasureVectorTan::Constant(mt_,1,c);
     }
 
     KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorRandom() const
     {
-        return MeasureVectorTan::Random(Index(mt_),1);
+        return MeasureVectorTan::Random(mt_,1);
     }
 
     KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorZero() const
     {
-        return MeasureVectorTan::Zero(Index(mt_),1);
+        return MeasureVectorTan::Zero(mt_,1);
     }
 
     bool KalmanFilterBase::checkMeasureTangentVector(const KalmanFilterBase::MeasureVectorTan & v) const
     {
-        return (size_t(v.rows())==mt_ && size_t(v.cols())==1);
+        return (v.rows()==mt_ && v.cols()==1);
     }
 
 
-    void KalmanFilterBase::setStateSize(size_t n)
+    void KalmanFilterBase::setStateSize(Index n)
     {
         setStateSize(n,n);
     }
 
-    void KalmanFilterBase::setStateSize(size_t n, size_t nt)
+    void KalmanFilterBase::setStateSize(Index n, Index nt)
     {
         if ((n!=n_) || (nt_ !=nt))
         {
@@ -376,12 +376,12 @@ namespace stateObservation
         }
     }
 
-    void KalmanFilterBase::setMeasureSize(size_t m)
+    void KalmanFilterBase::setMeasureSize(Index m)
     {
         setMeasureSize(m,m);
     }
 
-    void KalmanFilterBase::setMeasureSize(size_t m, size_t mt)
+    void KalmanFilterBase::setMeasureSize(Index m, Index mt)
     {
         if ((m!=m_) || mt!=mt_)
         {

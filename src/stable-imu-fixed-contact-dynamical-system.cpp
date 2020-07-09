@@ -188,17 +188,17 @@ namespace flexibilityEstimation
         dt_=dt;
     }
 
-    size_t StableIMUFixedContactDynamicalSystem::getStateSize()
+    Index StableIMUFixedContactDynamicalSystem::getStateSize()
     {
         return stateSize_;
     }
 
-    size_t StableIMUFixedContactDynamicalSystem::getInputSize()
+    Index StableIMUFixedContactDynamicalSystem::getInputSize()
     {
         return inputSize_;
     }
 
-    size_t StableIMUFixedContactDynamicalSystem::getMeasurementSize()
+    Index StableIMUFixedContactDynamicalSystem::getMeasurementSize()
     {
         return measurementSize_;
     }

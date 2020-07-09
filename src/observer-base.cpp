@@ -17,7 +17,7 @@ namespace stateObservation
         n_=m_=p_=0;
     }
 
-    ObserverBase::ObserverBase(size_t n, size_t m, size_t p):
+    ObserverBase::ObserverBase(Index n, Index m, Index p):
             n_(n),m_(m),p_(p)
     {
 
@@ -27,43 +27,43 @@ namespace stateObservation
 
     ObserverBase::StateVector ObserverBase::stateVectorConstant( double c ) const
     {
-        return StateVector::Constant(Index(n_),1,c);
+        return StateVector::Constant(n_,1,c);
     }
 
     ObserverBase::StateVector ObserverBase::stateVectorRandom() const
     {
-        return StateVector::Random(Index(n_),1);
+        return StateVector::Random(n_,1);
     }
 
     ObserverBase::StateVector ObserverBase::stateVectorZero() const
     {
-        return StateVector::Zero(Index(n_),1);
+        return StateVector::Zero(n_,1);
     }
 
     bool ObserverBase::checkStateVector(const StateVector & v) const
     {
-        return (size_t(v.rows())==n_ && size_t(v.cols())==1);
+        return (v.rows()==n_ && v.cols()==1);
     }
 
 
     ObserverBase::MeasureVector ObserverBase::measureVectorConstant( double c ) const
     {
-        return MeasureVector::Constant(Index(m_),1,c);
+        return MeasureVector::Constant(m_,1,c);
     }
 
     ObserverBase::MeasureVector ObserverBase::measureVectorRandom() const
     {
-        return MeasureVector::Random(Index(m_),1);
+        return MeasureVector::Random(m_,1);
     }
 
     ObserverBase::MeasureVector ObserverBase::measureVectorZero() const
     {
-        return MeasureVector::Zero(Index(m_),1);
+        return MeasureVector::Zero(m_,1);
     }
 
     bool ObserverBase::checkMeasureVector(const MeasureVector & v) const
     {
-        return (size_t(v.rows())==m_ && size_t(v.cols())==1);
+        return (v.rows()==m_ && v.cols()==1);
     }
 
 
@@ -84,37 +84,37 @@ namespace stateObservation
 
     bool ObserverBase::checkInputVector(const InputVector & v) const
     {
-        return (size_t(v.rows())==p_ && size_t(v.cols())==1);
+        return (v.rows()==p_ && v.cols()==1);
     }
 
 
-    void ObserverBase::setStateSize(size_t n)
+    void ObserverBase::setStateSize(Index n)
     {
         n_=n;
     }
 
-    size_t ObserverBase::getStateSize() const
+    Index ObserverBase::getStateSize() const
     {
         return n_;
     }
 
-    void ObserverBase::setMeasureSize(size_t m)
+    void ObserverBase::setMeasureSize(Index m)
     {
         m_=m;
     }
 
-    size_t ObserverBase::getMeasureSize() const
+    Index ObserverBase::getMeasureSize() const
     {
         return m_;
     }
 
 
-    void ObserverBase::setInputSize(size_t p)
+    void ObserverBase::setInputSize(Index p)
     {
         p_=p;
     }
 
-    size_t ObserverBase::getInputSize() const
+    Index ObserverBase::getInputSize() const
     {
         return p_;
     }
