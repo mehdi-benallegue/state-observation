@@ -71,10 +71,10 @@ namespace stateObservation
           doublecontainer.push_back(component);
         }
       }
-      v.resize(doublecontainer.size());
+      v.resize(Index(doublecontainer.size()));
       for (Index i=0 ; i<Index(doublecontainer.size()) ; ++i)
       {
-        v(i)=doublecontainer[i];
+        v(i)=doublecontainer[size_t(i)];
       }
 
       return v;

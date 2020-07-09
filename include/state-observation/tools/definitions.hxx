@@ -290,7 +290,7 @@ template <typename MatrixType, typename Allocator>
 inline MatrixType IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)const
 {
     check_(time);
-    return v_[Index(time - k_)];
+    return v_[size_t(time - k_)];
 }
 
 ///Get the matrix value
@@ -298,7 +298,7 @@ template <typename MatrixType, typename Allocator>
 inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)
 {
     check_(time);
-    return v_[Index(time - k_)];
+    return v_[size_t(time - k_)];
 }
 
 
@@ -334,7 +334,7 @@ inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::back()
 template <typename MatrixType, typename Allocator>
 inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::getLastIndex()const
 {
-  return long(k_+ TimeIndex(v_.size()))-1;
+  return k_+ TimeIndex(v_.size())-1;
 }
 
 ///Get the time index
@@ -367,7 +367,7 @@ inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::setFirstIndex(int i
 template <typename MatrixType, typename Allocator>
 inline TimeSize IndexedMatrixArrayT<MatrixType, Allocator>::size() const
 {
-    return v_.size();
+    return TimeSize(v_.size());
 }
 
 ///Switch off the initialization flag, the value is no longer accessible
@@ -422,7 +422,7 @@ inline void IndexedMatrixArrayT<MatrixType, Allocator>::checkNext_(TimeIndex tim
 template <typename MatrixType, typename Allocator>
 inline void IndexedMatrixArrayT<MatrixType, Allocator>::resize(TimeSize i, const MatrixType & m )
 {
-    v_.resize(i,m);
+    v_.resize(size_t(i),m);
 }
 
 ///Default constructor
@@ -593,10 +593,10 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::readVectorsFromFile(const char 
             doublecontainer.push_back(component);
           }
         }
-        v.resize(doublecontainer.size());
+        v.resize(Index(doublecontainer.size()));
         for (Index i=0 ; i<Index(doublecontainer.size()) ; ++i)
         {
-          v(i)=doublecontainer[i];
+          v(i)=doublecontainer[size_t(i)];
         }
         setValue(v,k);
         ++k;

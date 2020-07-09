@@ -415,7 +415,7 @@ int testKinematics (int errcode)
     kine::Kinematics k,l,k2;
 
 
-    int count = pow(2,6)*pow(2,6);
+    int count = int(pow(2,6)*pow(2,6));
     double err=0;
     double threshold=1e-30*count;
 
@@ -924,7 +924,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
      o.contactForceIndexTangent( 3 ) << " " <<
      o.contactTorqueIndexTangent( 3 ) << " " <<
      o.contactWrenchIndexTangent( 3 ) << " " << std::endl;
-     
+
     o.setWithUnmodeledWrench(true);
     o.setWithAccelerationEstimation(true );
     o.setWithGyroBias(true);
@@ -940,7 +940,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
     wrenchCov <<   Matrix3::Identity()*1e-0,        Matrix3::Zero(),
                         Matrix3::Zero(),                 Matrix3::Identity()*1e-4;
-    
+
     o.setContactWrenchSensorDefaultCovarianceMatrix(wrenchCov);
 
     o.setMass(mass);
@@ -956,7 +956,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
     std::cout << state3.transpose() <<std::endl;
 
     std::cout <<  "Sum error" <<(error = (state1 - state3).norm()) << std::endl;
-    
+
 
     state2 = o.getEKF().stateVectorRandom();
     statediff = o.getEKF().stateTangentVectorRandom();
@@ -975,7 +975,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
     {
     //    return errorcode;
     }
-    
+
 
     return 0;
 }
