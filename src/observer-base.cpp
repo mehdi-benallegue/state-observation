@@ -27,17 +27,17 @@ namespace stateObservation
 
     ObserverBase::StateVector ObserverBase::stateVectorConstant( double c ) const
     {
-        return StateVector::Constant(n_,1,c);
+        return StateVector::Constant(Index(n_),1,c);
     }
 
     ObserverBase::StateVector ObserverBase::stateVectorRandom() const
     {
-        return StateVector::Random(n_,1);
+        return StateVector::Random(Index(n_),1);
     }
 
     ObserverBase::StateVector ObserverBase::stateVectorZero() const
     {
-        return StateVector::Zero(n_,1);
+        return StateVector::Zero(Index(n_),1);
     }
 
     bool ObserverBase::checkStateVector(const StateVector & v) const
@@ -48,17 +48,17 @@ namespace stateObservation
 
     ObserverBase::MeasureVector ObserverBase::measureVectorConstant( double c ) const
     {
-        return MeasureVector::Constant(m_,1,c);
+        return MeasureVector::Constant(Index(m_),1,c);
     }
 
     ObserverBase::MeasureVector ObserverBase::measureVectorRandom() const
     {
-        return MeasureVector::Random(m_,1);
+        return MeasureVector::Random(Index(m_),1);
     }
 
     ObserverBase::MeasureVector ObserverBase::measureVectorZero() const
     {
-        return MeasureVector::Zero(m_,1);
+        return MeasureVector::Zero(Index(m_),1);
     }
 
     bool ObserverBase::checkMeasureVector(const MeasureVector & v) const
