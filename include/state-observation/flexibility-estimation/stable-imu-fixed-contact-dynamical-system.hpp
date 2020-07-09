@@ -82,11 +82,11 @@ namespace flexibilityEstimation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual Index getStateSize();
+        virtual Index getStateSize() const;
         ///Gets the input size
-        virtual Index getInputSize();
+        virtual Index getInputSize() const;
         ///Gets the measurement size
-        virtual Index getMeasurementSize();
+        virtual Index getMeasurementSize() const;
 
         ///Sets the number of contacts
         virtual void setContactsNumber(unsigned);

@@ -416,10 +416,10 @@ namespace stateObservation
               for(int i=0; i<3; i++)
               {
                 // Saturation for bounded forces and torques
-                lastX_[state::fc+6+i]=std::min(lastX_[state::fc+6+i],limitTorques_[i]);
-                lastX_[state::fc+i]=std::min(lastX_[state::fc+i],limitForces_[i]);
-                lastX_[state::fc+6+i]=std::max(lastX_[state::fc+6+i],-limitTorques_[i]);
-                lastX_[state::fc+i]=std::max(lastX_[state::fc+i],-limitForces_[i]);
+                lastX_[Index(state::fc+6+i)]=std::min(lastX_[Index(state::fc+6+i)],limitTorques_[i]);
+                lastX_[Index(state::fc+i)]=std::min(lastX_[Index(state::fc+i)],limitForces_[i]);
+                lastX_[Index(state::fc+6+i)]=std::max(lastX_[Index(state::fc+6+i)],-limitTorques_[i]);
+                lastX_[Index(state::fc+i)]=std::max(lastX_[Index(state::fc+i)],-limitForces_[i]);
               }
             }
             ekf_.setState(lastX_,ekf_.getCurrentTime());

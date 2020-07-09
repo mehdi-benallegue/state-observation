@@ -46,7 +46,7 @@ inline unsigned KineticsObserver::contactIndex(unsigned contactNbr) const
                   "The requested contact number is higher than the maximum");
   BOOST_ASSERT(contacts_[contactNbr].isSet && \
                   "The requested contact is not set yet, please add it before");
-  return contacts_[contactNbr].stateIndex;
+  return unsigned(contacts_[contactNbr].stateIndex);
 }
 inline unsigned KineticsObserver::contactKineIndex(unsigned contactNbr) const
 {
@@ -74,8 +74,11 @@ inline unsigned KineticsObserver::contactTorqueIndex(unsigned contactNbr) const
 }
 
 inline unsigned KineticsObserver::contactIndex(VectorContactConstIterator i) const
-{  
-  return i->stateIndex;
+{
+  BOOST_ASSERT(i->stateIndex > 0 && \
+                  "The requested contact is not set yet. THe iteratot may be wrong");
+
+  return unsigned(i->stateIndex);
 }
 inline unsigned KineticsObserver::contactKineIndex(VectorContactConstIterator i) const
 {
@@ -179,7 +182,7 @@ inline unsigned KineticsObserver::contactTorqueIndexTangent(unsigned contactNbr)
 }
 
 inline unsigned KineticsObserver::contactIndexTangent(VectorContactConstIterator i) const
-{  
+{
   return i->stateIndexTangent;
 }
 inline unsigned KineticsObserver::contactKineIndexTangent(VectorContactConstIterator i) const
@@ -206,10 +209,3 @@ inline unsigned KineticsObserver::contactTorqueIndexTangent(VectorContactConstIt
 {
   return contactForceIndexTangent(i)+sizeForce;
 }
-
-
-
-
-
-
-

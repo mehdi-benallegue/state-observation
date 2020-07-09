@@ -407,8 +407,8 @@ namespace stateObservation
 
             bool isSet;
             bool withRealSensor;
-            unsigned stateIndex;
-            unsigned stateIndexTangent;
+            int stateIndex;
+            int stateIndexTangent;
 
             Kinematics localKine; ///describes the kinematics of the contact point in the local frame
             static const Kinematics::Flags::Byte localKineFlags = ///flags for the components of the kinematics
