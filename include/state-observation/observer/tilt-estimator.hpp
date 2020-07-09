@@ -75,6 +75,7 @@ namespace stateObservation
     Vector3 getSensorAngularVelocityInC() { return w_S_C_; }
 
     /// sets the velocity of the control origin in the world frame
+    /// this velocity has to be expressed in the control frame.
     void setControlOriginVelocityInW(const Vector3& v) { v_C_ = v; }
     Vector3 getControlOriginVelocityInW() { return v_C_; }
 
