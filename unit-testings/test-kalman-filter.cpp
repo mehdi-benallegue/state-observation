@@ -195,7 +195,7 @@ double testExtendedKalmanFilter()
 
 double testExtendedKalmanFilterLTV()
 {
-    const static stateObservation::Index kmax=1000;
+    const static stateObservation::TimeIndex kmax=1000;
 
     typedef stateObservation::ExtendedKalmanFilter ekf;
 
@@ -223,7 +223,7 @@ public:
         virtual ekf::StateVector stateDynamics(const ekf::StateVector& x, const ekf::InputVector& u, stateObservation::TimeIndex k)
         {
             ekf::StateVector xk1;
-            stateObservation::Index kk=std::min(k,kmax);
+            stateObservation::TimeIndex kk=std::min(k,kmax);
             xk1=a[kk]*x+(u.transpose()*u)(0,0)*s_;
 
             return xk1;
@@ -235,7 +235,7 @@ public:
             (void)u;//unused
 
             ekf::MeasureVector yk;
-            stateObservation::Index kk=std::min(k,kmax);
+            stateObservation::TimeIndex kk=std::min(k,kmax);
             yk=c[kk]*x+(u.transpose()*u)(0,0)*n_;
             return yk;
         }
