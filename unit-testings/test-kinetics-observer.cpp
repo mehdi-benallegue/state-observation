@@ -823,7 +823,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
     o.addContact(contactKine,initialCov,processCov,linDamping,
                         linStiffness,angStiffness,angDamping,2);
 
-    o.clearContacts();
+
 
     std::cout << index << " " << x.transpose() << std::endl;
 
@@ -975,6 +975,8 @@ int testKineticsObserverCodeAccessor(int errorcode)
     {
     //    return errorcode;
     }
+
+    o.clearContacts();
 
 
     return 0;
