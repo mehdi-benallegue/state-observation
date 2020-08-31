@@ -422,7 +422,7 @@ namespace stateObservation
             EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         };
 
-       typedef std::vector < Contact, Eigen::aligned_allocator < Contact > > VectorContact;
+        typedef std::vector < Contact, Eigen::aligned_allocator < Contact > > VectorContact;
         typedef VectorContact::iterator VectorContactIterator;
         typedef VectorContact::const_iterator VectorContactConstIterator;
 
