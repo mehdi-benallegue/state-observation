@@ -76,7 +76,7 @@ inline unsigned KineticsObserver::contactTorqueIndex(unsigned contactNbr) const
 inline unsigned KineticsObserver::contactIndex(VectorContactConstIterator i) const
 {
   BOOST_ASSERT(i->stateIndex > 0 && \
-                  "The requested contact is not set yet. THe iteratot may be wrong");
+                  "The requested contact is not set yet. The iteratot may be wrong");
 
   return unsigned(i->stateIndex);
 }
@@ -183,6 +183,8 @@ inline unsigned KineticsObserver::contactTorqueIndexTangent(unsigned contactNbr)
 
 inline unsigned KineticsObserver::contactIndexTangent(VectorContactConstIterator i) const
 {
+    BOOST_ASSERT(i->stateIndexTangent > 0 && \
+                  "The requested contact is not set yet. The iteratot may be wrong");
   return i->stateIndexTangent;
 }
 inline unsigned KineticsObserver::contactKineIndexTangent(VectorContactConstIterator i) const
