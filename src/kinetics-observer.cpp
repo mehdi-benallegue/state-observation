@@ -1490,7 +1490,7 @@ namespace stateObservation
         difference.segment<sizePos>(contactPosIndexTangent(i)).noalias() =
                         stateVector1.segment<sizePos>(contactPosIndex(i)) - stateVector2.segment<sizePos>(contactPosIndex(i));
         o1.fromVector4(stateVector1.segment<sizeOri>(contactOriIndex(i)));
-        o2.fromVector4(stateVector1.segment<sizeOri>(contactOriIndex(i)));
+        o2.fromVector4(stateVector2.segment<sizeOri>(contactOriIndex(i)));
         difference.segment<sizeOriTangent>(contactOriIndexTangent(i))= o2.differentiate(o1);
         difference.segment<sizeWrench>(contactWrenchIndexTangent(i)).noalias() =
                         stateVector1.segment<sizeWrench>(contactWrenchIndex(i)) - stateVector2.segment<sizeWrench>(contactWrenchIndex(i));
