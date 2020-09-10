@@ -472,8 +472,10 @@ protected:
 public:
 
         virtual void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+        inline Vector stateSum(const  Vector& stateVector, const Vector& tangentVector);
 
         virtual void stateDifference(const Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        inline Vector stateDifference(const Vector& stateVector1, const Vector& stateVector2);
 
         virtual void measurementDifference(const Vector& measureVector1, const Vector& measureVector2, Vector& difference);
         ///////////////////////////////////////

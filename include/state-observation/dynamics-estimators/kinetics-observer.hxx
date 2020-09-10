@@ -211,3 +211,17 @@ inline unsigned KineticsObserver::contactTorqueIndexTangent(VectorContactConstIt
 {
   return contactForceIndexTangent(i)+sizeForce;
 }
+
+inline Vector KineticsObserver::stateSum(const Vector& stateVector, const Vector & tangentVector)
+{
+    Vector sum;
+    stateSum(stateVector, tangentVector, sum);
+    return sum;
+}
+
+inline Vector KineticsObserver::stateDifference(const Vector& stateVector1, const Vector& stateVector2)
+{
+    Vector diff;
+    stateSum(stateVector1, stateVector2, diff);
+    return diff;
+}
