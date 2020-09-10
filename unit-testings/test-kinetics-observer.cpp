@@ -955,11 +955,20 @@ int testKineticsObserverCodeAccessor(int errorcode)
     std::cout << state1.transpose() <<std::endl;
     std::cout << state3.transpose() <<std::endl;
 
-    std::cout <<  "Sum error" <<(error = (state1 - state3).norm()) << std::endl;
+    Matrix statecomp(state1.size(),2);
+
+    statecomp << state1, 
+                state3 ;
+
+
+    std::cout << statecomp <<std::endl;
+
+    std::cout <<  "Sum error" <<(error = o.stateDifference(state1 , state3).norm()) << std::endl;
 
 
     state2 = o.getEKF().stateVectorRandom();
     statediff = o.getEKF().stateTangentVectorRandom();
+  
 
     Vector statediff_bis;
     o.stateSum(state2,statediff,state1);
@@ -967,6 +976,13 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
     std::cout << statediff.transpose() <<std::endl;
     std::cout << statediff_bis.transpose() <<std::endl;
+
+    Matrix statecompdiff(statediff.size(),2);
+
+    statecompdiff << statediff, 
+                statediff_bis;
+
+    std::cout << statecompdiff <<std::endl;
 
     std::cout <<"DIff error" << (error +=  (statediff-statediff_bis).norm())<<std::endl;
 
@@ -980,6 +996,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
 
     return 0;
+
 }
 
 int main()
