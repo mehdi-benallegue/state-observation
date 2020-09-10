@@ -1449,7 +1449,7 @@ namespace stateObservation
         sum.segment<sizePos>(contactPosIndex(i))+=tangentVector.segment<sizePos>(contactPosIndexTangent(i));
         o.fromVector4(stateVector.segment<sizeOri>(contactOriIndex(i)));
         o.integrate(tangentVector.segment<sizeOriTangent>(contactOriIndexTangent(i)));
-        sum.segment<sizeOri>(contactOriIndexTangent(i)) = o.toVector4();
+        sum.segment<sizeOri>(contactOriIndex(i)) = o.toVector4();
         sum.segment<sizeWrench>(contactWrenchIndex(i)) += tangentVector.segment<sizeWrench>(contactWrenchIndexTangent(i));
       }
 
