@@ -49,7 +49,6 @@ endif(MSVC)
 
 add_project_dependency(Boost REQUIRED COMPONENTS filesystem system thread program_options timer random)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
-add_project_dependency(Boost REQUIRED COMPONENTS filesystem system thread program_options timer random)
 add_project_dependency(Eigen3 QUIET NO_CMAKE_PACKAGE_REGISTRY)
 if(Eigen3_FOUND)
   add_project_dependency(Eigen3 REQUIRED NO_CMAKE_PACKAGE_REGISTRY)
