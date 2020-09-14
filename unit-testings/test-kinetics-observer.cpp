@@ -384,6 +384,21 @@ int testOrientation(int errcode)
         std::cout<<"Integration/differentiation test 1 done. Current error "<<  err << std::endl;
     }
 
+    {
+        Vector3 v1;
+        kine::Orientation ori1;
+        kine::Orientation ori2;
+
+        ori1.setRandom();
+        ori2.setRandom();
+
+        v1 = ori2.differentiate(ori1);
+        kine::Orientation oris = ori2.integrate(v1);
+
+        err += oris.differentiate(ori1).norm();
+        std::cout << "Integration/differentiation test 2 done. Current error " << err << std::endl;
+    }
+
     if (err>1e-13)
     {
         return errcode;
