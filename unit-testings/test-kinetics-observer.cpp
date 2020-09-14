@@ -9,10 +9,6 @@ using namespace kine;
 int testOrientation(int errcode)
 {
 
-
-
-
-
     Vector4 q_i;
 
     tools::ProbabilityLawSimulation s;
@@ -421,14 +417,12 @@ int testKinematics (int errcode)
 
     for (int i = 0; i < count; i++)
     {
-
         Vector3 pos0 = Vector3::Random();
         kine::Orientation ori0 = kine::Orientation::randomRotation();
         Vector3 linvel0 = Vector3::Random();
         Vector3 angvel0 = Vector3::Random();
         Vector3 linacc0 = Vector3::Random();
         Vector3 angacc0 = Vector3::Random();
-
 
         Vector3 pos1 = Vector3::Random();
         kine::Orientation ori1= kine::Orientation::randomRotation();
@@ -528,7 +522,6 @@ int testKinematics (int errcode)
         {
             err += k.angAcc().squaredNorm();
         }
-
     }
 
     std::cout << "Error 1 : " << err <<std::endl;
@@ -939,7 +932,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
     Matrix6 wrenchCov;
 
     wrenchCov <<   Matrix3::Identity()*1e-0,        Matrix3::Zero(),
-                        Matrix3::Zero(),                 Matrix3::Identity()*1e-4;
+                   Matrix3::Zero(),                 Matrix3::Identity()*1e-4;
 
     o.setContactWrenchSensorDefaultCovarianceMatrix(wrenchCov);
 
@@ -965,7 +958,6 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
     std::cout <<  "Sum error" <<(error = o.stateDifference(state1 , state3).norm()) << std::endl;
 
-
     state2 = o.getEKF().stateVectorRandom();
     statediff = o.getEKF().stateTangentVectorRandom();
   
@@ -984,8 +976,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
     std::cout << statecompdiff <<std::endl;
 
-    std::cout <<"DIff error" << (error +=  (statediff-statediff_bis).norm())<<std::endl;
-
+    std::cout << "DIff error" << (error += (statediff - statediff_bis).norm()) << std::endl;
 
     if (error > 1e-8)
     {
@@ -994,9 +985,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
     o.clearContacts();
 
-
     return 0;
-
 }
 
 int main()

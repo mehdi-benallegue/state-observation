@@ -1452,7 +1452,6 @@ namespace stateObservation
         sum.segment<sizeOri>(contactOriIndex(i)) = o.toVector4();
         sum.segment<sizeWrench>(contactWrenchIndex(i)) += tangentVector.segment<sizeWrench>(contactWrenchIndexTangent(i));
       }
-
     }
   }
 
@@ -1473,8 +1472,7 @@ namespace stateObservation
       for (unsigned i = 0 ; i < imuSensors_.size() ; ++i)
       {
         difference.segment<sizeGyroBias>(gyroBiasIndexTangent(i)).noalias() =
-                        stateVector1.segment<sizeGyroBias>(gyroBiasIndex(i)) - stateVector2.segment<sizeGyroBias>(gyroBiasIndex(i));
-
+            stateVector1.segment<sizeGyroBias>(gyroBiasIndex(i)) - stateVector2.segment<sizeGyroBias>(gyroBiasIndex(i));
       }
     }
     if (withUnmodeledWrench_)
@@ -1495,7 +1493,6 @@ namespace stateObservation
         difference.segment<sizeWrench>(contactWrenchIndexTangent(i)).noalias() =
                         stateVector1.segment<sizeWrench>(contactWrenchIndex(i)) - stateVector2.segment<sizeWrench>(contactWrenchIndex(i));
       }
-
     }
   }
 
