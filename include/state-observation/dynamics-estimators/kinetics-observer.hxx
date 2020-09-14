@@ -222,6 +222,6 @@ inline Vector KineticsObserver::stateSum(const Vector& stateVector, const Vector
 inline Vector KineticsObserver::stateDifference(const Vector& stateVector1, const Vector& stateVector2)
 {
     Vector diff;
-    stateSum(stateVector1, stateVector2, diff);
+    stateDifference(stateVector1, stateVector2, diff);
     return diff;
 }
