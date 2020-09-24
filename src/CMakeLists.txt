@@ -12,55 +12,57 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with state-observation.  If not, see <http://www.gnu.org/licenses/>.
 
+set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME})
+
 SET(HEADERS
-  ../include/state-observation/observer/tilt-estimator.hpp
-  ../include/state-observation/observer/extended-kalman-filter.hpp
-  ../include/state-observation/observer/kalman-filter-base.hpp
-  ../include/state-observation/observer/linear-kalman-filter.hpp
-  ../include/state-observation/observer/observer-base.hpp
-  ../include/state-observation/observer/zero-delay-observer.hpp
-  ../include/state-observation/sensors-simulation/sensor-base.hpp
-  ../include/state-observation/sensors-simulation/algebraic-sensor.hpp
-  ../include/state-observation/sensors-simulation/accelerometer-gyrometer.hpp
-  ../include/state-observation/sensors-simulation/accelerometer-gyrometer-magnetometer.hpp
-  ../include/state-observation/noise/noise-base.hpp
-  ../include/state-observation/noise/gaussian-white-noise.hpp
-  ../include/state-observation/sensors-simulation/algorithm/rotation-velocity.hpp
-  ../include/state-observation/sensors-simulation/algorithm/linear-acceleration.hpp
-  ../include/state-observation/sensors-simulation/algorithm/magnetic-field.hpp
-  ../include/state-observation/tools/definitions.hpp
-  ../include/state-observation/tools/definitions.hxx
-  ../include/state-observation/tools/hrp2.hpp
-  ../include/state-observation/tools/probability-law-simulation.hpp
-  ../include/state-observation/tools/miscellaneous-algorithms.hpp
-  ../include/state-observation/tools/rigid-body-kinematics.hpp
-  ../include/state-observation/tools/rigid-body-kinematics.hxx
-  ../include/state-observation/tools/logger.hpp
-  ../include/state-observation/tools/logger.hxx
-  ../include/state-observation/tools/state-vector-arithmetics.hpp
-  ../include/state-observation/dynamical-system/dynamical-system-functor-base.hpp
-  ../include/state-observation/dynamical-system/dynamical-system-simulator.hpp
-  ../include/state-observation/dynamical-system/imu-dynamical-system.hpp
-  ../include/state-observation/dynamical-system/imu-mltpctive-dynamical-system.hpp
-  ../include/state-observation/dynamical-system/imu-magnetometer-dynamical-system.hpp
-  ../include/state-observation/dynamical-system/bidim-elastic-inv-pendulum-dyn-sys.hpp
-  ../include/state-observation/flexibility-estimation/flexibility-estimator-base.hpp
-  ../include/state-observation/flexibility-estimation/ekf-flexibility-estimator-base.hpp
-  ../include/state-observation/flexibility-estimation/fixed-contact-ekf-flex-estimator-imu.hpp
-  ../include/state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp
-  ../include/state-observation/flexibility-estimation/imu-fixed-contact-dynamical-system.hpp
-  ../include/state-observation/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp
-  ../include/state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp
-  ../include/state-observation/dynamics-estimators/kinetics-observer.hpp
-  ../include/state-observation/dynamics-estimators/kinetics-observer.hxx
-  ../include/state-observation/examples/imu-attitude-trajectory-reconstruction.hpp
-  ../include/state-observation/examples/imu-attitude-trajectory-reconstruction.hxx
-  ../include/state-observation/examples/imu-multiplicative-attitude-reconstruction.hpp
-  ../include/state-observation/examples/imu-multiplicative-attitude-reconstruction.hxx
-  ../include/state-observation/examples/offline-ekf-flexibility-estimation.hpp
-  ../include/state-observation/examples/offline-ekf-flexibility-estimation.hxx
-  ../include/state-observation/examples/offline-model-base-flex-estimation.hpp
-  ../include/state-observation/examples/offline-model-base-flex-estimation.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/tilt-estimator.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/extended-kalman-filter.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/kalman-filter-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/linear-kalman-filter.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/observer-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/zero-delay-observer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/sensor-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algebraic-sensor.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/accelerometer-gyrometer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/accelerometer-gyrometer-magnetometer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/noise/noise-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/noise/gaussian-white-noise.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algorithm/rotation-velocity.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algorithm/linear-acceleration.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algorithm/magnetic-field.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/definitions.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/definitions.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/hrp2.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/probability-law-simulation.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/miscellaneous-algorithms.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/rigid-body-kinematics.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/rigid-body-kinematics.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/logger.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/logger.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/state-vector-arithmetics.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/dynamical-system-functor-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/dynamical-system-simulator.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/imu-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/imu-mltpctive-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/imu-magnetometer-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/bidim-elastic-inv-pendulum-dyn-sys.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/flexibility-estimator-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/ekf-flexibility-estimator-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/fixed-contact-ekf-flex-estimator-imu.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/imu-fixed-contact-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamics-estimators/kinetics-observer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamics-estimators/kinetics-observer.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-attitude-trajectory-reconstruction.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-attitude-trajectory-reconstruction.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-multiplicative-attitude-reconstruction.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-multiplicative-attitude-reconstruction.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-ekf-flexibility-estimation.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-ekf-flexibility-estimation.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-model-base-flex-estimation.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-model-base-flex-estimation.hxx
 )
 
 SET(SRC 
@@ -122,6 +124,7 @@ INSTALL(TARGETS ${LIBRARY_NAME}
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
 )
-INSTALL(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DESTINATION})
+
+install(DIRECTORY ${${PROJECT_NAME}_INCLUDE_DIR}/ DESTINATION ${INCLUDE_INSTALL_DESTINATION})
 
 PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})
