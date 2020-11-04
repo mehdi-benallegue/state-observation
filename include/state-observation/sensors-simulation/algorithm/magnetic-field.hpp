@@ -9,8 +9,6 @@
  *
  */
 
-
-
 #ifndef SENSORALGORITHMSMAGNETICFIELDHPP
 #define SENSORALGORITHMSMAGNETICFIELDHPP
 
@@ -19,31 +17,30 @@
 
 namespace stateObservation
 {
-    namespace algorithm
-    {
-        /**
-         * \class MagneticField
-         * \brief Implements the measurements given by an magnetometer.
-         *
-         */
+namespace algorithm
+{
+/**
+ * \class MagneticField
+ * \brief Implements the measurements given by an magnetometer.
+ *
+ */
 
-        class STATE_OBSERVATION_DLLAPI MagneticField
-        {
-        public:
+class STATE_OBSERVATION_DLLAPI MagneticField
+{
+public:
+  MagneticField();
 
-            MagneticField();
+  /// virtual destructor
+  virtual ~MagneticField() {}
 
-            ///virtual destructor
-            virtual ~MagneticField(){}
+  /// The magnetic field measurement in the local frame represented by the orientation Matrix
+  Vector3 magneticFieldMeasure(const Matrix3 & orientation) const;
 
-            ///The magnetic field measurement in the local frame represented by the orientation Matrix
-            Vector3 magneticFieldMeasure(const Matrix3 & orientation) const;
+private:
+  Vector3 earthLocalMagneticField_;
+};
+} // namespace algorithm
 
-        private:
-            Vector3 earthLocalMagneticField_;
-        };
-    }
+} // namespace stateObservation
 
-}
-
-#endif //SENSORALGORITHMSLINEARACCELERATIONHPP
+#endif // SENSORALGORITHMSLINEARACCELERATIONHPP

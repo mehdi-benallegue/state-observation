@@ -10,7 +10,6 @@
  *
  */
 
-
 #ifndef FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H
 #define FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H
 
@@ -25,270 +24,261 @@ namespace stateObservation
 namespace flexibilityEstimation
 {
 
-    /**
-    * \class  ModelBaseEKFFlexEstimatorIMU
-    * \brief  This class implements the flexibility estimation of a robot with
-    *         the hypothesis that the contact positions do not move. This constraint
-    *         is expressed using fictious measurements but the interface is transparent
-    *         to this assumption, the state is expressed using classical representation
-    *         of position, velocity, acceleration, orientation (using (theta x mu) representation)
-    *         angular velocity (omega) and acceleration (omega dot)
-    *
-    */
+/**
+ * \class  ModelBaseEKFFlexEstimatorIMU
+ * \brief  This class implements the flexibility estimation of a robot with
+ *         the hypothesis that the contact positions do not move. This constraint
+ *         is expressed using fictious measurements but the interface is transparent
+ *         to this assumption, the state is expressed using classical representation
+ *         of position, velocity, acceleration, orientation (using (theta x mu) representation)
+ *         angular velocity (omega) and acceleration (omega dot)
+ *
+ */
+
+class STATE_OBSERVATION_DLLAPI ModelBaseEKFFlexEstimatorIMU : public EKFFlexibilityEstimatorBase,
+                                                              private boost::noncopyable
+{
+public:
+  struct contactModel
+  {
+    /// indexes of the different components of a vector of the input state
+    static const unsigned elasticContact = IMUElasticLocalFrameDynamicalSystem::contactModel::elasticContact;
+    static const unsigned pendulum = IMUElasticLocalFrameDynamicalSystem::contactModel::pendulum;
+  };
+
+  /// The constructor, it requires the value of the time discretization period
+  explicit ModelBaseEKFFlexEstimatorIMU(double dt = 0.005);
 
-    class STATE_OBSERVATION_DLLAPI ModelBaseEKFFlexEstimatorIMU :
-                                            public EKFFlexibilityEstimatorBase,
-                                            private boost::noncopyable
-    {
-    public:
+  /// Virtual destructor
+  virtual ~ModelBaseEKFFlexEstimatorIMU();
 
-        struct contactModel
-        {
-          ///indexes of the different components of a vector of the input state
-          static const unsigned elasticContact= IMUElasticLocalFrameDynamicalSystem::contactModel::elasticContact;
-          static const unsigned pendulum= IMUElasticLocalFrameDynamicalSystem::contactModel::pendulum;
+  /// Sets the number of contacts can be changed online
+  void setContactsNumber(unsigned i);
+
+  unsigned getContactsNumber()
+  {
+    return functor_.getContactsNumber();
+  }
 
-        };
+  IMUElasticLocalFrameDynamicalSystem getFunctor()
+  {
+    return functor_;
+  }
 
-        ///The constructor, it requires the value of the time discretization period
-        explicit ModelBaseEKFFlexEstimatorIMU( double dt=0.005 );
+  virtual stateObservation::Vector computeAccelerations()
+  {
+    return functor_.computeAccelerations(getFlexibilityVector(), getInput());
+  }
 
-        ///Virtual destructor
-        virtual ~ModelBaseEKFFlexEstimatorIMU();
+  void setContactModel(unsigned nb);
 
-        ///Sets the number of contacts can be changed online
-        void setContactsNumber(unsigned i);
+  /// Sets the value of the next sensor measurement y_{k+1}
+  virtual void setMeasurement(const Vector & y);
 
-        unsigned getContactsNumber()
-        {
-            return functor_.getContactsNumber();
-        }
+  /// Sets the process covariance matrice
+  virtual void setProcessNoiseCovariance(const Matrix & Q);
 
-        IMUElasticLocalFrameDynamicalSystem getFunctor()
-        {
-            return functor_;
-        }
+  /// Sets the measurements covariance matrice
+  virtual void setMeasurementNoiseCovariance(const Matrix & R);
 
-        virtual stateObservation::Vector computeAccelerations()
-        {
-            return functor_.computeAccelerations(getFlexibilityVector(),getInput());
-        }
+  /// gets the covariance matrices for the process noises
+  virtual Matrix getProcessNoiseCovariance() const;
 
-        void setContactModel(unsigned nb);
+  /// gets the covariance matrices for the sensor noises
+  virtual Matrix getMeasurementNoiseCovariance() const;
 
-        /// Sets the value of the next sensor measurement y_{k+1}
-        virtual void setMeasurement(const Vector & y);
+  virtual Vector getMomentaDotFromForces();
+  virtual Vector getMomentaDotFromKinematics();
+  virtual Vector getForcesAndMoments();
+
+  // get state covariance
+  stateObservation::Vector getStateCovariance() const
+  {
+    stateObservation::Matrix P(ekf_.getStateCovariance());
+    stateObservation::Vector Pvec(ekf_.getStateSize());
+    for(Index i = 0; i < ekf_.getStateSize(); ++i) Pvec(i) = P(i, i);
+    return Pvec;
+  }
+
+  virtual void setComBiasGuess(const stateObservation::Vector & x);
+
+  /// Sets a value of the flexibility x_k provided from another source
+  /// can be used for initialization of the estimator
+  virtual void setFlexibilityGuess(const Matrix & x);
+
+  /// Gets an estimation of the flexibility in the form of a homogeneous matrix
+  virtual Matrix4 getFlexibility();
+
+  /// Gets an estimation of the flexibility in the form of a state vector \hat{x_{k+1}}
+  virtual const Vector & getFlexibilityVector();
+
+  virtual stateObservation::Matrix & computeLocalObservationMatrix();
+  virtual stateObservation::Matrix getAMatrix()
+  {
+    return ekf_.getA();
+  }
+
+  virtual stateObservation::Matrix getCMatrix()
+  {
+    return ekf_.getC();
+  }
+
+  virtual Index getMeasurementSize() const;
+
+  virtual Index getStateSize() const;
 
-        ///Sets the process covariance matrice
-        virtual void setProcessNoiseCovariance(const Matrix & Q);
+  virtual Index getInputSize() const;
 
-        ///Sets the measurements covariance matrice
-        virtual void setMeasurementNoiseCovariance(const Matrix & R);
+  /// sets to whether or not the force mesurements are taken into account
+  virtual void setWithForcesMeasurements(bool);
 
-        ///gets the covariance matrices for the process noises
-        virtual Matrix getProcessNoiseCovariance() const ;
+  bool getWithForcesMeasurements();
 
-        ///gets the covariance matrices for the sensor noises
-        virtual Matrix getMeasurementNoiseCovariance() const ;
+  virtual void setWithAbsolutePos(bool);
 
-        virtual Vector getMomentaDotFromForces();
-        virtual Vector getMomentaDotFromKinematics();
-        virtual Vector getForcesAndMoments();
+  void setWithUnmodeledForces(bool b);
 
-        // get state covariance
-        stateObservation::Vector getStateCovariance() const
-        {
-            stateObservation::Matrix P(ekf_.getStateCovariance());
-            stateObservation::Vector Pvec(ekf_.getStateSize());
-            for(Index i=0;i<ekf_.getStateSize();++i) Pvec(i)=P(i,i);
-            return Pvec;
-        }
+  bool getWithUnmodeledForces()
+  {
+    return withUnmodeledForces_;
+  }
 
-        virtual void setComBiasGuess(const stateObservation::Vector & x);
+  bool getWithAbsolutePos()
+  {
+    return withAbsolutePos_;
+  }
 
-        ///Sets a value of the flexibility x_k provided from another source
-        /// can be used for initialization of the estimator
-        virtual void setFlexibilityGuess(const Matrix & x);
+  virtual void setWithComBias(bool b);
 
-        /// Gets an estimation of the flexibility in the form of a homogeneous matrix
-        virtual Matrix4 getFlexibility();
+  virtual bool getWithComBias()
+  {
+    return withComBias_;
+  }
 
-        /// Gets an estimation of the flexibility in the form of a state vector \hat{x_{k+1}}
-        virtual const Vector& getFlexibilityVector();
+  virtual void setUnmodeledForceVariance(double d);
+  virtual void setUnmodeledForceProcessVariance(double d);
 
-        virtual stateObservation::Matrix& computeLocalObservationMatrix();
-        virtual stateObservation::Matrix getAMatrix()
-        {
-            return ekf_.getA();
-        }
+  /// sets the force sensor variance, either with a diagonal matrix with
+  /// constant diagonal, or using a 3x3 matrix
+  virtual void setForceVariance(double d);
+  virtual void setForceVariance(const Matrix3 & C);
 
-        virtual stateObservation::Matrix getCMatrix()
-        {
-            return ekf_.getC();
-        }
+  virtual void setAbsolutePosVariance(double d);
 
+  /// sets the sampling period
+  virtual void setSamplingPeriod(double);
 
-        virtual Index getMeasurementSize() const ;
+  /// Enable or disable the estimation
+  void setOn(bool & b);
 
-        virtual Index getStateSize() const ;
+  virtual void setKfe(const Matrix3 & m);
+  virtual void setKfv(const Matrix3 & m);
+  virtual void setKte(const Matrix3 & m);
+  virtual void setKtv(const Matrix3 & m);
 
-        virtual Index getInputSize() const ;
+  virtual void setKfeRopes(const Matrix3 & m);
+  virtual void setKfvRopes(const Matrix3 & m);
+  virtual void setKteRopes(const Matrix3 & m);
+  virtual void setKtvRopes(const Matrix3 & m);
 
+  virtual void setPe(const stateObservation::Vector3 & Pe)
+  {
+    functor_.setPe(Pe);
+  }
 
-        ///sets to whether or not the force mesurements are taken into account
-        virtual void setWithForcesMeasurements(bool);
+  virtual Matrix getKfe() const;
+  virtual Matrix getKfv() const;
+  virtual Matrix getKte() const;
+  virtual Matrix getKtv() const;
 
-        bool getWithForcesMeasurements();
+  /// Resets the covariance matrices to their original values
+  virtual void resetCovarianceMatrices();
+  virtual void resetStateCovarianceMatrix();
 
-        virtual void setWithAbsolutePos(bool);
+  virtual void setRobotMass(double m);
+  virtual double getRobotMass() const
+  {
+    return functor_.getRobotMass();
+  }
 
-        void setWithUnmodeledForces(bool b);
+  void setTorquesLimit(const Vector3 & v)
+  {
+    limitTorques_ = v;
+  }
 
-        bool getWithUnmodeledForces()
-        {
-            return withUnmodeledForces_;
-        }
+  void setForcesLimit(const Vector3 & v)
+  {
+    limitForces_ = v;
+  }
 
-        bool getWithAbsolutePos()
-        {
-            return withAbsolutePos_;
-        }
+  virtual stateObservation::Vector3 getForcesLimit() const
+  {
+    return limitForces_;
+  }
 
-        virtual void setWithComBias(bool b);
+  virtual stateObservation::Vector3 getTorquesLimit() const
+  {
+    return limitTorques_;
+  }
 
-        virtual bool getWithComBias()
-        {
-            return withComBias_;
-        }
+  void setLimitOn(const bool & b)
+  {
+    limitOn_ = b;
+  }
 
-        virtual void setUnmodeledForceVariance(double d);
-        virtual void setUnmodeledForceProcessVariance(double d);
+  virtual bool getLimitOn() const
+  {
+    return limitOn_;
+  }
 
-        ///sets the force sensor variance, either with a diagonal matrix with
-        /// constant diagonal, or using a 3x3 matrix
-        virtual void setForceVariance(double d);
-        virtual void setForceVariance(const Matrix3 & C);
+  static Matrix getDefaultQ();
 
-        virtual void setAbsolutePosVariance(double d);
+  static Matrix6 getDefaultRIMU();
 
-        /// sets the sampling period
-        virtual void setSamplingPeriod(double);
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        /// Enable or disable the estimation
-        void setOn(bool & b);
+protected:
+  virtual void updateMeasurementCovarianceMatrix_();
 
-        virtual void setKfe(const Matrix3 & m);
-        virtual void setKfv(const Matrix3 & m);
-        virtual void setKte(const Matrix3 & m);
-        virtual void setKtv(const Matrix3 & m);
+  IMUElasticLocalFrameDynamicalSystem functor_;
 
-        virtual void setKfeRopes(const Matrix3 & m);
-        virtual void setKfvRopes(const Matrix3 & m);
-        virtual void setKteRopes(const Matrix3 & m);
-        virtual void setKtvRopes(const Matrix3 & m);
+  Vector x_;
 
-        virtual void setPe(const stateObservation::Vector3& Pe)
-        {
-            functor_.setPe(Pe);
-        }
+  Matrix R_, Q_, P_;
 
-        virtual Matrix getKfe() const;
-        virtual Matrix getKfv() const;
-        virtual Matrix getKte() const;
-        virtual Matrix getKtv() const;
+  const Index stateSize_;
 
-        ///Resets the covariance matrices to their original values
-        virtual void resetCovarianceMatrices();
-        virtual void resetStateCovarianceMatrix();
+  static const Index measurementSizeBase_ = 12;
 
+  static const Index inputSizeBase_ = IMUElasticLocalFrameDynamicalSystem::input::sizeBase;
+  Index inputSize_;
 
+  double dt_; // sampling period
+  bool on_;
 
-        virtual void setRobotMass(double m);
-        virtual double getRobotMass() const
-        {
-            return functor_.getRobotMass();
-        }
+  double unmodeledForceVariance_;
+  Matrix forceVariance_; // force sensor variance
+  double absPosVariance_;
 
-        void setTorquesLimit(const Vector3 & v)
-        {
-            limitTorques_=v;
-        }
+  bool useFTSensors_;
 
-        void setForcesLimit(const Vector3 & v)
-        {
-            limitForces_=v;
-        }
+  bool withAbsolutePos_;
+  bool withComBias_;
+  bool withUnmodeledForces_;
 
-        virtual stateObservation::Vector3 getForcesLimit () const
-        {
-            return limitForces_;
-        }
+  Vector3 limitTorques_;
+  Vector3 limitForces_;
+  bool limitOn_;
 
-        virtual stateObservation::Vector3 getTorquesLimit () const
-        {
-            return limitTorques_;
-        }
+  struct optimization
+  {
+    stateObservation::Matrix O;
+    stateObservation::Matrix CA;
+  } op_;
 
-        void setLimitOn(const bool& b)
-        {
-            limitOn_ = b;
-        }
+private:
+};
 
-        virtual bool getLimitOn() const
-        {
-            return limitOn_;
-        }
-
-        static Matrix getDefaultQ();
-
-        static Matrix6 getDefaultRIMU();
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    protected:
-
-        virtual void updateMeasurementCovarianceMatrix_();
-
-        IMUElasticLocalFrameDynamicalSystem functor_;
-
-        Vector x_;
-
-        Matrix R_,Q_,P_;
-
-        const Index stateSize_;
-
-        static const Index measurementSizeBase_=12;
-
-        static const Index inputSizeBase_=
-                    IMUElasticLocalFrameDynamicalSystem::input::sizeBase;
-        Index inputSize_;
-
-        double dt_;//sampling period
-        bool on_;
-
-        double unmodeledForceVariance_;
-        Matrix forceVariance_;//force sensor variance
-        double absPosVariance_;
-
-        bool useFTSensors_;
-
-        bool withAbsolutePos_;
-        bool withComBias_;
-        bool withUnmodeledForces_;
-
-        Vector3 limitTorques_;
-        Vector3 limitForces_;
-        bool limitOn_;
-
-        struct optimization
-        {
-            stateObservation::Matrix O;
-            stateObservation::Matrix CA;
-        }op_;
-
-    private:
-    };
-
-}
-}
+} // namespace flexibilityEstimation
+} // namespace stateObservation
 #endif // FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H

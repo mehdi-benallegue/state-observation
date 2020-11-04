@@ -9,8 +9,6 @@
  *
  */
 
-
-
 #ifndef SENSORALGORITHMSROTATIONVELOCITYHPP
 #define SENSORALGORITHMSROTATIONVELOCITYHPP
 
@@ -19,28 +17,27 @@
 
 namespace stateObservation
 {
-     namespace algorithm
-    {
-        /**
-         * \class  RotationVelocity
-         * \brief Implements the gyrometer measurement algorithm
-         *
-         */
+namespace algorithm
+{
+/**
+ * \class  RotationVelocity
+ * \brief Implements the gyrometer measurement algorithm
+ *
+ */
 
-        class STATE_OBSERVATION_DLLAPI RotationVelocity
-        {
-        public:
-            ///virtual destructor
-            virtual ~RotationVelocity(){}
+class STATE_OBSERVATION_DLLAPI RotationVelocity
+{
+public:
+  /// virtual destructor
+  virtual ~RotationVelocity() {}
 
-            ///The angular velocity measurement in the local frame represented by the orientation Matrix
-            Vector3 rotationVelocityMeasure(const Vector3 & angVelocityVector, const Matrix3 & orientation) const;
+  /// The angular velocity measurement in the local frame represented by the orientation Matrix
+  Vector3 rotationVelocityMeasure(const Vector3 & angVelocityVector, const Matrix3 & orientation) const;
 
-        protected:
+protected:
+};
+} // namespace algorithm
 
-        };
-    }
+} // namespace stateObservation
 
-}
-
-#endif //SENSORALGORITHMSROTATIONVELOCITYHPP
+#endif // SENSORALGORITHMSROTATIONVELOCITYHPP

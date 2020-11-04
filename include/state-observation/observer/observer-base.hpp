@@ -14,153 +14,144 @@
  *
  */
 
-
-
 #ifndef OBSERVERBASEHPP
 #define OBSERVERBASEHPP
 
-
-
-#include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
+#include <boost/static_assert.hpp>
 
 #include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
 {
-     /**
-     * \class  ObserverBase
-     * \brief  The base class for observers.
-     *         The observer is destinated to any dynamical system with a vector
-     *         state representation. This class mostly defined an abstract
-     *         interface, static constants and types. It is templated by:
-     *
-     *
-     */
+/**
+ * \class  ObserverBase
+ * \brief  The base class for observers.
+ *         The observer is destinated to any dynamical system with a vector
+ *         state representation. This class mostly defined an abstract
+ *         interface, static constants and types. It is templated by:
+ *
+ *
+ */
 
+class STATE_OBSERVATION_DLLAPI ObserverBase
+{
+public:
+  /// StateVector is the type of state vector
+  typedef Vector StateVector;
 
-    class STATE_OBSERVATION_DLLAPI ObserverBase
-    {
-    public:
+  /// MeasureVector is the type of measurements vector
+  typedef Vector MeasureVector;
 
-        ///StateVector is the type of state vector
-        typedef Vector StateVector;
+  /// InputVector is the type of the input vector
+  typedef Vector InputVector;
 
-        ///MeasureVector is the type of measurements vector
-        typedef Vector MeasureVector;
+  /// constructor
+  ///      \li n : size of the state vector
+  ///      \li m : size of the measurements vector
+  ///      \li p : size of the input vector
+  ObserverBase(Index n, Index m, Index p = 0);
 
-        ///InputVector is the type of the input vector
-        typedef Vector InputVector;
+  /// default constructor (default values for n,m,p are zero)
+  ObserverBase();
 
+  /// Destructor
+  virtual ~ObserverBase(){};
 
-        ///constructor
-        ///      \li n : size of the state vector
-        ///      \li m : size of the measurements vector
-        ///      \li p : size of the input vector
-        ObserverBase(Index n, Index m, Index p=0);
+  /// Changes the size of the state vector
+  virtual void setStateSize(Index n);
 
-        ///default constructor (default values for n,m,p are zero)
-        ObserverBase();
+  /// gets the size of the state vector
+  virtual Index getStateSize() const;
 
-        ///Destructor
-        virtual ~ObserverBase(){};
+  /// Changes the size of the measurement vector
+  virtual void setMeasureSize(Index m);
 
-        /// Changes the size of the state vector
-        virtual void setStateSize(Index n);
+  /// gets the size of the measurement vector
+  virtual Index getMeasureSize() const;
 
-        /// gets the size of the state vector
-        virtual Index getStateSize() const;
+  /// Changes the size of the input vector
+  virtual void setInputSize(Index p);
 
-        /// Changes the size of the measurement vector
-        virtual void setMeasureSize(Index m);
+  /// gets the size of the input vector
+  virtual Index getInputSize() const;
 
-        /// gets the size of the measurement vector
-        virtual Index getMeasureSize() const;
+  /// Set the value of the state vector at time index k
+  virtual void setState(const StateVector & x_k, TimeIndex k) = 0;
 
-        /// Changes the size of the input vector
-        virtual void setInputSize(Index p);
+  /// Remove all the given past values of the state
+  virtual void clearStates() = 0;
 
-        /// gets the size of the input vector
-        virtual Index getInputSize() const;
+  /// Set the value of the measurements vector at time index k
+  virtual void setMeasurement(const MeasureVector & y_k, TimeIndex k) = 0;
 
-        ///Set the value of the state vector at time index k
-        virtual void setState(const StateVector& x_k,TimeIndex k)=0;
+  /// Remove all the given past values of the measurements
+  virtual void clearMeasurements() = 0;
 
-        ///Remove all the given past values of the state
-        virtual void clearStates()=0;
+  /// Set the value of the input vector at time index k
+  virtual void setInput(const InputVector & x_k, TimeIndex k) = 0;
 
-        ///Set the value of the measurements vector at time index k
-        virtual void setMeasurement(const MeasureVector& y_k,TimeIndex k)=0;
+  /// Remove all the given past values of the inputs
+  virtual void clearInputs() = 0;
 
-        ///Remove all the given past values of the measurements
-        virtual void clearMeasurements()=0;
+  /// Run the observer loop and gets the state estimation of the state at
+  /// instant k
+  virtual StateVector getEstimatedState(TimeIndex k) = 0;
 
-        ///Set the value of the input vector at time index k
-        virtual void setInput(const InputVector& x_k,TimeIndex k)=0;
+  /// Reinitializes the whole observer
+  /// default behavior is to call the three "ObserverBase::clear*" methods
+  virtual void reset();
 
-        ///Remove all the given past values of the inputs
-        virtual void clearInputs()=0;
+  /// These are initializer  for vectors
+  /// We do not use the get prefix to be consistent with eigen initializers
+  /// Gives a vector of state vector size having duplicated "c" value
+  virtual StateVector stateVectorConstant(double c) const;
 
-        ///Run the observer loop and gets the state estimation of the state at
-        ///instant k
-        virtual StateVector getEstimatedState(TimeIndex k)=0;
+  /// Gives a vector of state vector size having random values
+  virtual StateVector stateVectorRandom() const;
 
-        ///Reinitializes the whole observer
-        ///default behavior is to call the three "ObserverBase::clear*" methods
-        virtual void reset();
+  /// Gives a vector of state vector size having zero values
+  virtual StateVector stateVectorZero() const;
 
-        ///These are initializer  for vectors
-        /// We do not use the get prefix to be consistent with eigen initializers
-        ///Gives a vector of state vector size having duplicated "c" value
-        virtual StateVector stateVectorConstant( double c ) const;
+  /// Tells whether or not the vector has the dimensions of a state vector
+  virtual bool checkStateVector(const StateVector & v) const;
 
-        ///Gives a vector of state vector size having random values
-        virtual StateVector stateVectorRandom() const;
+  /// Gives a vector of measurement vector size having duplicated "c" value
+  virtual MeasureVector measureVectorConstant(double c) const;
 
-        ///Gives a vector of state vector size having zero values
-        virtual StateVector stateVectorZero() const;
+  /// Gives a vector of measurement vector size having random values
+  virtual MeasureVector measureVectorRandom() const;
 
-        ///Tells whether or not the vector has the dimensions of a state vector
-        virtual bool checkStateVector(const StateVector & v ) const;
+  /// Gives a vector of measurement vector size having zero values
+  virtual MeasureVector measureVectorZero() const;
 
-        ///Gives a vector of measurement vector size having duplicated "c" value
-        virtual MeasureVector measureVectorConstant( double c ) const;
+  /// Tells whether or not the vector has the dimensions of a measurement vector
+  virtual bool checkMeasureVector(const MeasureVector &) const;
 
-        ///Gives a vector of measurement vector size having random values
-        virtual MeasureVector measureVectorRandom() const;
+  /// Gives a vector of input vector size having duplicated "c" value
+  virtual InputVector inputVectorConstant(double c) const;
 
-        ///Gives a vector of measurement vector size having zero values
-        virtual MeasureVector measureVectorZero() const;
+  /// Gives a vector of input vector size having random values
+  virtual InputVector inputVectorRandom() const;
 
-        ///Tells whether or not the vector has the dimensions of a measurement vector
-        virtual bool checkMeasureVector(const MeasureVector &) const;
+  /// Gives a vector of input vector size having zero values
+  virtual InputVector inputVectorZero() const;
 
-        ///Gives a vector of input vector size having duplicated "c" value
-        virtual InputVector inputVectorConstant( double c ) const;
+  /// Tells whether or not the vector has the dimensions of a input vector
+  virtual bool checkInputVector(const InputVector &) const;
 
-        ///Gives a vector of input vector size having random values
-        virtual InputVector inputVectorRandom() const;
+protected:
+  /// stateSize is the size of the state vector
+  Index n_;
 
-        ///Gives a vector of input vector size having zero values
-        virtual InputVector inputVectorZero() const;
+  /// measureSize is the size of measurements vector
+  Index m_;
 
-        ///Tells whether or not the vector has the dimensions of a input vector
-        virtual bool checkInputVector(const InputVector &) const;
+  /// inputSize is the size of the input vector
+  Index p_;
+};
 
-    protected:
+} // namespace stateObservation
 
-        ///stateSize is the size of the state vector
-        Index n_;
-
-        ///measureSize is the size of measurements vector
-        Index m_;
-
-        ///inputSize is the size of the input vector
-        Index p_;
-
-    };
-
-}
-
-#endif//OBSERVERBASEHPP
+#endif // OBSERVERBASEHPP

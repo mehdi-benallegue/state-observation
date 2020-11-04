@@ -1,294 +1,276 @@
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include <state-observation/noise/gaussian-white-noise.hpp>
-#include <state-observation/examples/offline-ekf-flexibility-estimation.hpp>
 #include <state-observation/dynamical-system/dynamical-system-simulator.hpp>
-#include <state-observation/tools/miscellaneous-algorithms.hpp>
 #include <state-observation/dynamical-system/imu-dynamical-system.hpp>
-
+#include <state-observation/examples/offline-ekf-flexibility-estimation.hpp>
+#include <state-observation/noise/gaussian-white-noise.hpp>
+#include <state-observation/tools/miscellaneous-algorithms.hpp>
 
 using namespace stateObservation;
 
 typedef kine::indexes<kine::rotationVector> indexes;
 
-///sampling period
-const double dt=5e-3;
+/// sampling period
+const double dt = 5e-3;
 
 int testDerivator()
 {
-    /// The number of samples
-    const unsigned kmax=3000;
+  /// The number of samples
+  const unsigned kmax = 3000;
 
-    ///sampling period
-    const double dt=1e-3;
+  /// sampling period
+  const double dt = 1e-3;
 
-    ///Sizes of the states for the state, the measurement, and the input vector
-    const unsigned stateSize=18;
-    const unsigned measurementSize=6;
-    //const unsigned inputSize=6;
+  /// Sizes of the states for the state, the measurement, and the input vector
+  const unsigned stateSize = 18;
+  const unsigned measurementSize = 6;
+  // const unsigned inputSize=6;
 
-    ///The array containing all the states, the measurements and the inputs
-    IndexedVectorArray x;
-    IndexedVectorArray y;
-    IndexedVectorArray u;
+  /// The array containing all the states, the measurements and the inputs
+  IndexedVectorArray x;
+  IndexedVectorArray y;
+  IndexedVectorArray u;
 
-    ///The covariance matrix of the process noise and the measurement noise
-    Matrix q;
-    Matrix r;
+  /// The covariance matrix of the process noise and the measurement noise
+  Matrix q;
+  Matrix r;
 
+  {
+    /// simulation of the signal
+    /// the IMU dynamical system functor
+    IMUDynamicalSystem imu;
+
+    /// The process noise initialization
+    Matrix q1 = Matrix::Identity(stateSize, stateSize) * 0.00;
+    GaussianWhiteNoise processNoise(imu.getStateSize());
+    processNoise.setStandardDeviation(q1);
+    imu.setProcessNoise(&processNoise);
+    q = q1 * q1.transpose();
+
+    /// The measurement noise initialization
+    Matrix r1 = Matrix::Identity(measurementSize, measurementSize) * 0.0;
+    GaussianWhiteNoise MeasurementNoise(imu.getMeasurementSize());
+    MeasurementNoise.setStandardDeviation(r1);
+    imu.setMeasurementNoise(&MeasurementNoise);
+    r = r1 * r1.transpose();
+
+    /// the simulator initalization
+    DynamicalSystemSimulator sim;
+    sim.setDynamicsFunctor(&imu);
+
+    /// initialization of the state vector
+    Vector x0 = Vector::Zero(stateSize, 1);
+    sim.setState(x0, 0);
+
+    /// construction of the input
+    /// the input is constant over 10 time samples
+    for(unsigned i = 0; i < kmax / 10; ++i)
     {
-        ///simulation of the signal
-        /// the IMU dynamical system functor
-        IMUDynamicalSystem imu;
+      Vector uk = Vector::Zero(imu.getInputSize(), 1);
 
-        ///The process noise initialization
-        Matrix q1=Matrix::Identity(stateSize,stateSize)*0.00;
-        GaussianWhiteNoise processNoise(imu.getStateSize());
-        processNoise.setStandardDeviation(q1);
-        imu.setProcessNoise( & processNoise );
-        q=q1*q1.transpose();
+      uk[0] = 0.4 * sin(M_PI / 10 * i);
+      uk[1] = 0.6 * sin(M_PI / 12 * i);
+      uk[2] = 0.2 * sin(M_PI / 5 * i);
 
-        ///The measurement noise initialization
-        Matrix r1=Matrix::Identity(measurementSize,measurementSize)*0.0;
-        GaussianWhiteNoise MeasurementNoise(imu.getMeasurementSize());
-        MeasurementNoise.setStandardDeviation(r1);
-        imu.setMeasurementNoise( & MeasurementNoise );
-        r=r1*r1.transpose();
+      uk[3] = 10 * sin(M_PI / 12 * i);
+      uk[4] = 0.07 * sin(M_PI / 15 * i);
+      uk[5] = 0.05 * sin(M_PI / 5 * i);
 
-        ///the simulator initalization
-        DynamicalSystemSimulator sim;
-        sim.setDynamicsFunctor(&imu);
+      /// filling the 10 time samples of the constant input
+      for(int j = 0; j < 10; ++j)
+      {
+        u.setValue(uk, i * 10 + j);
+      }
 
-        ///initialization of the state vector
-        Vector x0=Vector::Zero(stateSize,1);
-        sim.setState(x0,0);
-
-        ///construction of the input
-        /// the input is constant over 10 time samples
-        for (unsigned i=0;i<kmax/10;++i)
-        {
-            Vector uk=Vector::Zero(imu.getInputSize(),1);
-
-            uk[0]=0.4 * sin(M_PI/10*i);
-            uk[1]=0.6 * sin(M_PI/12*i);
-            uk[2]=0.2 * sin(M_PI/5*i);
-
-            uk[3]=10  * sin(M_PI/12*i);
-            uk[4]=0.07  * sin(M_PI/15*i);
-            uk[5]=0.05 * sin(M_PI/5*i);
-
-            ///filling the 10 time samples of the constant input
-            for (int j=0;j<10;++j)
-            {
-                u.setValue(uk,i*10+j);
-            }
-
-            ///give the input to the simulator
-            ///we only need to give one value and the
-            ///simulator takes automatically the appropriate value
-            sim.setInput(uk,10*i);
-
-        }
-
-        ///set the sampling perdiod to the functor
-        imu.setSamplingPeriod(dt);
-
-        ///launched the simulation to the time kmax+1
-        sim.simulateDynamicsTo(kmax+1);
-
-        ///extract the array of measurements and states
-        y = sim.getMeasurementArray(1,kmax);
-        x = sim.getStateArray(1,kmax);
+      /// give the input to the simulator
+      /// we only need to give one value and the
+      /// simulator takes automatically the appropriate value
+      sim.setInput(uk, 10 * i);
     }
 
-    IndexedVectorArray dta;
+    /// set the sampling perdiod to the functor
+    imu.setSamplingPeriod(dt);
 
-    for (TimeIndex i=x.getFirstIndex() ; i<x.getNextIndex() ; ++i)
-    {
-        Vector xi = Vector::Zero(6,1);
+    /// launched the simulation to the time kmax+1
+    sim.simulateDynamicsTo(kmax + 1);
 
-        xi.head(3) = Vector(x[i]).segment(indexes::pos,3);
-        xi.tail(3) = Vector(x[i]).segment(indexes::ori,3);
+    /// extract the array of measurements and states
+    y = sim.getMeasurementArray(1, kmax);
+    x = sim.getStateArray(1, kmax);
+  }
 
-        dta.setValue(xi,i);
-    }
+  IndexedVectorArray dta;
 
-    IndexedVectorArray state = kine::reconstructStateTrajectory(dta,dt);
+  for(TimeIndex i = x.getFirstIndex(); i < x.getNextIndex(); ++i)
+  {
+    Vector xi = Vector::Zero(6, 1);
 
-    ///file of output
-    std::ofstream f;
-    f.open("trajectory.dat");
+    xi.head(3) = Vector(x[i]).segment(indexes::pos, 3);
+    xi.tail(3) = Vector(x[i]).segment(indexes::ori, 3);
 
-    for (TimeIndex i=x.getFirstIndex() ; i<x.getNextIndex() ; ++i)
-    {
-        //f<<dta[i].transpose()<<"\t#####\t\t"<<Vector(Vector(x[i]).segment(9,3)).transpose()<<"\t#####\t\t"<<(x[i]-state[i]).transpose()<<std::endl;
-        f<<(x[i]-state[i])<<std::endl<<std::endl;
-    }
+    dta.setValue(xi, i);
+  }
 
-    return 0;
+  IndexedVectorArray state = kine::reconstructStateTrajectory(dta, dt);
 
+  /// file of output
+  std::ofstream f;
+  f.open("trajectory.dat");
 
+  for(TimeIndex i = x.getFirstIndex(); i < x.getNextIndex(); ++i)
+  {
+    // f<<dta[i].transpose()<<"\t#####\t\t"<<Vector(Vector(x[i]).segment(9,3)).transpose()<<"\t#####\t\t"<<(x[i]-state[i]).transpose()<<std::endl;
+    f << (x[i] - state[i]) << std::endl << std::endl;
+  }
+
+  return 0;
 }
 
-IndexedVectorArray getMeasurements(const char * accelerometerSignal, const  char * gyrometerSignal)
+IndexedVectorArray getMeasurements(const char * accelerometerSignal, const char * gyrometerSignal)
 {
-    std::ifstream facc;
-    std::ifstream fgyr;
+  std::ifstream facc;
+  std::ifstream fgyr;
 
-    facc.open(accelerometerSignal);
-    fgyr.open(gyrometerSignal);
+  facc.open(accelerometerSignal);
+  fgyr.open(gyrometerSignal);
 
-    Vector3 mAcc;
-    Vector3 mGyr;
+  Vector3 mAcc;
+  Vector3 mGyr;
 
-    Vector yk=Vector::Zero(6,1);
+  Vector yk = Vector::Zero(6, 1);
 
-    IndexedVectorArray y;
+  IndexedVectorArray y;
 
-    bool continuation=true;
+  bool continuation = true;
 
-    while (continuation)
+  while(continuation)
+  {
+    unsigned k1;
+    unsigned k2;
+    facc >> k1;
+    fgyr >> k2;
+    if(facc.eof() || facc.eof() || k1 != k2) continuation = false;
+
+    if(continuation)
     {
-        unsigned k1;
-        unsigned k2;
-        facc >> k1;
-        fgyr >> k2;
-        if (facc.eof()||facc.eof()||k1!=k2)
-            continuation=false;
+      facc >> mAcc[0] >> mAcc[1] >> mAcc[2];
+      fgyr >> mGyr[0] >> mGyr[1] >> mGyr[2];
 
-        if (continuation)
-        {
-            facc >> mAcc[0]>> mAcc[1]>> mAcc[2];
-            fgyr >> mGyr[0]>> mGyr[1]>> mGyr[2];
-
-            yk.head(3)=mAcc;
-            yk.tail(3)=mGyr;
-            y.setValue(yk,k1);
-        }
+      yk.head(3) = mAcc;
+      yk.tail(3) = mGyr;
+      y.setValue(yk, k1);
     }
+  }
 
-    return y;
+  return y;
 }
 
 IndexedVectorArray getTrajectory(const char * PositionOrientation)
 {
-    std::ifstream f;
+  std::ifstream f;
 
-    f.open(PositionOrientation);
+  f.open(PositionOrientation);
 
-    Vector6 configuration;
+  Vector6 configuration;
 
-    IndexedVectorArray up;
+  IndexedVectorArray up;
 
-    bool continuation=true;
+  bool continuation = true;
 
-    while (continuation)
+  while(continuation)
+  {
+    unsigned k;
+
+    f >> k;
+
+    if(f.eof()) continuation = false;
+
+    if(continuation)
     {
-        unsigned k;
+      f >> configuration[0] >> configuration[1] >> configuration[2] >> configuration[3] >> configuration[4]
+          >> configuration[5];
 
-        f >> k;
-
-        if (f.eof())
-            continuation=false;
-
-        if (continuation)
-        {
-            f >> configuration[0]>> configuration[1]>> configuration[2]
-              >> configuration[3]>> configuration[4]>> configuration[5];
-
-            up.setValue(configuration,k);
-        }
+      up.setValue(configuration, k);
     }
+  }
 
-    IndexedVectorArray state = kine::reconstructStateTrajectory(up,dt);
+  IndexedVectorArray state = kine::reconstructStateTrajectory(up, dt);
 
-    return state;
+  return state;
 }
 
-
-
-int test (const IndexedVectorArray & y, const IndexedVectorArray & u)
+int test(const IndexedVectorArray & y, const IndexedVectorArray & u)
 {
-    /// The number of samples
-    const unsigned stateSize = 18;
+  /// The number of samples
+  const unsigned stateSize = 18;
 
+  /// the initalization of an estimation of the initial state
+  Vector xh0 = Vector::Zero(stateSize, 1);
 
+  std::vector<Vector3, Eigen::aligned_allocator<Vector3>> contactPositions;
 
-    ///the initalization of an estimation of the initial state
-    Vector xh0=Vector::Zero(stateSize,1);
+  contactPositions.push_back(Matrix::Zero(3, 0));
 
-    std::vector<Vector3, Eigen::aligned_allocator<Vector3> > contactPositions;
+  stateObservation::IndexedVectorArray xh =
+      stateObservation::examples::offlineEKFFlexibilityEstimation(y, u, xh0, 1, contactPositions, dt);
 
-    contactPositions.push_back(Matrix::Zero(3,0));
+  /// file of output
+  std::ofstream f;
+  f.open("trajectory.dat");
 
-    stateObservation::IndexedVectorArray xh=
-        stateObservation::examples::offlineEKFFlexibilityEstimation
-        (y,u,xh0,1,contactPositions,dt);
+  double error;
 
-    ///file of output
-    std::ofstream f;
-    f.open("trajectory.dat");
-
-    double error;
-
-    ///the reconstruction of the state
-    for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
+  /// the reconstruction of the state
+  for(TimeIndex i = y.getFirstIndex(); i < y.getNextIndex(); ++i)
+  {
+    /// display part, useless
+    Vector3 g;
     {
-        ///display part, useless
-        Vector3 g;
-        {
-            g = Vector(y[i]).head(3);
-            g.normalize();
-        }
-
-        Vector3 gh;
-        {
-            Matrix3 Rh;
-
-            Vector3 orientationV=Vector(xh[i]).segment(indexes::ori,3);
-            double angle=orientationV.norm();
-            if (angle > cst::epsilonAngle)
-                Rh = AngleAxis(angle, orientationV/angle).toRotationMatrix();
-            else
-                Rh = Matrix3::Identity();
-            gh=Rh.transpose()*Vector3::UnitZ();
-            gh.normalize();
-        }
-
-        error = acos(double(g.transpose()*gh)) * 180 / M_PI;
-
-
-        f << i<< " \t "<< error << " \t\t\t "
-          << g.transpose() << " \t\t\t " << gh.transpose() << " \t\t\t "
-          << xh[i].transpose() << std::endl;
+      g = Vector(y[i]).head(3);
+      g.normalize();
     }
 
-    std::cout << "Error " << error << ", test: " ;
+    Vector3 gh;
+    {
+      Matrix3 Rh;
 
-    if (error > 2)
-    {
-        std::cout << "FAILED !!!!!!!";
-        return 1;
+      Vector3 orientationV = Vector(xh[i]).segment(indexes::ori, 3);
+      double angle = orientationV.norm();
+      if(angle > cst::epsilonAngle)
+        Rh = AngleAxis(angle, orientationV / angle).toRotationMatrix();
+      else
+        Rh = Matrix3::Identity();
+      gh = Rh.transpose() * Vector3::UnitZ();
+      gh.normalize();
     }
-    else
-    {
-        std::cout << "SUCCEEDED !!!!!!!";
-        return 0;
-    }
+
+    error = acos(double(g.transpose() * gh)) * 180 / M_PI;
+
+    f << i << " \t " << error << " \t\t\t " << g.transpose() << " \t\t\t " << gh.transpose() << " \t\t\t "
+      << xh[i].transpose() << std::endl;
+  }
+
+  std::cout << "Error " << error << ", test: ";
+
+  if(error > 2)
+  {
+    std::cout << "FAILED !!!!!!!";
+    return 1;
+  }
+  else
+  {
+    std::cout << "SUCCEEDED !!!!!!!";
+    return 0;
+  }
 }
 
 int main()
 {
 
-    IndexedVectorArray y =
-            getMeasurements("dg_HRP2LAAS-accelerometer.dat",
-                "dg_HRP2LAAS-gyrometer.dat");
+  IndexedVectorArray y = getMeasurements("dg_HRP2LAAS-accelerometer.dat", "dg_HRP2LAAS-gyrometer.dat");
 
-    IndexedVectorArray u= getTrajectory("IMUTrajectory.dat");
+  IndexedVectorArray u = getTrajectory("IMUTrajectory.dat");
 
-
-
-    return test(y,u);
-
+  return test(y, u);
 }

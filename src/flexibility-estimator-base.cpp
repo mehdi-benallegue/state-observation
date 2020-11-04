@@ -5,10 +5,6 @@ namespace stateObservation
 namespace flexibilityEstimation
 {
 
-    FlexibilityEstimatorBase::FlexibilityEstimatorBase
-            ()
-    {
-
-    }
-}
-}
+FlexibilityEstimatorBase::FlexibilityEstimatorBase() {}
+} // namespace flexibilityEstimation
+} // namespace stateObservation

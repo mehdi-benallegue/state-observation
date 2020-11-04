@@ -8,8 +8,6 @@
  *
  */
 
-
-
 #ifndef SENSORSIMULATIONNOISEBASEHPP
 #define SENSORSIMULATIONNOISEBASEHPP
 
@@ -19,27 +17,26 @@
 namespace stateObservation
 {
 
-    /**
-     * \class  NoiseBase
-     * \brief
-     *
-     * \details
-     *
-     */
+/**
+ * \class  NoiseBase
+ * \brief
+ *
+ * \details
+ *
+ */
 
-    class STATE_OBSERVATION_DLLAPI NoiseBase
-    {
-    public:
-        /// Virtual destructor
-        virtual ~NoiseBase(){}
+class STATE_OBSERVATION_DLLAPI NoiseBase
+{
+public:
+  /// Virtual destructor
+  virtual ~NoiseBase() {}
 
-        /// The method to overload to produce the noisy version of a given vector
-        virtual Vector getNoisy( const Vector &)=0;
+  /// The method to overload to produce the noisy version of a given vector
+  virtual Vector getNoisy(const Vector &) = 0;
 
-    protected:
+protected:
+};
 
-    };
+} // namespace stateObservation
 
-}
-
-#endif //SENSORSIMULATIONNOISEBASEHPP
+#endif // SENSORSIMULATIONNOISEBASEHPP
