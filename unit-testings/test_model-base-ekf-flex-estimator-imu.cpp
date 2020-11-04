@@ -33,7 +33,7 @@ int test()
           0, 0, 0, 0, unitCov, 0,
           0, 0, 0, 0, 0, unitCov;
   // clang-format on
-  
+
   /// Initializations
   // Dimensions
   const Index kinit = 0;
