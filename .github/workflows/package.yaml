@@ -9,8 +9,13 @@ name: Package state-observation
 on:
   push:
     branches:
-      - master
-      - topic/packaging
+    - "**"
+    paths-ignore:
+    - README.md
+    - ".github/workflows/build.yml"
+  pull_request:
+    branches:
+    - "**"
 
 jobs:
   # This job build binary packages for Ubuntu
@@ -55,6 +60,7 @@ jobs:
         dist: [bionic,focal]
         arch: [amd64]
     runs-on: ubuntu-18.04 
+    if: github.ref == 'refs/heads/master'
     steps:
     - name: Download packages
       uses: actions/download-artifact@v1
