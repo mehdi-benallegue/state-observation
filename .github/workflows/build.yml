@@ -9,7 +9,18 @@ on:
       - '**'
 
 jobs:
+  cmake-format:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install cmakelang
+      run: |
+        sudo pip3 install cmakelang
+    - name: Run cmake-format-check
+      run: |
+        ./.cmake-format-check.sh
   build:
+    needs: cmake-format
     strategy:
       fail-fast: false
       matrix:
