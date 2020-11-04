@@ -13,8 +13,10 @@
 #ifndef BIDIM_ELASTIC_INV_PENDULUM
 #define BIDIM_ELASTIC_INV_PENDULUM
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/noise/noise-base.hpp>
+#include <state-observation/api.h>
 
 namespace stateObservation
 {
@@ -26,7 +28,7 @@ namespace stateObservation
     *         horizontal acceleration.
     *
     */
-    class BidimElasticInvPendulum : public DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI BidimElasticInvPendulum : public DynamicalSystemFunctorBase
     {
     public:
         ///The constructor
@@ -61,11 +63,11 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual Index getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual Index getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual Index getMeasurementSize() const;
 
         /// set the height of the com of the pendulum
         void setHeight(const double & h);
@@ -84,9 +86,9 @@ namespace stateObservation
 
         double dt_;
 
-        static const unsigned stateSize_=4;
-        static const unsigned inputSize_=1;
-        static const unsigned measurementSize_=0;
+        static const Index stateSize_=4;
+        static const Index inputSize_=1;
+        static const Index measurementSize_=0;
     };
 }
 #endif // BIDIM_ELASTIC_INV_PENDULUM

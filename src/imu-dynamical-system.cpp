@@ -63,7 +63,7 @@ namespace stateObservation
         xk1.segment(indexes::angAcc,3)+=angularAccelerationInput;
 
         if (processNoise_!=0x0)
-            return processNoise_->addNoise(xk1);
+            return processNoise_->getNoisy(xk1);
         else
             return xk1;
 
@@ -127,17 +127,17 @@ namespace stateObservation
         dt_=dt;
     }
 
-    unsigned IMUDynamicalSystem::getStateSize() const
+    Index IMUDynamicalSystem::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned IMUDynamicalSystem::getInputSize() const
+    Index IMUDynamicalSystem::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned IMUDynamicalSystem::getMeasurementSize() const
+    Index IMUDynamicalSystem::getMeasurementSize() const
     {
         return measurementSize_;
     }

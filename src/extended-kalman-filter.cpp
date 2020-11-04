@@ -2,6 +2,56 @@
 
 namespace stateObservation
 {
+    ExtendedKalmanFilter::ExtendedKalmanFilter(Index n,Index m)
+        :KalmanFilterBase(n,m,0),
+        directInputOutputFeedthrough_(false),
+        directInputStateProcessFeedthrough_(false), f_(0x0)
+
+    {
+#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+            std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
+#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
+
+    }
+
+
+    ExtendedKalmanFilter::ExtendedKalmanFilter(Index n,Index m,Index p,
+            bool directInputOutputFeedthrough,
+            bool directInputStateProcessFeedthrough)
+        :KalmanFilterBase(n,m,p),
+        directInputOutputFeedthrough_(directInputOutputFeedthrough),
+        directInputStateProcessFeedthrough_(directInputStateProcessFeedthrough), f_(0x0)
+    {
+#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+        std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
+#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
+
+        if (p==0)
+        {
+            directInputOutputFeedthrough_=false;
+            directInputStateProcessFeedthrough_=false;
+        }
+    }
+
+    ExtendedKalmanFilter::ExtendedKalmanFilter(Index n, Index nt, Index  m, Index mt, Index p,
+            bool directInputOutputFeedthrough,
+            bool directInputStateProcessFeedthrough):
+        KalmanFilterBase(n,nt,m,mt,p),
+        directInputOutputFeedthrough_(directInputOutputFeedthrough),
+        directInputStateProcessFeedthrough_(directInputStateProcessFeedthrough), f_(0x0)
+    {
+#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+        std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
+#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
+
+        if (p==0)
+        {
+            directInputOutputFeedthrough_=false;
+            directInputStateProcessFeedthrough_=false;
+        }
+    }
+
+
     void ExtendedKalmanFilter::setFunctor(DynamicalSystemFunctorBase* f)
     {
         f_=f;
@@ -38,7 +88,7 @@ namespace stateObservation
 
     ObserverBase::StateVector ExtendedKalmanFilter::prediction_(TimeIndex k)
     {
-        if (!this->xbar_.isSet() || this->xbar_.getTime()!=k)
+        if (!xbar_.isSet() || xbar_.getTime()!=k)
         {
             if ((p_>0) && (directInputStateProcessFeedthrough_))
             {
@@ -51,7 +101,6 @@ namespace stateObservation
             {
                 opt.u_ = inputVectorZero();
             }
-
             BOOST_ASSERT (f_!=0x0 && "ERROR: The Kalman filter functor is not set");
             xbar_.set(f_->stateDynamics(
                       this->x_(),
@@ -108,7 +157,9 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
     {
         TimeIndex k=this->x_.getTime();
         opt.a_.resize(nt_,nt_);
-        opt.xbar_=prediction_(k+1);
+        updateStatePrediction();
+
+
         opt.x_=this->x_();
         opt.dx_.resize(nt_);
 
@@ -120,18 +171,18 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
                 opt.u_=inputVectorZero();
         }
 
-        for (unsigned i=0;i<nt_;++i)
+        for (Index i=0;i< nt_;++i)
         {
 
             opt.dx_.setZero();
             opt.dx_[i]=dx[i];
 
-            sum_(this->x_(),opt.dx_,opt.x_);
+            arithm_->stateSum(this->x_(),opt.dx_,opt.x_);
 
 
             opt.xp_=f_->stateDynamics(opt.x_,opt.u_,k);
 
-            difference_(opt.xp_,opt.xbar_,opt.dx_);
+            arithm_->stateDifference(opt.xp_,xbar_(),opt.dx_);
 
             opt.dx_/=dx[i];
 
@@ -148,23 +199,22 @@ must set directInputOutputFeedthrough to 'false' in the constructor");
 
         opt.c_.resize(m_,nt_);
 
-        opt.xbar_=prediction_(k+1);
-        opt.xp_ = opt.xbar_;
+        updateStateAndMeasurementPrediction();
 
-        opt.y_=predictSensor_(k+1);
+        xbar_.set(prediction_(k+1),k+1);
 
         opt.dx_.resize(nt_);
 
-        for (unsigned i=0;i<nt_;++i)
+        for (Index i=0;i<nt_;++i)
         {
             opt.dx_.setZero();
             opt.dx_[i]=dx[i];
 
-            sum_(opt.xbar_,opt.dx_,opt.xp_);
+            arithm_->stateSum(xbar_(),opt.dx_,opt.xp_);
 
             opt.yp_=simulateSensor_(opt.xp_, k+1);
 
-            opt.yp_-=opt.y_;
+            opt.yp_-=ybar_();
             opt.yp_/=dx[i];
 
             opt.c_.col(i)=opt.yp_;

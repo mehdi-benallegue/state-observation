@@ -14,6 +14,7 @@
 #ifndef SENSORALGORITHMSLINEARACCELERATIONHPP
 #define SENSORALGORITHMSLINEARACCELERATIONHPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -26,7 +27,7 @@ namespace stateObservation
          *
          */
 
-        class LinearAcceleration
+        class STATE_OBSERVATION_DLLAPI LinearAcceleration
         {
         public:
             ///virtual destructor
@@ -34,7 +35,6 @@ namespace stateObservation
 
             ///The acceleration measurement in the local frame represented by the orientation Matrix
             Vector3 accelerationMeasure(const Vector3 & acceleration, const Matrix3 & orientation) const;
-
 
         protected:
 

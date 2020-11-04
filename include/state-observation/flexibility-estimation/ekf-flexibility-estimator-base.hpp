@@ -15,6 +15,7 @@
 
 #include <boost/utility.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/observer/extended-kalman-filter.hpp>
 
 #include <state-observation/flexibility-estimation/flexibility-estimator-base.hpp>
@@ -32,7 +33,7 @@ namespace flexibilityEstimation
     *
     */
 
-    class EKFFlexibilityEstimatorBase:
+    class STATE_OBSERVATION_DLLAPI EKFFlexibilityEstimatorBase:
                 public FlexibilityEstimatorBase
     {
     public:
@@ -44,9 +45,9 @@ namespace flexibilityEstimation
         ///  \li inputSize : size of the input vector
         ///  \li dx gives the derivation step for a finite differences derivation method
 
-        EKFFlexibilityEstimatorBase(unsigned stateSize,
-                                    unsigned measurementSize,
-                                    unsigned inputSize,
+        EKFFlexibilityEstimatorBase(Index stateSize,
+                                    Index measurementSize,
+                                    Index inputSize,
                                     const Vector & dx=Vector::Zero(0) );
 
 
@@ -110,15 +111,15 @@ namespace flexibilityEstimation
 
         /// Gets the state size
         /// this method is pure virtual and reauires to be overloaded in implementation
-        virtual unsigned getStateSize() const =0;
+        virtual Index getStateSize() const =0;
 
         /// Gets the measurements size
         /// this method is pure virtual and reauires to be overloaded in implementation
-        virtual unsigned getMeasurementSize() const =0;
+        virtual Index getMeasurementSize() const =0;
 
         /// Gets the input size
         /// this method is pure virtual and reauires to be overloaded in implementation
-        virtual unsigned getInputSize() const =0;
+        virtual Index getInputSize() const =0;
 
         /// Gets a simulation of the
         virtual Vector getSimulatedMeasurement();

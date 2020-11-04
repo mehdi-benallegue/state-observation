@@ -11,6 +11,7 @@
 #ifndef SENSORSIMULATIONGAUSSIANWHITENOISEHPP
 #define SENSORSIMULATIONGAUSSIANWHITENOISEHPP
 
+#include <state-observation/api.h>
 #include <state-observation/noise/noise-base.hpp>
 
 namespace stateObservation
@@ -25,7 +26,7 @@ namespace stateObservation
      *
      */
 
-    class GaussianWhiteNoise : public NoiseBase
+    class STATE_OBSERVATION_DLLAPI GaussianWhiteNoise : public NoiseBase
     {
     public:
 
@@ -33,14 +34,15 @@ namespace stateObservation
         virtual ~GaussianWhiteNoise(){}
 
         ///The constructor that provides the dimension of the noise vector
-        GaussianWhiteNoise(unsigned dimension);
+        GaussianWhiteNoise(Index dimension);
 
         ///The default constructor
         GaussianWhiteNoise();
 
-        ///Adds the noise to a given vector it is only an addition of a given vector
+
+        ///get the noisy version of a given vector it is only an addition of a given vector
         ///and a gaussian white noise
-        virtual Vector addNoise(const Vector &);
+        virtual Vector getNoisy(const Vector &);
 
         ///Sets the standard deviation of the Gaussian white noise.
         /// The covariance matrix is then std*std.transpose()
@@ -55,10 +57,10 @@ namespace stateObservation
         virtual void setBias(const Vector & bias);
 
         ///sets the dimension of the noise vector
-        virtual void setDimension(unsigned dim_);
+        virtual void setDimension(Index dim_);
 
         ///Gets the dimension of the noise vector
-        virtual unsigned getDimension() const;
+        virtual Index getDimension() const;
 
         ///set update functions for sum for a vector
         /// (used in case of lie group vectors)
@@ -69,7 +71,7 @@ namespace stateObservation
 
         virtual void checkVector_(const Vector & v) const;
 
-        unsigned dim_;
+        Index dim_;
 
 
 

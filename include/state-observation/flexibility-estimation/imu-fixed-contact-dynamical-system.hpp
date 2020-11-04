@@ -14,6 +14,7 @@
 
 #include <vector>
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/noise/noise-base.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
@@ -31,7 +32,7 @@ namespace flexibilityEstimation
     *         other hypothesis than that the contact points are at constant position
     *
     */
-    class IMUFixedContactDynamicalSystem :
+    class STATE_OBSERVATION_DLLAPI IMUFixedContactDynamicalSystem :
         public stateObservation::DynamicalSystemFunctorBase
     {
     public:
@@ -73,11 +74,11 @@ namespace flexibilityEstimation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual Index getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual Index getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual Index getMeasurementSize() const;
 
         ///Sets the number of contacts
         virtual void setContactsNumber(unsigned);
@@ -100,11 +101,11 @@ namespace flexibilityEstimation
 
         Quaternion computeQuaternion_(const Vector3 & x);
 
-        static const unsigned stateSize_=18;
-        static const unsigned inputSize_=15;
-        static const unsigned measurementSizeBase_=6;
+        static const Index stateSize_=18;
+        static const Index inputSize_=15;
+        static const Index measurementSizeBase_=6;
 
-        unsigned measurementSize_;
+        Index measurementSize_;
 
         std::vector <Vector3,Eigen::aligned_allocator<Vector3> >
             contactPositions_;

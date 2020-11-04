@@ -6,30 +6,6 @@
 
 namespace stateObservation
 {
-
-  namespace detail
-  {
-    const bool defaultTrue = true;
-    const char* defaultErrorMSG = "The Object is not initialized. \
-         If this happened during initialization then run command chckitm_set() \
-         to switch it to set. And if the initialization is incomplete, run \
-         chckitm_reset() afterwards.";
-    const std::runtime_error defaultException(defaultErrorMSG);
-    const std::exception* defaultExcepionAddr=&defaultException;
-
-
-    void defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& result)
-    {
-      result.noalias() = stateVector + tangentVector;
-    }
-
-    void defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference)
-    {
-      difference.noalias() = stateVector1 - stateVector2;
-    }
-
-  }
-
   namespace tools
   {
     std::string matrixToString(const Matrix& mat)
@@ -39,20 +15,27 @@ namespace stateObservation
       return ss.str();
     }
 
+    namespace detail
+    {
+
+
+    } // namespace detail
+
+
     std::string vectorToString(const Vector& v)
     {
       return matrixToString(v.transpose());
     }
 
-    Matrix stringToMatrix(const std::string& str, unsigned rows, unsigned cols)
+    Matrix stringToMatrix(const std::string& str, Index rows, Index cols)
     {
       Matrix m(Matrix::Zero(rows,cols));
       std::stringstream ss;
       ss << str;
 
-      for (size_t i = 0 ; i<rows; ++i)
+      for (Index i = 0 ; i<rows; ++i)
       {
-        for (size_t j = 0 ; j<cols; ++j)
+        for (Index j = 0 ; j<cols; ++j)
         {
           ss >> m(i,j);
         }
@@ -61,7 +44,7 @@ namespace stateObservation
       return m;
     }
 
-    Vector stringToVector(const std::string& str, unsigned length)
+    Vector stringToVector(const std::string& str, Index length)
     {
       return stringToMatrix(str,length,1);
     }
@@ -88,10 +71,10 @@ namespace stateObservation
           doublecontainer.push_back(component);
         }
       }
-      v.resize(doublecontainer.size());
-      for (unsigned i=0 ; i<doublecontainer.size() ; ++i)
+      v.resize(Index(doublecontainer.size()));
+      for (Index i=0 ; i<Index(doublecontainer.size()) ; ++i)
       {
-        v(i)=doublecontainer[i];
+        v(i)=doublecontainer[size_t(i)];
       }
 
       return v;

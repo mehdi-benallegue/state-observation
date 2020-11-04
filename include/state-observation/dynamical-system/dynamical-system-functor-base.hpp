@@ -13,6 +13,7 @@
 #ifndef STATEOBSERVERDYNAMICALSYSTEMFUNCTORBASE_H
 #define STATEOBSERVERDYNAMICALSYSTEMFUNCTORBASE_H
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -28,7 +29,7 @@ namespace stateObservation
     *
     */
 
-    class DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI DynamicalSystemFunctorBase
     {
     public:
         DynamicalSystemFunctorBase();
@@ -47,11 +48,11 @@ namespace stateObservation
         virtual void reset(){}
 
         ///gets the state size
-        virtual unsigned getStateSize()const =0 ;
+        virtual Index getStateSize()const =0 ;
         ///gets the input size
-        virtual unsigned getInputSize()const =0 ;
+        virtual Index getInputSize()const =0 ;
         ///gets the measurements size
-        virtual unsigned getMeasurementSize() const=0;
+        virtual Index getMeasurementSize() const=0;
 
         ///Gives a boolean answer on whether or not the vector is correctly sized to be a state vector
         virtual bool checkStateVector(const Vector &);
@@ -73,6 +74,7 @@ namespace stateObservation
 
     private:
     };
+
 }
 
 #endif // STATEOBSERVERDYNAMICSYSTEMFUNCTORBASE_H

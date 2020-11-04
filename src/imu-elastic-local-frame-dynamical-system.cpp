@@ -11,6 +11,24 @@
 
 namespace stateObservation
 {
+
+  inline Matrix3 buildInertiaTensor(const Vector6 inputInertia, Matrix3& inertiaTensor)
+  {
+
+    const double & Ixx=inputInertia[0];
+    const double & Iyy=inputInertia[1];
+    const double & Izz=inputInertia[2];
+    const double & Ixy=inputInertia[3];
+    const double & Ixz=inputInertia[4];
+    const double & Iyz=inputInertia[5];
+
+    inertiaTensor   <<    Ixx, Ixy, Ixz,
+                    Ixy, Iyy, Iyz,
+                    Ixz, Iyz, Izz;
+
+    return inertiaTensor;
+  }
+
   namespace flexibilityEstimation
   {
     using namespace stateObservation;
@@ -164,8 +182,8 @@ namespace stateObservation
         op_.positionCom-=op_.positionComBias;
       }
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
       op_.AngMomentum=u.segment<3>(input::angMoment);
       op_.dotAngMomentum=u.segment<3>(input::dotAngMoment);
 
@@ -440,8 +458,8 @@ namespace stateObservation
       op_.fm=x.segment(state::unmodeledForces,3);
       op_.tm=x.segment(state::unmodeledForces+3,3);
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
 
       unsigned nbContacts(getContactsNumber());
 
@@ -789,8 +807,8 @@ namespace stateObservation
       op_.fm=x.segment(state::unmodeledForces,3);
       op_.tm=x.segment(state::unmodeledForces+3,3);
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
 
       unsigned nbContacts(getContactsNumber());
 
@@ -871,7 +889,7 @@ namespace stateObservation
       }
 
       if (processNoise_!=0x0)
-        return processNoise_->addNoise(op_.xk1);
+        return processNoise_->getNoisy(op_.xk1);
       else
         return xk1_;
     }
@@ -915,8 +933,8 @@ namespace stateObservation
 
       op_.rFlex =computeRotation_(op_.orientationFlexV,0);
 
-      kine::computeInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
-      kine::computeInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
+      buildInertiaTensor(u.segment<6>(input::inertia),op_.inertia);
+      buildInertiaTensor(u.segment<6>(input::dotInertia),op_.dotInertia);
       unsigned nbContacts(getContactsNumber());
       for (unsigned i = 0; i<nbContacts ; ++i)
       {
@@ -925,7 +943,14 @@ namespace stateObservation
         op_.contactOriV.setValue(u.segment<3>(input::contacts +12*i+3),i);
       }
       op_.positionCom=u.segment<3>(input::posCom);
-      if(withComBias_) op_.positionCom-=op_.positionComBias;
+
+      if(withComBias_)
+      {
+        op_.positionComBias <<  x.segment(state::comBias,2),
+                              0;// the bias of the com along the z axis is assumed 0.
+        op_.positionCom-=op_.positionComBias;
+      }
+
       op_.velocityCom=u.segment<3>(input::velCom);
       op_.accelerationCom=u.segment<3>(input::accCom);
       op_.AngMomentum=u.segment<3>(input::angMoment);
@@ -1028,9 +1053,9 @@ namespace stateObservation
       op_.xk_fory = xk_fory_;
       op_.yk = yk_;
 
-      unsigned sizeAfterComBias=getStateSize()-state::comBias-2;
+      Index sizeAfterComBias=getStateSize()-state::comBias-2;
 
-      for (unsigned i=0; i<state::unmodeledForces; ++i)
+      for (Index i=0; i<state::unmodeledForces; ++i)
       {
         op_.xdx[i]+= dx_[i];
 
@@ -1048,7 +1073,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
+        for (Index i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1067,7 +1092,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::comBias; i<state::comBias+2; ++i)
+        for (Index i=state::comBias; i<state::comBias+2; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1086,7 +1111,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::comBias+2; i<state::comBias+2+sizeAfterComBias; ++i)
+        for (Index i=state::comBias+2; i<state::comBias+2+sizeAfterComBias; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1118,10 +1143,10 @@ namespace stateObservation
       op_.xk = xk_;
       op_.xk1 = xk1_;
 
-      unsigned sizeAfterComBias=getStateSize()-state::comBias-2;
-      unsigned sizeAfterUnmodeledForces=getStateSize()-state::unmodeledForces-6;
+      Index sizeAfterComBias=getStateSize()-state::comBias-2;
+      Index sizeAfterUnmodeledForces=getStateSize()-state::unmodeledForces-6;
 
-      for (unsigned i=0; i<state::unmodeledForces; ++i)
+      for (Index i=0; i<state::unmodeledForces; ++i)
       {
         op_.xdx[i]+= dx_[i];
 
@@ -1141,7 +1166,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
+        for (Index i=state::unmodeledForces; i<state::unmodeledForces+6; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1162,7 +1187,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::comBias; i<state::comBias+2; ++i)
+        for (Index i=state::comBias; i<state::comBias+2; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1182,7 +1207,7 @@ namespace stateObservation
       }
       else
       {
-        for (unsigned i=state::drift; i<state::drift+3; ++i)
+        for (Index i=state::drift; i<state::drift+3; ++i)
         {
           op_.xdx[i]+= dx_[i];
 
@@ -1230,22 +1255,22 @@ namespace stateObservation
       dt_=dt;
     }
 
-    unsigned IMUElasticLocalFrameDynamicalSystem::getStateSize() const
+    Index IMUElasticLocalFrameDynamicalSystem::getStateSize() const
     {
       return stateSize_;
     }
 
-    unsigned IMUElasticLocalFrameDynamicalSystem::getInputSize() const
+    Index IMUElasticLocalFrameDynamicalSystem::getInputSize() const
     {
       return inputSize_;
     }
 
-    void IMUElasticLocalFrameDynamicalSystem::setInputSize(unsigned i)
+    void IMUElasticLocalFrameDynamicalSystem::setInputSize(Index i)
     {
       inputSize_=i;
     }
 
-    unsigned IMUElasticLocalFrameDynamicalSystem::getMeasurementSize() const
+    Index IMUElasticLocalFrameDynamicalSystem::getMeasurementSize() const
     {
       return measurementSize_;
     }
@@ -1392,5 +1417,3 @@ namespace stateObservation
     }
   }
 }
-
-

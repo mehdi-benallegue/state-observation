@@ -19,6 +19,7 @@
 
 #include <deque>
 
+#include <state-observation/api.h>
 #include <state-observation/observer/observer-base.hpp>
 
 
@@ -41,7 +42,7 @@ namespace stateObservation
      * \details
      *
      */
-    class ZeroDelayObserver: public ObserverBase
+    class STATE_OBSERVATION_DLLAPI ZeroDelayObserver: public ObserverBase
     {
     public:
 
@@ -49,7 +50,7 @@ namespace stateObservation
         ///  \li n : size of the state vector
         ///  \li m : size of the measurements vector
         ///  \li p : size of the input vector
-        ZeroDelayObserver(unsigned n, unsigned m, unsigned p=0):
+        ZeroDelayObserver(Index n, Index m, Index p=0):
             ObserverBase(n,m,p){}
 
         ///Default constructor (default values for n,m,p are zero)
@@ -124,13 +125,13 @@ namespace stateObservation
         virtual TimeSize getMeasurementsNumber()const;
 
         ///changes the size of the state vector: resets the stored state vector
-        virtual void setStateSize(unsigned n);
+        virtual void setStateSize(Index n);
 
         ///changes the size of the measurement vector: reset the stored measurement vectors
-        virtual void setMeasureSize(unsigned m);
+        virtual void setMeasureSize(Index m);
 
         ///changes the size of the input vector: reset the stored input vectors
-        virtual void setInputSize(unsigned p);
+        virtual void setInputSize(Index p);
 
     protected:
 
@@ -148,6 +149,8 @@ namespace stateObservation
 
         ///Container for the inputs.
         IndexedVectorArray u_;
+    public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     };
 

@@ -36,7 +36,7 @@ namespace stateObservation
         BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C is not initialized");
         BOOST_ASSERT(checkDmatrix(d_) && "ERROR: The D is not initialized");
 
-        optlkf_.prediction.noalias() = a_*x_();
+        xbar_.set(a_*x_(),k);
 
 
         if (p_>0 && b_!=getBmatrixZero())
@@ -46,10 +46,10 @@ namespace stateObservation
                              (the state at time k+1 needs the input at time k which was not given) \
                              if you don't need the input in the computation of state, you \
                              must set B matrix to zero");
-            optlkf_.prediction.noalias()+= b_*this->u_[k-1];
+            xbar_().noalias()+= b_*this->u_[k-1];
         }
 
-        return optlkf_.prediction;
+        return xbar_();
 
     }
 
@@ -66,13 +66,14 @@ namespace stateObservation
                              (the measurement at time k needs the input at time k which was not given) \
                              if you don't need the input in the computation of measurement, you \
                              must set D matrix to zero");
-                return c_*x+d_*u_[k];
+                ybar_.set(c_*x+d_*u_[k],k);
 
         }
         else
         {
-            return ObserverBase::MeasureVector(c_*x);
+            ybar_.set(ObserverBase::MeasureVector(c_*x),k);
         }
+        return ybar_();
 
     }
 
@@ -101,7 +102,7 @@ namespace stateObservation
 
     bool LinearKalmanFilter::checkBmatrix(const Bmatrix & a) const
     {
-        return (unsigned(a.rows())==n_ && unsigned(a.cols())==p_);
+        return (a.rows()==n_ && a.cols()==p_);
     }
 
     LinearKalmanFilter::Dmatrix LinearKalmanFilter::getDmatrixConstant(double c) const
@@ -121,11 +122,11 @@ namespace stateObservation
 
     bool LinearKalmanFilter::checkDmatrix(const Dmatrix & a) const
     {
-        return (unsigned(a.rows())==m_ && unsigned(a.cols())==p_);
+        return (a.rows()==m_ && a.cols()==p_);
     }
 
 
-    void LinearKalmanFilter::setStateSize(unsigned n)
+    void LinearKalmanFilter::setStateSize(Index n)
     {
         if (n!=n_)
         {
@@ -134,7 +135,7 @@ namespace stateObservation
         }
     }
 
-    void LinearKalmanFilter::setMeasureSize(unsigned m)
+    void LinearKalmanFilter::setMeasureSize(Index m)
     {
         if (m!=m_)
         {
@@ -143,7 +144,7 @@ namespace stateObservation
         }
     }
 
-    void LinearKalmanFilter::setInputSize(unsigned p)
+    void LinearKalmanFilter::setInputSize(Index p)
     {
         if (p!=p_)
         {

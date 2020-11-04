@@ -14,6 +14,7 @@
 #ifndef IMU_DYNAMICAL_SYSTEM_HPP
 #define IMU_DYNAMICAL_SYSTEM_HPP
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer-magnetometer.hpp>
@@ -32,7 +33,7 @@ namespace stateObservation
     *
     *
     */
-    class IMUMagnetometerDynamicalSystem : public DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI IMUMagnetometerDynamicalSystem : public DynamicalSystemFunctorBase
     {
     public:
         ///The constructor
@@ -43,11 +44,11 @@ namespace stateObservation
 
         ///Description of the state dynamics
         virtual Vector stateDynamics
-        (const Vector& x, const Vector& u, unsigned k);
+        (const Vector& x, const Vector& u, TimeIndex k);
 
         ///Description of the sensor's dynamics
         virtual Vector measureDynamics
-        (const Vector& x, const Vector& u, unsigned k);
+        (const Vector& x, const Vector& u, TimeIndex k);
 
         ///Sets a noise which disturbs the state dynamics
         virtual void setProcessNoise( NoiseBase * );
@@ -67,11 +68,11 @@ namespace stateObservation
         virtual void setSamplingPeriod(double dt);
 
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual Index getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual Index getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual Index getMeasurementSize() const;
 
     protected:
 
@@ -88,9 +89,9 @@ namespace stateObservation
 
         Quaternion computeQuaternion_(const Vector3 & x);
 
-        static const unsigned stateSize_=18;
-        static const unsigned inputSize_=0;
-        static const unsigned measurementSize_=9;
+        static const Index stateSize_=18;
+        static const Index inputSize_=0;
+        static const Index measurementSize_=9;
 
 
     private:

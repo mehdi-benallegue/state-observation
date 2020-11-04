@@ -123,7 +123,7 @@ stateObservation::IndexedVectorArray offlineModelBaseFlexEstimation(
   for (TimeIndex i=y.getFirstIndex(); i<y.getNextIndex(); ++i)
   {
 
-    estimator.setContactsNumber(unsigned(numberOfContacts[i](0)));
+    estimator.setContactsNumber(unsigned(round(numberOfContacts[i](0))));
 
     if (verbose>0)
     {
@@ -207,7 +207,3 @@ stateObservation::IndexedVectorArray offlineModelBaseFlexEstimation(
 
   return xh;
 }
-
-
-
-

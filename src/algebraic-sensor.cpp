@@ -20,12 +20,12 @@ namespace stateObservation
     }
 
 
-    unsigned AlgebraicSensor::getStateSize() const
+    Index AlgebraicSensor::getStateSize() const
     {
         return getStateSize_()+concat_;
     }
 
-    unsigned AlgebraicSensor::getMeasurementSize() const
+    Index AlgebraicSensor::getMeasurementSize() const
     {
         return getMeasurementSize_()+concat_;
     }
@@ -80,14 +80,14 @@ namespace stateObservation
             storedNoiselessMeasurement_=true;
         }
 
-        return noise_->addNoise( noiselessMeasurement_);
+        return noise_->getNoisy( noiselessMeasurement_);
     }
 
 
-    unsigned AlgebraicSensor::concatenateWithInput( unsigned n)
+    Index AlgebraicSensor::concatenateWithInput( Index n)
     {
         concat_ = n;
         noiselessMeasurement_.resize(getMeasurementSize());
-        return unsigned(getMeasurementSize());
+        return getMeasurementSize();
     }
 }

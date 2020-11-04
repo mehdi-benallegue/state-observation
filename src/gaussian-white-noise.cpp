@@ -8,7 +8,7 @@ namespace stateObservation
 {
 
 
-    GaussianWhiteNoise::GaussianWhiteNoise(unsigned dimension):
+    GaussianWhiteNoise::GaussianWhiteNoise(Index dimension):
             dim_(dimension),
             std_(Matrix::Identity(dimension, dimension)),
             bias_(Vector::Zero(dimension,1)),
@@ -22,11 +22,11 @@ namespace stateObservation
     {
     }
 
-    Vector GaussianWhiteNoise::addNoise(const Vector & v)
+    Vector GaussianWhiteNoise::getNoisy(const Vector & v)
     {
         checkVector_(v);
 
-        sum_(v,tools::ProbabilityLawSimulation::getWGNoise(std_, bias_,dim_),noisy_);
+        sum_(v,tools::ProbabilityLawSimulation::getGaussianVector(std_, bias_,dim_),noisy_);
 
         return noisy_;
 
@@ -51,12 +51,12 @@ namespace stateObservation
         bias_=bias;
     }
 
-    unsigned GaussianWhiteNoise::getDimension() const
+    Index GaussianWhiteNoise::getDimension() const
     {
         return dim_;
     }
 
-    void GaussianWhiteNoise::setDimension(unsigned dim)
+    void GaussianWhiteNoise::setDimension(Index dim)
     {
         dim_=dim;
         bias_=Vector::Zero(dim,1);
@@ -66,13 +66,13 @@ namespace stateObservation
     void GaussianWhiteNoise::checkMatrix_(const Matrix & m) const
     {
         (void)m;//avoid warning
-        BOOST_ASSERT(unsigned(m.rows())==dim_ && unsigned(m.cols())==dim_ && "ERROR: Matrix incorrecly dimemsioned");
+        BOOST_ASSERT(m.rows()==dim_ && m.cols()==dim_ && "ERROR: Matrix incorrecly dimemsioned");
     }
 
     void GaussianWhiteNoise::checkVector_(const Vector & v) const
     {
         (void)v;//avoid warning
-        BOOST_ASSERT(unsigned(v.rows())==dim_ && unsigned(v.cols())==1 && "ERROR: Vector incorrecly dimemsioned");
+        BOOST_ASSERT(v.rows()==dim_ && v.cols()==1 && "ERROR: Vector incorrecly dimemsioned");
     }
 
     void GaussianWhiteNoise::setSumFunction(void (* sum)(const  Vector& stateVector, const Vector& tangentVector, Vector& result))

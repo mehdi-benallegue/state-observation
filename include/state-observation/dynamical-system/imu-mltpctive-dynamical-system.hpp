@@ -13,7 +13,9 @@
 #ifndef IMU_MULTIPLICATIVE_DYNAMICAL_SYSTEM_HPP
 #define IMU_MULTIPLICATIVE_DYNAMICAL_SYSTEM_HPP
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
+#include <state-observation/tools/state-vector-arithmetics.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
 #include <state-observation/noise/noise-base.hpp>
@@ -30,7 +32,9 @@ namespace stateObservation
     *
     *
     */
-    class IMUMltpctiveDynamicalSystem : public DynamicalSystemFunctorBase
+    class STATE_OBSERVATION_DLLAPI IMUMltpctiveDynamicalSystem :
+      public DynamicalSystemFunctorBase,
+      public StateVectorArithmetics
     {
     public:
         ///The constructor
@@ -64,20 +68,53 @@ namespace stateObservation
         ///Set the period of the time discretization
         virtual void setSamplingPeriod(double dt);
 
+        virtual Matrix getAMatrix(const Vector &xh);
+        virtual Matrix getCMatrix(const Vector &xp);
+
         ///Gets the state size
-        virtual unsigned getStateSize() const;
+        virtual Index getStateSize() const;
         ///Gets the input size
-        virtual unsigned getInputSize() const;
+        virtual Index getInputSize() const;
         ///Gets the measurement size
-        virtual unsigned getMeasurementSize() const;
+        virtual Index getMeasurementSize() const;
 
-        static void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+        void stateSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
 
-        static void stateDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        void stateDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
 
     protected:
+        static const Index stateSize_=19;
+        static const Index stateTangentSize_=18;
+        static const Index inputSize_=6;
+        static const Index measurementSize_=6;
         typedef kine::indexes<kine::quaternion> indexes;
         typedef kine::indexes<kine::rotationVector> indexesTangent;
+
+        struct opt
+        {
+          ///containers for Jacobians
+          Matrix3 jRR, jRv;
+
+          Vector3 deltaR;
+
+          Matrix AJacobian;
+          Matrix CJacobian;
+
+          Matrix3 Rt;
+
+          opt(int stateSize, int measurementSize):
+          AJacobian(stateSize,stateSize),
+          CJacobian(measurementSize,stateSize)
+          {
+            AJacobian.setZero();
+            AJacobian.block<3,3>(indexesTangent::pos,indexesTangent::pos).setIdentity();
+            AJacobian.block<6,6>(indexesTangent::linVel,indexesTangent::linVel).setIdentity();
+
+
+            CJacobian.setZero();
+          }
+        } opt_;
+
 
         AccelerometerGyrometer sensor_;
 
@@ -85,9 +122,7 @@ namespace stateObservation
 
         double dt_;
 
-        static const unsigned stateSize_=19;
-        static const unsigned inputSize_=6;
-        static const unsigned measurementSize_=6;
+
 
     private:
 

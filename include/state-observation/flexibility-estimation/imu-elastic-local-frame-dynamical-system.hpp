@@ -11,6 +11,7 @@
 
 #include <vector>
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/noise/noise-base.hpp>
 #include <state-observation/sensors-simulation/accelerometer-gyrometer.hpp>
@@ -34,7 +35,7 @@ namespace stateObservation
     *         other hypothesis than that the contact points are at constant position
     *
     */
-    class 	IMUElasticLocalFrameDynamicalSystem :
+    class STATE_OBSERVATION_DLLAPI	IMUElasticLocalFrameDynamicalSystem :
       public stateObservation::DynamicalSystemFunctorBase
     {
     public:
@@ -169,13 +170,13 @@ namespace stateObservation
       virtual void setSamplingPeriod(double dt);
 
       ///Gets the state size
-      virtual unsigned getStateSize() const;
+      virtual Index getStateSize() const;
 
       ///Gets the input size
-      virtual unsigned getInputSize() const;
+      virtual Index getInputSize() const;
 
       ///Sets the input size
-      virtual void setInputSize(unsigned i);
+      virtual void setInputSize(Index i);
 
       ///Gets the contact number
       ///virtual
@@ -183,7 +184,7 @@ namespace stateObservation
       ///Gets the contacts position
 
       ///Gets the measurement size
-      virtual unsigned getMeasurementSize() const;
+      virtual Index getMeasurementSize() const;
 
       ///Sets the number of contacts
       virtual void setContactsNumber(unsigned);
@@ -319,9 +320,9 @@ namespace stateObservation
 
       Matrix3& computeRotation_(const Vector3 & x, int i);
 
-      static const unsigned stateSize_=state::size;
-      unsigned inputSize_;
-      static const unsigned measurementSizeBase_=6;
+      static const Index stateSize_=state::size;
+      Index inputSize_;
+      static const Index measurementSizeBase_=6;
       unsigned nbContacts_;
       unsigned contactModel_;
 
@@ -339,7 +340,7 @@ namespace stateObservation
       Vector uk_fory_;
 
 
-      unsigned measurementSize_;
+      Index measurementSize_;
 
       std::vector <Vector3,Eigen::aligned_allocator<Vector3> > contactPositions_;
 
@@ -542,4 +543,3 @@ namespace stateObservation
 
 
 #endif /* DYNAMICAL_SYSTEM_HPP_ */
-

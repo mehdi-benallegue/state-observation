@@ -9,23 +9,21 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   double dt)
 {
   ///Sizes of the states for the state, the measurement, and the input vector
-  const unsigned stateSize=19;
-  const unsigned measurementSize=6;
-  const unsigned inputSize=6;
+  const Index stateSize=19;
+  const Index measurementSize=6;
+  const Index inputSize=6;
 
-  typedef kine::indexes<kine::quaternion> indexes;
   typedef kine::indexes<kine::rotationVector> indexesTangent;
 
   ///initialization of the extended Kalman filter
-  ExtendedKalmanFilter filter(stateSize, indexesTangent::size, measurementSize, inputSize, false);
+  ExtendedKalmanFilter filter(stateSize, indexesTangent::size, measurementSize, measurementSize, inputSize, false,true );
 
 
   ///initalization of the functor
   IMUMltpctiveDynamicalSystem imuFunctor;
   imuFunctor.setSamplingPeriod(dt);
   filter.setFunctor(& imuFunctor);
-  filter.setSumFunction(imuFunctor.stateSum);
-  filter.setDifferenceFunction(imuFunctor.stateDifference);
+  filter.setStateArithmetics(& imuFunctor);
 
   ///the initalization of the estimation of the initial state
   filter.setState(xh0,y.getFirstIndex()-1);
@@ -41,12 +39,12 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
   filter.setR(r);
   filter.setQ(q);
 
-  ///set the derivation step for the finite difference method
-  Vector dx=filter.stateVectorConstant(1)*1e-2;
-
   ///the array of the state estimations over time
   IndexedVectorArray xh;
   xh.setValue(xh0,y.getFirstIndex()-1);
+
+
+  Vector xkp=xh0;//previous xk
 
   ///the reconstruction of the state
   for (TimeIndex i=y.getFirstIndex(); i<y.getNextIndex(); ++i)
@@ -58,19 +56,14 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
     if (i<y.getLastIndex())
       filter.setInput(u[i],i);
 
-    ///get the jacobians by finite differences and provide
-    ///them to the Kalman filter
-    ///Matrix a=filter.getAMatrixFD(dx);
-    Matrix c= filter.getCMatrixFD(dx);
+    Matrix a= imuFunctor.getAMatrix(xkp);
 
-    Matrix a = filter.getAmatrixIdentity();
+    filter.updateStatePrediction();
+    Matrix c= imuFunctor.getCMatrix(filter.getLastPrediction());
 
-    a.block<12,12>(0,indexesTangent::linVel).diagonal().setConstant(dt);
-    a.block<6,6>(0,indexesTangent::linAcc).diagonal().setConstant(dt*dt*0.5);
 
     //std::cout<<"a" << std::endl << a <<std::endl;
     //std::cout<<"c" << std::endl << c <<std::endl;
-
 
     filter.setA(a);
     filter.setC(c);
@@ -81,16 +74,14 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction
 
     //std::cout<<"xh"<< xhk.transpose() <<std::endl;
 
-    ///regulate the part of orientation vector in the state vector
-    xhk.segment(indexes::ori,3)=kine::regulateOrientationVector
-                                (xhk.segment(indexes::ori,3));
-
     ///give the new value of the state to the kalman filter.
     ///This step is usually unnecessary, unless we modify the
     ///value of the state esimation which is the case here.
     filter.setState(xhk,i);
 
     xh.setValue(xhk,i);
+
+    xkp = xhk;
   }
 
   return xh;
@@ -104,7 +95,7 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
   const Matrix & r,
   double dt)
 {
-  const unsigned inputSize=6;
+  const Index inputSize=6;
 
   ///initialization of a zero input
   IndexedVectorArray u;
@@ -115,7 +106,3 @@ IndexedVectorArray imuMultiplicativeAttitudeReconstruction(
 
   return imuMultiplicativeAttitudeReconstruction (y, u, xh0, p, q, r, dt);
 }
-
-
-
-

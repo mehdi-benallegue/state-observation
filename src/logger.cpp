@@ -83,6 +83,8 @@ namespace stateObservation
 
     void Logger::update_(const Tmap::iterator & i)
     {
+
+      ///If it is a Matrix or a Vector type
       if (*i->second.type == typeid(Matrix))
       {
         i->second.array.pushBack(*static_cast<const Matrix *>(i->first));
@@ -103,7 +105,9 @@ namespace stateObservation
         i->second.array.pushBack(*static_cast<const Vector3 *>(i->first));
         return;
       }
-      else if (*i->second.type == typeid(int))
+
+      ///if it is a scalar type
+      if (*i->second.type == typeid(int))
       {
         scalar_(0,0)=double(*static_cast<const int *>(i->first));
       }
@@ -114,6 +118,10 @@ namespace stateObservation
       else if (*i->second.type == typeid(long))
       {
         scalar_(0,0)=double(*static_cast<const long *>(i->first));
+      }
+      else if (*i->second.type == typeid(Index))
+      {
+        scalar_(0,0)=double(*static_cast<const Index *>(i->first));
       }
       else if (*i->second.type == typeid(double))
       {

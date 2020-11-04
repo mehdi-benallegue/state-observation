@@ -9,9 +9,9 @@ IndexedVectorArray imuAttitudeTrajectoryReconstruction
     double dt)
 {
     ///Sizes of the states for the state, the measurement, and the input vector
-    const unsigned stateSize=18;
-    const unsigned measurementSize=6;
-    const unsigned inputSize=6;
+    const Index stateSize=18;
+    const Index measurementSize=6;
+    const Index inputSize=6;
 
     typedef kine::indexes<kine::rotationVector> indexes;
 
@@ -87,7 +87,7 @@ IndexedVectorArray imuAttitudeTrajectoryReconstruction(
     const Matrix & r,
     double dt)
 {
-    const unsigned inputSize=6;
+    const Index inputSize=6;
 
     ///initialization of a zero input
     IndexedVectorArray u;
@@ -98,7 +98,3 @@ IndexedVectorArray imuAttitudeTrajectoryReconstruction(
 
     return imuAttitudeTrajectoryReconstruction (y, u, xh0, p, q, r, dt);
 }
-
-
-
-

@@ -14,6 +14,7 @@
 #ifndef TILTESTIMATORHPP
 #define TILTESTIMATORHPP
 
+#include <state-observation/api.h>
 #include <state-observation/observer/zero-delay-observer.hpp>
 
 
@@ -30,7 +31,7 @@ namespace stateObservation
   *         with the last three components of the state vector.
   *
   */
-  class TiltEstimator: public ZeroDelayObserver
+  class STATE_OBSERVATION_DLLAPI TiltEstimator: public ZeroDelayObserver
   {
   public:
 
@@ -44,7 +45,7 @@ namespace stateObservation
     ///set the gain of x1_hat variable
     void setAlpha(const double alpha) { alpha_ = alpha; }
     double getAlpha() const { return alpha_; }
-    
+
     ///set the gain of x2prime_hat variable
     void setBeta(const double beta) { beta_ = beta; }
     double getBeta() const { return beta_; }
@@ -52,7 +53,7 @@ namespace stateObservation
     ///set the gain of x2_hat variable
     void setGamma(const double gamma) { gamma_ = gamma; }
     double getGamma() const { return gamma_; }
-    
+
     ///set the sampling time of the measurements
     void setSamplingTime(const double dt) { dt_ = dt; }
     double getSamplingTime() const { return dt_; }
@@ -60,28 +61,48 @@ namespace stateObservation
     /// sets the position of the IMU sensor in the control frame
     void setSensorPositionInC(const Vector3& p) { p_S_C_ = p; }
     Vector3 getSensorPositionInC() { return p_S_C_; }
-    
+
     /// sets the oriantation of the IMU sensor in the control frame
     void setSensorOrientationInC(const Matrix3& R) { R_S_C_ = R; }
     Matrix3 getSensorOrientationInC() { return R_S_C_; }
-    
+
     /// sets teh linear velocity of the IMU sensor in the control frame
     void setSensorLinearVelocityInC(const Vector3& v) { v_S_C_ = v; }
     Vector3 getSensorLinearVelocityInC() { return v_S_C_; }
-    
+
     /// sets the angular velocity of the IMU sensor in the control frame
     void setSensorAngularVelocityInC(const Vector3& w) { w_S_C_ = w; }
     Vector3 getSensorAngularVelocityInC() { return w_S_C_; }
 
     /// sets the velocity of the control origin in the world frame
+    /// this velocity has to be expressed in the control frame.
     void setControlOriginVelocityInW(const Vector3& v) { v_C_ = v; }
     Vector3 getControlOriginVelocityInW() { return v_C_; }
-    
+
+/// prevent c++ overloaded virtual function warning
+#if defined(__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Woverloaded-virtual"
+#else
+# if defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Woverloaded-virtual"
+# endif
+#endif
+
     /// sets ths measurement (accelero and gyro stacked in one vector)
     void setMeasurement(const Vector3 ya_k, const Vector3 yg_k, TimeIndex k);
 
+#if defined(__clang__)
+#pragma clang diagnostic pop
+    #else
+# if defined(__GNUC__)
+#   pragma GCC diagnostic pop
+# endif
+#endif
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    
+
   protected:
 
     /// The parameters of the estimator
@@ -89,7 +110,7 @@ namespace stateObservation
 
     /// Sampling time
     double dt_;
-    
+
     /// Position of the IMU in the control frame
     Vector3 p_S_C_;
 
@@ -112,14 +133,11 @@ namespace stateObservation
     Vector3 x2_hat_prime_;
     Vector3 x2_hat_;
     Vector3 dx1_hat;
-    
-    
 
-    
     /// The tilt estimator loop
     StateVector oneStepEstimation_();
   };
-  
+
 }
 
 #endif //TILTESTIMATORHPP

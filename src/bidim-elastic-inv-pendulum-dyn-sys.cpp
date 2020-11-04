@@ -45,7 +45,7 @@ namespace stateObservation
         xk1[3]= thetadot + dt_*thetadotdot;
 
         if (processNoise_!=0x0)
-            return processNoise_->addNoise(xk1);
+            return processNoise_->getNoisy(xk1);
         else
             return xk1;
 
@@ -101,17 +101,17 @@ namespace stateObservation
         dt_=dt;
     }
 
-    unsigned BidimElasticInvPendulum::getStateSize() const
+    Index BidimElasticInvPendulum::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned BidimElasticInvPendulum::getInputSize() const
+    Index BidimElasticInvPendulum::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned BidimElasticInvPendulum::getMeasurementSize() const
+    Index BidimElasticInvPendulum::getMeasurementSize() const
     {
         return measurementSize_;
     }

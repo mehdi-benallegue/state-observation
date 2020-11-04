@@ -14,7 +14,7 @@ namespace stateObserver
 
             //add White Gaussian Noise to a vector
             //having a given bias and standard deviation(std)
-            static Eigen::MatrixXd getWGNoise( const Eigen::MatrixXd& std, const Eigen::MatrixXd& bias, unsigned rows, unsigned cols=1);
+            static Eigen::MatrixXd getWGNoise( const Eigen::MatrixXd& std, const Eigen::MatrixXd& bias, Index rows, Index cols=1);
 
         protected:
             static boost::lagged_fibonacci1279 gen_;

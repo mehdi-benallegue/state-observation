@@ -11,7 +11,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=3000;
+    const Index kmax=10000;
 
     ///sampling period
     const double dt=1e-3;
@@ -59,17 +59,18 @@ int test()
 
         ///construction of the input
         /// the input is constant over 10 time samples
-        for (unsigned i=0;i<kmax/10;++i)
+        for (Index i=0;i<kmax/10;++i)
         {
             Vector uk=Vector::Zero(imu.getInputSize(),1);
+            double id = double(i);
 
-            uk[0]=0.4 * sin(M_PI/10*i);
-            uk[1]=0.6 * sin(M_PI/12*i);
-            uk[2]=0.2 * sin(M_PI/5*i);
+            uk[0]=0.4 * sin(M_PI/10*id);
+            uk[1]=0.6 * sin(M_PI/12*id);
+            uk[2]=0.2 * sin(M_PI/5*id);
 
-            uk[3]=10  * sin(M_PI/12*i);
-            uk[4]=0.07  * sin(M_PI/15*i);
-            uk[5]=0.05 * sin(M_PI/5*i);
+            uk[3]=10  * sin(M_PI/12*id);
+            uk[4]=0.07  * sin(M_PI/15*id);
+            uk[5]=0.05 * sin(M_PI/5*id);
 
             ///filling the 10 time samples of the constant input
             for (int j=0;j<10;++j)
@@ -105,15 +106,20 @@ int test()
 
     ///computation and initialization of the covariance matrix of the initial state
     Matrix p=Matrix::Zero(stateSize,stateSize);
-    for (unsigned i=0;i<filter.getStateSize();++i)
+    for (Index i=0;i<filter.getStateSize();++i)
     {
         p(i,i)=xh0[i];
     }
     p=p*p.transpose();
 
+    tools::SimplestStopwatch timer;
+    timer.start();
 
     IndexedVectorArray xh = examples::imuAttitudeTrajectoryReconstruction
                                                     (y, u, xh0, p, q, r, dt);
+
+    double duration = timer.stop();
+
 
 
     ///file of output
@@ -122,7 +128,8 @@ int test()
 
     double dx;
 
-    ///the reconstruction of the state
+
+
     for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
     {
         ///display part, useless
@@ -154,22 +161,29 @@ int test()
 
         dx= acos(double(g.transpose()*gh));
 
+
         f << i<< " \t "<<  dx * 180 / M_PI << " \t\t\t "
         << g.transpose() << " \t\t\t " << gh.transpose() << std::endl;
+
     }
 
-    std::cout << "Verticality estimation error (degrees):" << dx* 180 / M_PI;
+
+    std::cout << "computation time: " << duration/kmax << ". ";
+    std::cout << "Verticality estimation error (degrees): " << dx* 180 / M_PI;
+
 
     if (dx* 180 / M_PI < 1)
     {
-        std::cout<<"Test succeeded";
+        std::cout<<" Test succeeded"<< std::endl;
         return 0;
     }
     else
     {
-        std::cout<<"Test failed";
+        std::cout<<" Test failed"<< std::endl;
         return 1;
     }
+
+
 }
 
 int main()

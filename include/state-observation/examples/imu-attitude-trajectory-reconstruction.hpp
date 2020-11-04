@@ -15,6 +15,7 @@
 #define IMUATTITUDETRAJECTORYRECONTRUCTIONHPP
 
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/imu-dynamical-system.hpp>
 #include <state-observation/dynamical-system/dynamical-system-simulator.hpp>
 #include <state-observation/observer/extended-kalman-filter.hpp>

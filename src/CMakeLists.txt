@@ -4,8 +4,7 @@
 # state-observation is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
+# (at your option) any later version. 
 # state-observation is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,30 +12,60 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with state-observation.  If not, see <http://www.gnu.org/licenses/>.
 
-# prefix and suffix each element of list by ${prefix}elemnt${suffix}
-macro(ADDPREFIX newlist prefix list_name)
-    # create empty list - necessary?
-    SET(${newlist})
+set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME})
 
-     # prefix and suffix elements
-    foreach(l ${${list_name}})
-      list(APPEND ${newlist} ${prefix}${l} )
-    endforeach()
+SET(HEADERS
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/tilt-estimator.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/extended-kalman-filter.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/kalman-filter-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/linear-kalman-filter.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/observer-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/observer/zero-delay-observer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/sensor-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algebraic-sensor.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/accelerometer-gyrometer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/accelerometer-gyrometer-magnetometer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/noise/noise-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/noise/gaussian-white-noise.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algorithm/rotation-velocity.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algorithm/linear-acceleration.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/sensors-simulation/algorithm/magnetic-field.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/definitions.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/definitions.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/hrp2.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/probability-law-simulation.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/miscellaneous-algorithms.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/rigid-body-kinematics.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/rigid-body-kinematics.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/logger.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/logger.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/tools/state-vector-arithmetics.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/dynamical-system-functor-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/dynamical-system-simulator.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/imu-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/imu-mltpctive-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/imu-magnetometer-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamical-system/bidim-elastic-inv-pendulum-dyn-sys.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/flexibility-estimator-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/ekf-flexibility-estimator-base.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/fixed-contact-ekf-flex-estimator-imu.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/imu-fixed-contact-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamics-estimators/kinetics-observer.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/dynamics-estimators/kinetics-observer.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-attitude-trajectory-reconstruction.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-attitude-trajectory-reconstruction.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-multiplicative-attitude-reconstruction.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/imu-multiplicative-attitude-reconstruction.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-ekf-flexibility-estimation.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-ekf-flexibility-estimation.hxx
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-model-base-flex-estimation.hpp
+  ${${PROJECT_NAME}_INCLUDE_DIR}/examples/offline-model-base-flex-estimation.hxx
+)
 
-endmacro(ADDPREFIX)
-
-if(${_Eigen_VERSION} VERSION_LESS "3.2.0")
-    add_definitions(-DEIGEN_VERSION_LESS_THAN_3_2)
-endif()
-
-ADDPREFIX(${PROJECT_NAME}_ABSOLUTE_HEADERS  "${CMAKE_SOURCE_DIR}/"  ${PROJECT_NAME}_HEADERS)
-
-SET(LIBRARY_NAME ${PROJECT_NAME})
-
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
-
-ADD_LIBRARY(${LIBRARY_NAME}
-  SHARED
+SET(SRC 
   tilt-estimator.cpp
   kalman-filter-base.cpp
   observer-base.cpp
@@ -50,6 +79,7 @@ ADD_LIBRARY(${LIBRARY_NAME}
   magnetic-field.cpp
   definitions.cpp
   logger.cpp
+  state-vector-arithmetics.cpp
   accelerometer-gyrometer.cpp
   accelerometer-gyrometer-magnetometer.cpp
   probability-law-simulation.cpp
@@ -68,21 +98,33 @@ ADD_LIBRARY(${LIBRARY_NAME}
   imu-elastic-local-frame-dynamical-system.cpp
   bidim-elastic-inv-pendulum-dyn-sys.cpp
   kinetics-observer.cpp
-  kinetics-dynamical-system.cpp
-  ${${PROJECT_NAME}_ABSOLUTE_HEADERS}
-  )
+)
 
-SET_TARGET_PROPERTIES(${LIBRARY_NAME}
-  PROPERTIES
-  SOVERSION ${PROJECT_VERSION}
-  INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+
+SET(LIBRARY_NAME ${PROJECT_NAME})
+ADD_LIBRARY(${LIBRARY_NAME} SHARED ${SRC} ${HEADERS})
+SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS "-DSTATE_OBSERVATION_EXPORTS")
+set_target_properties(${LIBRARY_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR} VERSION ${PROJECT_VERSION})
+target_include_directories(${LIBRARY_NAME} PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>/$<CONFIG>/include
+	$<INSTALL_INTERFACE:include>)
+
+TARGET_LINK_LIBRARIES(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::thread Boost::program_options Boost::timer Boost::random Boost::disable_autolinking)
+if(TARGET Eigen3::Eigen)
+  target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen)
+else()
+  target_include_directories(${LIBRARY_NAME} PUBLIC "${EIGEN3_INCLUDE_DIR}")
+endif()
+SET_TARGET_PROPERTIES(${LIBRARY_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 
 INSTALL(TARGETS ${LIBRARY_NAME}
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+  EXPORT "${TARGETS_EXPORT_NAME}"
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
-ADD_REQUIRED_DEPENDENCY("eigen3 >= 3.0.0")
-INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIRS})
-SET(LINEAR_ALGEBRA_LIB_FOUND 1)
-SET(_EIGEN_MATRIX_FOUND_ 1)
+install(DIRECTORY ${${PROJECT_NAME}_INCLUDE_DIR}/ DESTINATION ${INCLUDE_INSTALL_DESTINATION})
 
-
+PKG_CONFIG_APPEND_LIBS(${PROJECT_NAME})

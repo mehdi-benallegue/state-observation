@@ -14,6 +14,7 @@
 #ifndef FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H
 #define FLEXBILITYESTMATOR_MODELBASEEKFFLEXIBILITYESTIMATOR_IMU_H
 
+#include <state-observation/api.h>
 #include <state-observation/flexibility-estimation/ekf-flexibility-estimator-base.hpp>
 //#include <state-observation/flexibility-estimation/stable-imu-fixed-contact-dynamical-system.hpp>
 #include <state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp>
@@ -35,7 +36,7 @@ namespace flexibilityEstimation
     *
     */
 
-    class ModelBaseEKFFlexEstimatorIMU :
+    class STATE_OBSERVATION_DLLAPI ModelBaseEKFFlexEstimatorIMU :
                                             public EKFFlexibilityEstimatorBase,
                                             private boost::noncopyable
     {
@@ -99,7 +100,7 @@ namespace flexibilityEstimation
         {
             stateObservation::Matrix P(ekf_.getStateCovariance());
             stateObservation::Vector Pvec(ekf_.getStateSize());
-            for(unsigned i=0;i<ekf_.getStateSize();++i) Pvec(i)=P(i,i);
+            for(Index i=0;i<ekf_.getStateSize();++i) Pvec(i)=P(i,i);
             return Pvec;
         }
 
@@ -127,11 +128,11 @@ namespace flexibilityEstimation
         }
 
 
-        virtual unsigned getMeasurementSize() const ;
+        virtual Index getMeasurementSize() const ;
 
-        virtual unsigned getStateSize() const ;
+        virtual Index getStateSize() const ;
 
-        virtual unsigned getInputSize() const ;
+        virtual Index getInputSize() const ;
 
 
         ///sets to whether or not the force mesurements are taken into account
@@ -254,12 +255,13 @@ namespace flexibilityEstimation
 
         Matrix R_,Q_,P_;
 
-        const unsigned stateSize_;
+        const Index stateSize_;
 
-        static const unsigned measurementSizeBase_=12;
+        static const Index measurementSizeBase_=12;
 
-        static const unsigned inputSizeBase_=42;
-        unsigned inputSize_;
+        static const Index inputSizeBase_=
+                    IMUElasticLocalFrameDynamicalSystem::input::sizeBase;
+        Index inputSize_;
 
         double dt_;//sampling period
         bool on_;

@@ -14,24 +14,23 @@ namespace stateObservation
 
     KalmanFilterBase::KalmanFilterBase():
       nt_(0),
-      sum_(detail::defaultSum),
-      difference_(detail::defaultDifference)
+      arithm_(this)
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(unsigned n,unsigned m,unsigned p)
+    KalmanFilterBase::KalmanFilterBase(Index n,Index m,Index p)
             :ZeroDelayObserver(n,m,p),
             nt_(n),
-            sum_(detail::defaultSum),
-            difference_(detail::defaultDifference)
+            mt_(m),
+            arithm_(this)
     {
     }
 
-    KalmanFilterBase::KalmanFilterBase(unsigned n, unsigned nt, unsigned m,unsigned p)
+    KalmanFilterBase::KalmanFilterBase(Index n, Index nt, Index m, Index mt, Index p)
             :ZeroDelayObserver(n,m,p),
             nt_(nt),
-            sum_(detail::defaultSum),
-            difference_(detail::defaultDifference)
+            mt_(mt),
+            arithm_(this)
     {
     }
 
@@ -129,13 +128,13 @@ namespace stateObservation
 
 
         //innovation Measurements
-        oc_.inoMeas.noalias() = this->y_[k+1] - predictedMeasurement_;
+        arithm_->measurementDifference(this->y_[k+1], ybar_(),oc_.inoMeas);
         oc_.inoMeasCov.noalias() = r_ +  c_ * (oc_.pbar * c_.transpose());
 
-        unsigned &  measurementSize =m_;
+        Index &  measurementTangentSize =mt_;
         //inversing innovation measurement covariance matrix
         oc_.inoMeasCovLLT.compute(oc_.inoMeasCov);
-        oc_.inoMeasCovInverse.resize(measurementSize,measurementSize);
+        oc_.inoMeasCovInverse.resize(measurementTangentSize,measurementTangentSize);
         oc_.inoMeasCovInverse.setIdentity();
         oc_.inoMeasCovLLT.matrixL().solveInPlace(oc_.inoMeasCovInverse);
         oc_.inoMeasCovLLT.matrixL().transpose().solveInPlace(oc_.inoMeasCovInverse);
@@ -146,7 +145,7 @@ namespace stateObservation
 
         //update
 
-        sum_(oc_.xbar,innovation_,oc_.xhat);
+        arithm_->stateSum(xbar_(),innovation_,oc_.xhat);
 
 #ifdef VERBOUS_KALMANFILTER
         Eigen::IOFormat CleanFmt(2, 0, " ", "\n", "", "");
@@ -154,12 +153,12 @@ namespace stateObservation
         std::cout <<"C" <<std::endl<< c_.format(CleanFmt)<<std::endl;
         std::cout <<"P" <<std::endl<< pr_.format(CleanFmt)<<std::endl;
         std::cout <<"K" <<std::endl<< oc_.kGain.format(CleanFmt)<<std::endl;
-        std::cout <<"Xbar" <<std::endl<< oc_.xbar.transpose().format(CleanFmt)<<std::endl;
+        std::cout <<"Xbar" <<std::endl<< xbar().transpose().format(CleanFmt)<<std::endl;
         std::cout <<"inoMeasCov" <<std::endl<< oc_.inoMeasCov.format(CleanFmt)<<std::endl;
         std::cout <<"oc_.pbar" <<std::endl<< (oc_.pbar).format(CleanFmt)<<std::endl;
         std::cout <<"c_ * (oc_.pbar * c_.transpose())" <<std::endl<< ( c_ * (oc_.pbar * c_.transpose())).format(CleanFmt)<<std::endl;
         std::cout <<"inoMeasCovInverse" <<std::endl<< oc_.inoMeasCovInverse.format(CleanFmt)<<std::endl;
-        std::cout <<"predictedMeasurement " <<std::endl<< predictedMeasurement_.transpose().format(CleanFmt)<<std::endl;
+        std::cout <<"predictedMeasurement " <<std::endl<<  ybar_().transpose().format(CleanFmt)<<std::endl;
         std::cout <<"inoMeas" <<std::endl<< oc_.inoMeas.transpose().format(CleanFmt)<<std::endl;
         std::cout <<"inovation_" <<std::endl<< inovation_.transpose().format(CleanFmt)<<std::endl;
         std::cout <<"Xhat" <<std::endl<< oc_.xhat.transpose().format(CleanFmt)<<std::endl;
@@ -214,27 +213,27 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkAmatrix(const Amatrix & a) const
     {
-        return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
+        return (a.rows()==nt_ && a.cols()==nt_);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(m_,nt_,c);
+        return Cmatrix::Constant(mt_,nt_,c);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixRandom() const
     {
-        return Cmatrix::Random(m_,nt_);
+        return Cmatrix::Random(mt_,nt_);
     }
 
     KalmanFilterBase::Cmatrix KalmanFilterBase::getCmatrixZero() const
     {
-        return Cmatrix::Zero(m_,nt_);
+        return Cmatrix::Zero(mt_,nt_);
     }
 
     bool KalmanFilterBase::checkCmatrix(const Cmatrix & a) const
     {
-        return (unsigned(a.rows())==m_ && unsigned(a.cols())==nt_);
+        return (a.rows()==mt_ && a.cols()==nt_);
     }
 
     KalmanFilterBase::Qmatrix KalmanFilterBase::getQmatrixConstant(double c) const
@@ -259,32 +258,32 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkQmatrix(const Qmatrix & a) const
     {
-        return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
+        return (a.rows()==nt_ && a.cols()==nt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixConstant(double c) const
     {
-        return Cmatrix::Constant(m_,m_,c);
+        return Cmatrix::Constant(mt_,mt_,c);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixRandom() const
     {
-        return Cmatrix::Random(m_,m_);
+        return Cmatrix::Random(mt_,mt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixZero() const
     {
-        return Rmatrix::Zero(m_,m_);
+        return Rmatrix::Zero(mt_,mt_);
     }
 
     KalmanFilterBase::Rmatrix KalmanFilterBase::getRmatrixIdentity() const
     {
-        return Rmatrix::Identity(m_,m_);
+        return Rmatrix::Identity(mt_,mt_);
     }
 
     bool KalmanFilterBase::checkRmatrix(const Rmatrix & a) const
     {
-        return (unsigned(a.rows())==m_ && (unsigned(a.cols()))==m_);
+        return (a.rows()==mt_ && a.cols()==mt_);
     }
 
     KalmanFilterBase::Pmatrix KalmanFilterBase::getPmatrixConstant(double c) const
@@ -309,26 +308,59 @@ namespace stateObservation
 
     bool KalmanFilterBase::checkPmatrix(const Pmatrix & a) const
     {
-        return (unsigned(a.rows())==nt_ && unsigned(a.cols())==nt_);
+        return (a.rows()==nt_ && a.cols()==nt_);
     }
 
-    void KalmanFilterBase::setStateSize(unsigned n)
+
+
+    KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorConstant( double c ) const
     {
-        if ((n!=n_) || (nt_ !=n))
-        {
-            ZeroDelayObserver::setStateSize(n);
-
-            nt_=n;
-
-            clearA();
-            clearC();
-            clearQ();
-            clearStateCovariance();
-
-        }
+        return StateVectorTan::Constant(nt_,1,c);
     }
 
-    void KalmanFilterBase::setStateSize(unsigned n, unsigned nt)
+    KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorRandom() const
+    {
+        return StateVectorTan::Random(nt_,1);
+    }
+
+    KalmanFilterBase::StateVectorTan KalmanFilterBase::stateTangentVectorZero() const
+    {
+        return StateVectorTan::Zero(nt_,1);
+    }
+
+    bool KalmanFilterBase::checkStateTangentVector(const KalmanFilterBase::StateVectorTan & v) const
+    {
+        return (v.rows()==nt_ && v.cols()==1);
+    }
+
+
+    KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorConstant( double c ) const
+    {
+        return MeasureVectorTan::Constant(mt_,1,c);
+    }
+
+    KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorRandom() const
+    {
+        return MeasureVectorTan::Random(mt_,1);
+    }
+
+    KalmanFilterBase::MeasureVectorTan KalmanFilterBase::measureTangentVectorZero() const
+    {
+        return MeasureVectorTan::Zero(mt_,1);
+    }
+
+    bool KalmanFilterBase::checkMeasureTangentVector(const KalmanFilterBase::MeasureVectorTan & v) const
+    {
+        return (v.rows()==mt_ && v.cols()==1);
+    }
+
+
+    void KalmanFilterBase::setStateSize(Index n)
+    {
+        setStateSize(n,n);
+    }
+
+    void KalmanFilterBase::setStateSize(Index n, Index nt)
     {
         if ((n!=n_) || (nt_ !=nt))
         {
@@ -344,10 +376,16 @@ namespace stateObservation
         }
     }
 
-    void KalmanFilterBase::setMeasureSize(unsigned m)
+    void KalmanFilterBase::setMeasureSize(Index m)
     {
-        if (m!=m_)
+        setMeasureSize(m,m);
+    }
+
+    void KalmanFilterBase::setMeasureSize(Index m, Index mt)
+    {
+        if ((m!=m_) || mt!=mt_)
         {
+            mt_=mt;
             ZeroDelayObserver::setMeasureSize(m);
             clearC();
             clearR();
@@ -366,12 +404,12 @@ namespace stateObservation
 
     Vector KalmanFilterBase::getLastPrediction() const
     {
-        return oc_.xbar;
+        return xbar_();
     }
 
     Vector KalmanFilterBase::getLastPredictedMeasurement() const
     {
-        return predictedMeasurement_;
+        return ybar_();
     }
 
     Matrix KalmanFilterBase::getLastGain() const
@@ -381,20 +419,13 @@ namespace stateObservation
 
     Vector KalmanFilterBase::predictSensor_(TimeIndex k)
     {
-        oc_.xbar = prediction_(k);
-        return predictedMeasurement_=simulateSensor_(oc_.xbar,k);
+        return ybar_.set(simulateSensor_(xbar_(),k),k);
     }
 
 
-    void KalmanFilterBase::setSumFunction(void (* sum )(const  Vector& stateVector, const Vector& tangentVector, Vector& result))
+    void KalmanFilterBase::setStateArithmetics(StateVectorArithmetics * a)
     {
-      sum_ = sum;
+        arithm_ = a;
     }
-
-    void KalmanFilterBase::setDifferenceFunction(void (* difference )(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference))
-    {
-      difference_= difference;
-    }
-
 
 }

@@ -1,76 +1,156 @@
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem():
-  IsSet(false)
+inline CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem(bool initialize)
+{
+  if (initialize)
+    isSet_=false;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline CheckedItem<T,lazy,alwaysCheck,assertion , eigenAlignedNew>::CheckedItem(const CheckedItem & c):
+  v_(c.v_)
+{
+  if (do_check_)
+  {
+    isSet_ = c.isSet_;
+  }
+
+  if (do_assert_)
+  {
+    assertMsg_ = c.assertMsg_;
+  }
+
+  if (do_exception_)
+  {
+    exceptionPtr_=c.exceptionPtr_;
+  }
+}
+
+
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline CheckedItem<T,lazy,alwaysCheck,assertion, eigenAlignedNew>::CheckedItem(const T& v):
+  isSet_(true), v_(v)
 {
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-CheckedItem<T,lazy,alwaysCheck,assertion, eigenAlignedNew>::CheckedItem(const T& v):
-  IsSet(true), v_(v)
+inline T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(const T& v)
 {
-}
-
-template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(const T& v)
-{
-  IsSet::set(true);
+  isSet_.set(true);
   return v_=v;
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew> &
+    CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator=(const CheckedItem & c)
+{
+  v_=c.v_;
+
+  if (do_check_)
+  {
+    isSet_ = c.isSet_;
+  }
+
+  if (do_assert_)
+  {
+    assertMsg_ = c.assertMsg_;
+  }
+
+  if (do_exception_)
+  {
+    exceptionPtr_=c.exceptionPtr_;
+  }
+
+  return *this;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
 inline  CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator T() const
+{
+  return (*this)();
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator const T&() const
+{
+  return (*this)();
+}
+
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  T CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_getValue() const
+{
+  return (*this)();
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline  const T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator()() const
 {
   chckitm_check_();
   return v_;
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_check_() const throw(std::exception)
+inline  T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::operator()()
+{
+  chckitm_check_();
+  return v_;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_check_() const
 {
   if (assertion)
   {
-    BOOST_ASSERT_MSG(chckitm_isSet(),AssertMsg::get());
+    BOOST_ASSERT_MSG(isSet(),assertMsg_.get());
   }
 
   if (alwaysCheck || isDebug)
   {
-    if (!chckitm_isSet())
+    if (!isSet())
     {
-      throw (*(ExceptionPtr::get()));
+      throw (*(exceptionPtr_.get()));
     }
   }
-  return (chckitm_isSet());
+  return (isSet());
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_isSet() const
+inline bool CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::isSet() const
 {
-  return IsSet::get();
+  return isSet_.get();
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_reset()
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::reset()
 {
-  IsSet::set(false);
+  isSet_.set(false);
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_set(bool value)
+inline T& CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::set()
 {
-  IsSet::set(value);
+  isSet_.set(true);
+  return v_;
+}
+
+template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::set(bool value)
+{
+  isSet_.set(value);
 }
 
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_setAssertMessage(std::string s)
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::setAssertMessage(std::string s)
 {
-  AssertMsg::set(s);
+  assertMsg_.set(s);
 }
 
 template <typename T, bool lazy, bool alwaysCheck , bool assertion, bool eigenAlignedNew>
-inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::chckitm_setExceptionPtr(std::exception* e)
+inline void CheckedItem<T,lazy,alwaysCheck , assertion,eigenAlignedNew>::setExceptionPtr(std::exception* e)
 {
-  ExceptionPtr::set(e);
+  exceptionPtr_.set(e);
 }
 
 
@@ -101,11 +181,19 @@ inline bool IndexedMatrixT<MatrixType,lazy>::isSet()const
 
 ///Set the value of the matrix and the time sample
 template <typename MatrixType, bool lazy>
-inline void IndexedMatrixT<MatrixType,lazy>::set(const MatrixType& v,TimeIndex k)
+inline MatrixType IndexedMatrixT<MatrixType,lazy>::set(const MatrixType& v,TimeIndex k)
 {
   IsSet::set(true);
   k_=k;
   v_=v;
+  return(v);
+}
+
+///Switch the matrix to set
+template <typename MatrixType, bool lazy>
+inline void IndexedMatrixT<MatrixType,lazy>::set(bool b)
+{
+  IsSet::set(b);
 }
 
 ///Set the value of the matrix and the time sample
@@ -166,8 +254,8 @@ TimeIndex IndexedMatrixT<MatrixType,lazy>::getTime()const
 
 
 ///Set the value of the matrix and the time sample
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::setValue(const MatrixType& v,TimeIndex k)
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator >::setValue(const MatrixType& v,TimeIndex k)
 {
     if (checkIndex(k))
     {
@@ -183,14 +271,14 @@ inline void IndexedMatrixArrayT<MatrixType>::setValue(const MatrixType& v,TimeIn
     }
 }
 
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::pushBack(const MatrixType& v)
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::pushBack(const MatrixType& v)
 {
     v_.push_back(v);
 }
 
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::popFront()
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::popFront()
 {
     check_();
     v_.pop_front();
@@ -198,115 +286,117 @@ inline void IndexedMatrixArrayT<MatrixType>::popFront()
 }
 
 ///Get the matrix value
-template <typename MatrixType>
-inline MatrixType IndexedMatrixArrayT<MatrixType>::operator[](TimeIndex time)const
+template <typename MatrixType, typename Allocator>
+inline MatrixType IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)const
 {
     check_(time);
-    return v_[time - k_];
+    return v_[size_t(time - k_)];
 }
 
 ///Get the matrix value
-template <typename MatrixType>
-inline MatrixType & IndexedMatrixArrayT<MatrixType>::operator[](TimeIndex time)
+template <typename MatrixType, typename Allocator>
+inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::operator[](TimeIndex time)
 {
     check_(time);
-    return v_[time - k_];
+    return v_[size_t(time - k_)];
 }
 
 
 ///gets the first value
-template <typename MatrixType>
-inline const MatrixType & IndexedMatrixArrayT<MatrixType>::front() const
+template <typename MatrixType, typename Allocator>
+inline const MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::front() const
 {
     return v_.front();
 }
 
 ///gets the first value
-template <typename MatrixType>
-inline MatrixType& IndexedMatrixArrayT<MatrixType>::front()
+template <typename MatrixType, typename Allocator>
+inline MatrixType& IndexedMatrixArrayT<MatrixType, Allocator>::front()
 {
     return v_.front();
 }
 
 ///gets the last value
-template <typename MatrixType>
-inline const MatrixType & IndexedMatrixArrayT<MatrixType>::back() const
+template <typename MatrixType, typename Allocator>
+inline const MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::back() const
 {
     return v_.back();
 }
 
 ///gets the last value
-template <typename MatrixType>
-inline MatrixType & IndexedMatrixArrayT<MatrixType>::back()
+template <typename MatrixType, typename Allocator>
+inline MatrixType & IndexedMatrixArrayT<MatrixType, Allocator>::back()
 {
     return v_.back();
 }
 
 ///Get the time index
-template <typename MatrixType>
-inline long int IndexedMatrixArrayT<MatrixType>::getLastIndex()const
+template <typename MatrixType, typename Allocator>
+inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::getLastIndex()const
 {
-  return long(k_+v_.size())-1;
+  return k_+ TimeIndex(v_.size())-1;
 }
 
 ///Get the time index
-template <typename MatrixType>
-inline TimeIndex IndexedMatrixArrayT<MatrixType>::getNextIndex()const
+template <typename MatrixType, typename Allocator>
+inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::getNextIndex()const
 {
-  return k_+v_.size();
+  return k_+TimeIndex(v_.size());
 }
 
 
 ///Get the time index
-template <typename MatrixType>
-inline TimeIndex IndexedMatrixArrayT<MatrixType>::getFirstIndex()const
+template <typename MatrixType, typename Allocator>
+inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::getFirstIndex()const
 {
   return k_;
 }
 
-template <typename MatrixType>
-inline TimeIndex IndexedMatrixArrayT<MatrixType>::setLastIndex(int index)
+template <typename MatrixType, typename Allocator>
+inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::setLastIndex(int index)
 {
   return k_=index-(v_.size()+1);
 }
 
-template <typename MatrixType>
-inline TimeIndex IndexedMatrixArrayT<MatrixType>::setFirstIndex(int index)
+template <typename MatrixType, typename Allocator>
+inline TimeIndex IndexedMatrixArrayT<MatrixType, Allocator>::setFirstIndex(int index)
 {
   return k_=index;
 }
 
-template <typename MatrixType>
-inline TimeSize IndexedMatrixArrayT<MatrixType>::size() const
+template <typename MatrixType, typename Allocator>
+inline TimeSize IndexedMatrixArrayT<MatrixType, Allocator>::size() const
 {
-    return v_.size();
+    return TimeSize(v_.size());
 }
 
 ///Switch off the initialization flag, the value is no longer accessible
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::reset()
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::reset()
 {
     k_=0;
     v_.clear();
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::clear()
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::clear()
 {
-  k_=k_+v_.size();
+  k_=k_+TimeIndex(v_.size());
   v_.clear();
 }
 
-template <typename MatrixType>
-inline bool IndexedMatrixArrayT<MatrixType>::checkIndex(TimeIndex time) const
+template <typename MatrixType, typename Allocator>
+inline bool IndexedMatrixArrayT<MatrixType, Allocator>::checkIndex(TimeIndex time) const
 {
-    return (v_.size()>0 && k_<=time && TimeIndex(k_+v_.size()) > time);
+    return (v_.size()>0 &&
+            k_<=time &&
+            k_ + TimeIndex(v_.size()) > time);
 }
 
 ///Checks whether the matrix is set or not (assert)
 ///does nothing in release mode
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::check_(TimeIndex time)const
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::check_(TimeIndex time)const
 {
     (void)time;//avoid warning in release mode
     BOOST_ASSERT(checkIndex(time) && "Error: Time out of range");
@@ -314,36 +404,36 @@ inline void IndexedMatrixArrayT<MatrixType>::check_(TimeIndex time)const
 
 ///Checks whether the matrix is set or not (assert)
 ///does nothing in release mode
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::check_()const
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::check_()const
 {
     BOOST_ASSERT(v_.size() && "Error: Matrix array is empty");
 }
 
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::checkNext_(TimeIndex time)const
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::checkNext_(TimeIndex time)const
 {
     (void)time;//avoid warning
-    BOOST_ASSERT( (v_.size()==0 || TimeIndex(k_+v_.size()) == time )&&
+    BOOST_ASSERT( (v_.size()==0 || k_+ TimeIndex(v_.size()) == time )&&
                   "Error: New time instants must be consecutive to existing ones");
 }
 
 ///resizes the array
-template <typename MatrixType>
-inline void IndexedMatrixArrayT<MatrixType>::resize(TimeSize i, const MatrixType & m )
+template <typename MatrixType, typename Allocator>
+inline void IndexedMatrixArrayT<MatrixType, Allocator>::resize(TimeSize i, const MatrixType & m )
 {
-    v_.resize(i,m);
+    v_.resize(size_t(i),m);
 }
 
 ///Default constructor
-template <typename MatrixType>
-IndexedMatrixArrayT<MatrixType>::IndexedMatrixArrayT():
+template <typename MatrixType, typename Allocator>
+IndexedMatrixArrayT<MatrixType, Allocator>::IndexedMatrixArrayT():
   k_(0)
 {
 }
 
-template <typename MatrixType>
-typename IndexedMatrixArrayT<MatrixType>::Array IndexedMatrixArrayT<MatrixType>::getArray() const
+template <typename MatrixType, typename Allocator>
+typename IndexedMatrixArrayT<MatrixType, Allocator>::Array IndexedMatrixArrayT<MatrixType, Allocator>::getArray() const
 {
   Array v;
 
@@ -355,8 +445,8 @@ typename IndexedMatrixArrayT<MatrixType>::Array IndexedMatrixArrayT<MatrixType>:
   return v;
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::truncateAfter(TimeIndex time)
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::truncateAfter(TimeIndex time)
 {
   if (v_.size()>0)
   {
@@ -364,7 +454,7 @@ void IndexedMatrixArrayT<MatrixType>::truncateAfter(TimeIndex time)
     {
       if (time < getLastIndex())
       {
-        resize (time-getFirstIndex()+1);
+        resize (TimeSize(time-getFirstIndex()+1));
       }
     }
     else
@@ -374,8 +464,8 @@ void IndexedMatrixArrayT<MatrixType>::truncateAfter(TimeIndex time)
   }
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::truncateBefore(TimeIndex time)
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::truncateBefore(TimeIndex time)
 {
   if (v_.size()>0)
   {
@@ -395,14 +485,14 @@ void IndexedMatrixArrayT<MatrixType>::truncateBefore(TimeIndex time)
   }
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::readFromFile(const std::string & filename, size_t rows, size_t cols, bool withTimeStamp)
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const std::string & filename, Index rows, Index cols, bool withTimeStamp)
 {
   readFromFile(filename.c_str(),rows, cols, withTimeStamp);
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::readFromFile(const char * filename, size_t rows, size_t cols, bool withTimeStamp)
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::readFromFile(const char * filename, Index rows, Index cols, bool withTimeStamp)
 {
   reset();
 
@@ -432,9 +522,9 @@ void IndexedMatrixArrayT<MatrixType>::readFromFile(const char * filename, size_t
         continuation=false;
       else
       {
-        for (size_t i = 0 ; i<rows; ++i)
+        for (Index i = 0 ; i<rows; ++i)
         {
-          for (size_t j = 0 ; j<cols; ++j)
+          for (Index j = 0 ; j<cols; ++j)
           {
             f >> m(i,j);
           }
@@ -447,14 +537,14 @@ void IndexedMatrixArrayT<MatrixType>::readFromFile(const char * filename, size_t
   }
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::readVectorsFromFile(const std::string & filename, bool withTimeStamp )
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::readVectorsFromFile(const std::string & filename, bool withTimeStamp )
 {
   readVectorsFromFile(filename.c_str(),withTimeStamp);
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::readVectorsFromFile(const char * filename, bool withTimeStamp )
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::readVectorsFromFile(const char * filename, bool withTimeStamp )
 {
   reset();
 
@@ -503,10 +593,10 @@ void IndexedMatrixArrayT<MatrixType>::readVectorsFromFile(const char * filename,
             doublecontainer.push_back(component);
           }
         }
-        v.resize(doublecontainer.size());
-        for (unsigned i=0 ; i<doublecontainer.size() ; ++i)
+        v.resize(Index(doublecontainer.size()));
+        for (Index i=0 ; i<Index(doublecontainer.size()) ; ++i)
         {
-          v(i)=doublecontainer[i];
+          v(i)=doublecontainer[size_t(i)];
         }
         setValue(v,k);
         ++k;
@@ -516,15 +606,15 @@ void IndexedMatrixArrayT<MatrixType>::readVectorsFromFile(const char * filename,
   }
 }
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::writeInFile(const std::string & filename,  bool clearLog, bool append)
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::writeInFile(const std::string & filename,  bool clearLog, bool append)
 {
   writeInFile(filename.c_str(),  clearLog, append);
 }
 
 
-template <typename MatrixType>
-void IndexedMatrixArrayT<MatrixType>::writeInFile(const char * filename, bool clearLog, bool append)
+template <typename MatrixType, typename Allocator>
+void IndexedMatrixArrayT<MatrixType, Allocator>::writeInFile(const char * filename, bool clearLog, bool append)
 {
   std::ofstream f;
   if (!append)
@@ -573,28 +663,3 @@ void IndexedMatrixArrayT<MatrixType>::writeInFile(const char * filename, bool cl
   }
 
 }
-
-namespace tools
-{
-
-  inline void SimplestStopwatch::start()
-  {
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time1);
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
-  }
-
-  inline double SimplestStopwatch::stop()
-  {
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time3);
-
-    return diff(time2,time3)-diff(time1,time2);
-  }
-
-  double SimplestStopwatch::diff(const timespec & start, const timespec & end)
-  {
-    return 1e9*double(end.tv_sec-start.tv_sec) + double(end.tv_nsec - start.tv_nsec);
-  }
-}
-
-
-

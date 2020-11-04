@@ -56,8 +56,8 @@ int test(const IndexedVectorArray & y)
     const double dt=5e-3;
 
     ///Sizes of the states for the state, the measurement, and the input vector
-    const unsigned stateSize=18;
-    const unsigned measurementSize=6;
+    const Index stateSize=18;
+    const Index measurementSize=6;
 
     Vector xh0=Vector::Zero(stateSize,1);
 

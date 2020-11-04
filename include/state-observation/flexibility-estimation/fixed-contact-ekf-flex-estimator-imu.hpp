@@ -14,6 +14,7 @@
 #ifndef FLEXBILITYESTMATOR_FIXEDCONTACTEKFFLEXIBILITYESTIMATOR_IMU_H
 #define FLEXBILITYESTMATOR_FIXEDCONTACTEKFFLEXIBILITYESTIMATOR_IMU_H
 
+#include <state-observation/api.h>
 #include <state-observation/flexibility-estimation/ekf-flexibility-estimator-base.hpp>
 #include <state-observation/flexibility-estimation/imu-fixed-contact-dynamical-system.hpp>
 
@@ -33,7 +34,7 @@ namespace flexibilityEstimation
     *
     */
 
-    class FixedContactEKFFlexEstimatorIMU :
+    class STATE_OBSERVATION_DLLAPI FixedContactEKFFlexEstimatorIMU :
                                             public EKFFlexibilityEstimatorBase,
                                             private boost::noncopyable
     {
@@ -83,11 +84,11 @@ namespace flexibilityEstimation
         virtual const Vector& getFlexibilityVector();
 
 
-        virtual unsigned getMeasurementSize() const ;
+        virtual Index getMeasurementSize() const ;
 
-        virtual unsigned getStateSize() const ;
+        virtual Index getStateSize() const ;
 
-        virtual unsigned getInputSize() const ;
+        virtual Index getInputSize() const ;
 
         /// sets the sampling period
         virtual void setSamplingPeriod(double);
@@ -108,9 +109,9 @@ namespace flexibilityEstimation
 
         Matrix R_,Q_;
 
-        static const unsigned stateSizeConst_=18;
-        static const unsigned measurementSizeConst_=6;
-        static const unsigned inputSizeConst_=15;
+        static const Index stateSizeConst_=18;
+        static const Index measurementSizeConst_=6;
+        static const Index inputSizeConst_=15;
 
         double dt_;//sampling period
 

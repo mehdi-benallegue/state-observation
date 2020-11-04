@@ -57,7 +57,7 @@ namespace flexibilityEstimation
         xk1.segment(indexes::angVel,3) = angularVelocityFlex;
 
         if (processNoise_!=0x0)
-            return processNoise_->addNoise(xk1);
+            return processNoise_->getNoisy(xk1);
         else
             return xk1;
     }
@@ -163,17 +163,17 @@ namespace flexibilityEstimation
         dt_=dt;
     }
 
-    unsigned IMUFixedContactDynamicalSystem::getStateSize() const
+    Index IMUFixedContactDynamicalSystem::getStateSize() const
     {
         return stateSize_;
     }
 
-    unsigned IMUFixedContactDynamicalSystem::getInputSize() const
+    Index IMUFixedContactDynamicalSystem::getInputSize() const
     {
         return inputSize_;
     }
 
-    unsigned IMUFixedContactDynamicalSystem::getMeasurementSize() const
+    Index IMUFixedContactDynamicalSystem::getMeasurementSize() const
     {
         return measurementSize_;
     }

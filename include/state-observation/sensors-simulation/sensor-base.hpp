@@ -15,6 +15,7 @@
 #include <Eigen/Core>
 #include <boost/assert.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/noise/noise-base.hpp>
 
 namespace stateObservation
@@ -28,7 +29,7 @@ namespace stateObservation
      *
      */
 
-    class SensorBase
+    class STATE_OBSERVATION_DLLAPI SensorBase
     {
     public:
         ///default constructor
@@ -58,10 +59,10 @@ namespace stateObservation
         virtual TimeIndex getTime() const=0;
 
         ///gets the state vector size. Pure virtual method.
-        virtual unsigned getStateSize() const=0;
+        virtual Index getStateSize() const=0;
 
         ///get the size of the measurements. Pure virtual method.
-        virtual unsigned getMeasurementSize() const=0;
+        virtual Index getMeasurementSize() const=0;
 
         ///gets a zero vector of the size of a state vector
         virtual Vector stateVectorZero() const;

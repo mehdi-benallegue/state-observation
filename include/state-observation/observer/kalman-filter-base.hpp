@@ -24,7 +24,9 @@
 #ifndef KALMANFILTERBASEHPP
 #define KALMANFILTERBASEHPP
 
+#include <state-observation/api.h>
 #include <state-observation/observer/zero-delay-observer.hpp>
+#include <state-observation/tools/state-vector-arithmetics.hpp>
 
 
 namespace stateObservation
@@ -49,7 +51,8 @@ namespace stateObservation
      *
      *
      */
-    class KalmanFilterBase: public ZeroDelayObserver
+    class STATE_OBSERVATION_DLLAPI KalmanFilterBase: public ZeroDelayObserver,
+                            protected StateVectorArithmetics
     {
     public:
 
@@ -70,6 +73,13 @@ namespace stateObservation
 
         typedef Eigen::LLT<Pmatrix> LLTPMatrix;
 
+        ///StateVector is the type of state tangent vector
+        typedef Vector StateVectorTan;
+
+        ///MeasureVector is the type of measurement tanegnt vector
+        typedef Vector MeasureVectorTan;
+
+
         /// Default constructor
         KalmanFilterBase();
 
@@ -77,7 +87,7 @@ namespace stateObservation
         ///  \li n : size of the state vector
         ///  \li m : size of the measurements vector
         ///  \li p : size of the input vector
-        KalmanFilterBase(unsigned n,unsigned m,unsigned p=0);
+        KalmanFilterBase(Index n,Index m,Index p=0);
 
         /// The constructor to use in case the dimension of the state space
         /// is smaller that its vector representation. For example
@@ -89,10 +99,11 @@ namespace stateObservation
         ///
         /// The update can then be done using exponential maps.
         ///  \li n : size of the state vector representation
-        ///  \li nt : size of the tangent vector
+        ///  \li nt : dimension of the tangent space to the state space
         ///  \li m : size of the measurements vector
+        ///  \li mt : dimension of the tangent space to the measurement space
         ///  \li p : size of the input vector
-        KalmanFilterBase(unsigned n, unsigned nt, unsigned m, unsigned p);
+        KalmanFilterBase(Index n, Index nt, Index m, Index mt, Index p);
 
         /// Set the value of the jacobian df/dx
         virtual void setA(const Amatrix& A);
@@ -114,9 +125,11 @@ namespace stateObservation
 
         /// Set the measurement noise covariance matrix
         virtual void setR(const Rmatrix& R);
+        inline void setMeasurementCovariance(const Rmatrix& R){setR(R);}
 
         /// Set the measurement noise covariance matrix
         virtual Matrix getR() const ;
+        inline Matrix getMeasurementCovariance() const {return getR();}
 
         /// Clear the measurement noise covariance matrix
         virtual void clearR();
@@ -124,9 +137,11 @@ namespace stateObservation
 
         /// Set the process noise covariance matrix
         virtual void setQ(const Qmatrix& Q);
+        inline void setProcessCovariance(const Qmatrix& Q){setQ(Q);}
 
         /// Set the process noise covariance matrix
         virtual Matrix getQ() const;
+        inline Matrix getProcessCovariance() const {return getQ();}
 
 
         /// Clear the process noise covariance matrix
@@ -223,22 +238,53 @@ namespace stateObservation
         /// Checks whether or not a matrix has the dimensions of the P matrix
         bool checkPmatrix(const Pmatrix & ) const;
 
+        ///Gives a vector of state tangent vector size having duplicated "c" value
+        virtual StateVectorTan stateTangentVectorConstant( double c ) const;
+
+        ///Gives a vector of state  tangent vector size having random values
+        virtual StateVectorTan stateTangentVectorRandom() const;
+
+        ///Gives a vector of state  tangent vector size having zero values
+        virtual StateVectorTan stateTangentVectorZero() const;
+
+        ///Tells whether or not the vector has the dimensions of a state tangent vector
+        virtual bool checkStateTangentVector(const StateVectorTan & v ) const;
+
+        ///Gives a vector of measurement tangent vector size having duplicated "c" value
+        virtual MeasureVectorTan measureTangentVectorConstant( double c ) const;
+
+        ///Gives a vector of measurement tangent vector size having random values
+        virtual MeasureVectorTan measureTangentVectorRandom() const;
+
+        ///Gives a vector of measurement tangent vector size having zero values
+        virtual MeasureVectorTan measureTangentVectorZero() const;
+
+        ///Tells whether or not the vector has the dimensions of a measurement tangent vector
+        virtual bool checkMeasureTangentVector(const MeasureVectorTan &) const;
+
         /// Changes the dimension of the state vector:
         ///resets the internal container for the state vector and
         ///the containers for the matrices A, C, Q, P
-        virtual void setStateSize(unsigned n);
+        virtual void setStateSize(Index n);
 
         /// Changes the dimension of the state vector:
         /// n is the dimension of the state representation
         /// and nt is the dimension of the tangent vector representation
         ///resets the internal container for the state vector and
         ///the containers for the matrices A, C, Q, P
-        virtual void setStateSize(unsigned n, unsigned nt);
+        virtual void setStateSize(Index n, Index nt);
 
         /// Changes the dimension of the measurement vector:
         ///resets the internal container for the measurement vectors and
         ///the containers for the matrices C, R
-        virtual void setMeasureSize(unsigned m);
+        virtual void setMeasureSize(Index m);
+
+        /// Changes the dimension of the measurement vector:
+        /// m is the size of the measurementVector
+        /// mt is the dimension of the measurement tangent space
+        ///resets the internal container for the measurement vectors and
+        ///the containers for the matrices C, R
+        virtual void setMeasureSize(Index m, Index mt);
 
         /// Get simulation of the measurement y_k using the state estimation
         virtual MeasureVector getSimulatedMeasurement(TimeIndex k);
@@ -269,12 +315,15 @@ namespace stateObservation
 
         ///set update functions for sum and difference for the state vector
         /// (used for the case of multiplicative Kalman filter)
-        void setSumFunction(void (* sum)(const  Vector& stateVector, const Vector& tangentVector, Vector& result));
-        void setDifferenceFunction(void (* difference)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference));
+        void setStateArithmetics(StateVectorArithmetics * arith);
 
     protected:
 
-        unsigned nt_;
+        /// the size of tangent space of the state space
+        Index nt_;
+
+        /// the size of tangent space of the measurement space
+        Index mt_;
 
         /// The type of Kalman gain matrix
         typedef Matrix Kmatrix;
@@ -289,7 +338,6 @@ namespace stateObservation
         virtual MeasureVector simulateSensor_(const StateVector& x, TimeIndex k)=0;
 
         /// Predicts the sensor measurement,
-        /// by default simulates the sensor on the predicted state
         virtual MeasureVector predictSensor_(TimeIndex k);
 
         /// Containers for the jacobian matrix of the process
@@ -307,15 +355,18 @@ namespace stateObservation
         /// Container for the covariance matrix of the estimation error
         Matrix pr_;
 
-        ///Vector of the simulated measurement of the predicted state
-        Vector predictedMeasurement_;
+        /// container for the prediction
+        IndexedVector xbar_;
+
+        /// container for the prediction of the sensor
+        IndexedVector ybar_;
 
         ///Vector containing the inovation of the Kalman filter
         Vector innovation_;
 
         struct optimizationContainer
         {
-            Vector xbar;
+            EIGEN_MAKE_ALIGNED_OPERATOR_NEW
             Matrix pbar;
             Vector xhat;
             Vector inoMeas;
@@ -326,19 +377,23 @@ namespace stateObservation
             Matrix t;
         } oc_;
 
-        void (* sum_)(const  Vector& stateVector, const Vector& tangentVector, Vector& result);
-        void (* difference_)(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+        StateVectorArithmetics * arithm_;
+
+    public:
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
     /*inline*/ Vector KalmanFilterBase::updateStatePrediction()
     {
-        return oc_.xbar = prediction_(this->x_.getTime()+1);
+        prediction_(this->x_.getTime()+1);
+        return xbar_();
     }
 
     /*inline*/ Vector KalmanFilterBase::updateStateAndMeasurementPrediction()
     {
         updateStatePrediction();
-        return predictedMeasurement_=predictSensor_(this->x_.getTime()+1);
+        predictSensor_(this->x_.getTime()+1);
+        return ybar_();
     }
 
 

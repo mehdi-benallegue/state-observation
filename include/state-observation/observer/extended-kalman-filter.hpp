@@ -16,6 +16,7 @@
 #ifndef STATEOBSERVER_EXTENDEDKALMANFILTERHPP
 #define STATEOBSERVER_EXTENDEDKALMANFILTERHPP
 
+#include <state-observation/api.h>
 #include <state-observation/observer/kalman-filter-base.hpp>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 
@@ -39,10 +40,16 @@ namespace stateObservation
      *
      */
 
-    class ExtendedKalmanFilter: public KalmanFilterBase
+    class STATE_OBSERVATION_DLLAPI ExtendedKalmanFilter: public KalmanFilterBase
     {
 
     public:
+
+        /// The constructor.
+        ///  \li n : size of the state vector
+        ///  \li m : size of the measurements vector
+
+        ExtendedKalmanFilter(Index n,Index m);
 
         /// The constructor.
         ///  \li n : size of the state vector
@@ -51,24 +58,9 @@ namespace stateObservation
         ///  \li The parameter directInputOutputFeedthrough defines whether (true) or not (false) the measurement y_k requires the input u_k
         ///  \li The parameter directInputStateProcessFeedthrough defines whether (true) or not (false) the state x_{k+1} requires the input u_k
 
-        ExtendedKalmanFilter(unsigned n,unsigned m,unsigned p=0,
+        ExtendedKalmanFilter(Index n,Index m,Index p,
                 bool directInputOutputFeedthrough=true,
-                bool directInputStateProcessFeedthrough=true)
-            :KalmanFilterBase(n,m,p),
-            directInputOutputFeedthrough_(directInputOutputFeedthrough),
-            directInputStateProcessFeedthrough_(directInputStateProcessFeedthrough), f_(0x0)
-
-        {
-#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
-            std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
-#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
-
-            if (p==0)
-            {
-                directInputOutputFeedthrough_=false;
-                directInputStateProcessFeedthrough_=false;
-            }
-        }
+                bool directInputStateProcessFeedthrough=true);
 
         /// The constructor.
         ///  \li n : size of the state vector
@@ -78,24 +70,9 @@ namespace stateObservation
         ///  \li The parameter directInputOutputFeedthrough defines whether (true) or not (false) the measurement y_k requires the input u_k
         ///  \li The parameter directInputStateProcessFeedthrough defines whether (true) or not (false) the state x_{k+1} requires the input u_k
 
-        ExtendedKalmanFilter(unsigned n, unsigned nt, unsigned  m, unsigned p,
-                bool directInputOutputFeedthrough=true,
-                bool directInputStateProcessFeedthrough=true)
-            :KalmanFilterBase(n,nt,m,p),
-            directInputOutputFeedthrough_(directInputOutputFeedthrough),
-            directInputStateProcessFeedthrough_(directInputStateProcessFeedthrough), f_(0x0)
-
-        {
-#ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
-            std::cout<<std::endl<<"ExtendedKalmanFilter Constructor"<<std::endl;
-#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTOR
-
-            if (p==0)
-            {
-                directInputOutputFeedthrough_=false;
-                directInputStateProcessFeedthrough_=false;
-            }
-        }
+        ExtendedKalmanFilter(Index n, Index nt, Index  m, Index mt, Index p,
+                bool directInputOutputFeedthrough,
+                bool directInputStateProcessFeedthrough);
 
 
         /// Set a pointer to the functor that defines the dynamics of the states
@@ -146,11 +123,7 @@ namespace stateObservation
         /// predicts the measurement using the functor, assumed that the predicted state is up-to-date
         virtual MeasureVector predictSensor_(TimeIndex k);
 
-        /// container for the prediction
-        IndexedVector xbar_;
 
-        /// container for the prediction of the sensor
-        IndexedVector ybar_;
 
         /// boolean that provides if theris a need of not for input for the masurement
         bool directInputOutputFeedthrough_;
@@ -169,10 +142,8 @@ namespace stateObservation
           KalmanFilterBase::Amatrix a_;
           KalmanFilterBase::Cmatrix c_;
           ObserverBase::StateVector x_;
-          ObserverBase::StateVector xbar_;
           ObserverBase::StateVector dx_;
           ObserverBase::StateVector xp_;
-          ObserverBase::MeasureVector y_;
           ObserverBase::MeasureVector yp_;
 
         } opt;

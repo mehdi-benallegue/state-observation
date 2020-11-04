@@ -14,6 +14,7 @@
 #ifndef SENSORALGORITHMSMAGNETICFIELDHPP
 #define SENSORALGORITHMSMAGNETICFIELDHPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -26,9 +27,12 @@ namespace stateObservation
          *
          */
 
-        class MagneticField
+        class STATE_OBSERVATION_DLLAPI MagneticField
         {
         public:
+
+            MagneticField();
+
             ///virtual destructor
             virtual ~MagneticField(){}
 
@@ -36,7 +40,7 @@ namespace stateObservation
             Vector3 magneticFieldMeasure(const Matrix3 & orientation) const;
 
         private:
-            static Vector3 earthLocalMagneticField_;
+            Vector3 earthLocalMagneticField_;
         };
     }
 

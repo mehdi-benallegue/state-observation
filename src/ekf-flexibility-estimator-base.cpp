@@ -3,9 +3,9 @@ namespace stateObservation
 {
 namespace flexibilityEstimation
 {
-    EKFFlexibilityEstimatorBase::EKFFlexibilityEstimatorBase(unsigned stateSize,
-                                    unsigned measurementSize,
-                                    unsigned inputSize,
+    EKFFlexibilityEstimatorBase::EKFFlexibilityEstimatorBase(Index stateSize,
+                                    Index measurementSize,
+                                    Index inputSize,
                                     const Vector & dx):
         FlexibilityEstimatorBase(),
         ekf_(stateSize,measurementSize,inputSize),

@@ -27,6 +27,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <state-observation/api.h>
 
 namespace stateObservation
 {
@@ -34,13 +35,13 @@ namespace stateObservation
     namespace hrp2
     {
         /// mass of the robot
-        const double m=56.8;
+        constexpr double m=56.8;
 
         /// stifness and damping
-        const double linKe=40000;
-        const double angKe=400;
-        const double linKv=600;
-        const double angKv=10;
+        constexpr double linKe=40000;
+        constexpr double angKe=400;
+        constexpr double linKv=600;
+        constexpr double angKv=10;
 
         struct contact
         {

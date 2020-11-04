@@ -13,7 +13,7 @@ using namespace stateObservation;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=2000;
+    const Index kmax=2000;
 
     ///sampling period
     const double dt=5e-3;
@@ -26,7 +26,7 @@ int test()
     (void)inputSize;
 
 
-    for (unsigned i = 0; i<1; ++i)
+    for (Index i = 0; i<1; ++i)
     {
     	///The array containing all the states, the measurements and the inputs
     	IndexedVectorArray x;
@@ -43,7 +43,7 @@ int test()
         Vector x0=(Vector::Zero(stateSize,1));
 
         ///initialization of the state vector
-        for (unsigned j= 0; j<stateSize ;++j)
+        for (Index j= 0; j<stateSize ;++j)
         	x0[j]=(double(rand())/RAND_MAX -0.5)*2;
 
         sim.setState(x0,0);
@@ -51,7 +51,7 @@ int test()
         Vector uk=Vector::Zero(imu.getInputSize(),1);
 
 
-        for (unsigned k=0;k<kmax;++k)
+        for (Index k=0;k<kmax;++k)
         {
         	u.setValue(uk,k);
 
@@ -82,8 +82,3 @@ int main()
     return test();
 
 }
-
-
-
-
-

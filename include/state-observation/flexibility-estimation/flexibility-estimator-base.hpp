@@ -12,6 +12,7 @@
 #ifndef FLEXIBILITY_ESTIMATION_FLEXIBILITY_ESTIMATOR_BASE_HPP
 #define FLEXIBILITY_ESTIMATION_FLEXIBILITY_ESTIMATOR_BASE_HPP
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
@@ -23,7 +24,7 @@ namespace flexibilityEstimation
     * \brief  This class is the base class of the flexibility estimators.
     *
     */
-    class FlexibilityEstimatorBase
+    class STATE_OBSERVATION_DLLAPI FlexibilityEstimatorBase
     {
     public:
         /// virtual destructor

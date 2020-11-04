@@ -16,12 +16,12 @@ stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
 
 
     Matrix R(estimator.getEKF().getRmatrixIdentity());
-    R=R*1.e-16;
+    R=R*1.e-30;
 
     Matrix Q(estimator.getEKF().getQmatrixIdentity());
     Q=Q*1.e-4;
-    Q.block(6,6,3,3)=Matrix3::Identity()*1.e-2;
-    Q.block(15,15,3,3)=Matrix3::Identity()*1.e-2;
+    Q.block(6,6,3,3)=Matrix3::Identity()*1.e-8;
+    Q.block(15,15,3,3)=Matrix3::Identity()*1.e-8;
 
 
     estimator.setFlexibilityCovariance(Q);
@@ -79,7 +79,7 @@ stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
             const std::vector<Vector3, Eigen::aligned_allocator<Vector3> > & contactsPositions,
             double dt)
 {
-    const unsigned inputSize=15;
+    const Index inputSize=15;
 
     ///initialization of a zero input
     stateObservation::IndexedVectorArray u;
@@ -91,4 +91,3 @@ stateObservation::IndexedVectorArray offlineEKFFlexibilityEstimation(
     return offlineEKFFlexibilityEstimation
                         (y, u, xh0, numberOfContacts, contactsPositions, dt);
 }
-

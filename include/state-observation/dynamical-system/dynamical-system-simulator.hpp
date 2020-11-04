@@ -15,6 +15,7 @@
 
 #include <map>
 
+#include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 
 namespace stateObservation
@@ -27,7 +28,7 @@ namespace stateObservation
     *       states, inputs and measurements.
     *
     */
-    class DynamicalSystemSimulator
+    class STATE_OBSERVATION_DLLAPI DynamicalSystemSimulator
     {
     public:
         ///Constructor

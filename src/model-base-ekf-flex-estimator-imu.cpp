@@ -158,10 +158,9 @@ namespace stateObservation
       functor_.setContactModel(nb);
     }
 
-
     void ModelBaseEKFFlexEstimatorIMU::setMeasurement(const Vector & y)
     {
-      BOOST_ASSERT((getMeasurementSize()==unsigned(y.size())) &&
+      BOOST_ASSERT((getMeasurementSize()==y.size()) &&
                    "ERROR: The measurement vector has incorrect size");
 
 
@@ -214,7 +213,7 @@ namespace stateObservation
     (const Matrix & R)
     {
       BOOST_ASSERT(R.rows()==R.cols() &&
-                    unsigned(R.rows()) >0 &&
+                    R.rows() >0 &&
                     (R.rows() % 6) ==0 &&
                    "ERROR: The measurement noise covariance matrix R has \
                         incorrect size");
@@ -289,10 +288,10 @@ namespace stateObservation
       if (R_.rows()!=getMeasurementSize())
       {
 
-        size_t realIndex = R_.rows();
+        Index realIndex = R_.rows();
         R_.conservativeResize(getMeasurementSize(),getMeasurementSize());
 
-        size_t currIndex = 6;
+        Index currIndex = 6;
         if(useFTSensors_)
         {
           ///if the force part of the matrix is not filled
@@ -300,7 +299,7 @@ namespace stateObservation
           {
             R_.block(currIndex,0,functor_.getContactsNumber()*6,currIndex).setZero();
             R_.block(0,currIndex,currIndex,functor_.getContactsNumber()*6).setZero();
-            for (size_t i=0; i<functor_.getContactsNumber(); ++i)
+            for (Index i=0; i<functor_.getContactsNumber(); ++i)
             {
               R_.block(currIndex,currIndex,6,6) = forceVariance_;
               currIndex +=6;
@@ -325,18 +324,18 @@ namespace stateObservation
       ekf_.setR(R_);
     }
 
-    unsigned ModelBaseEKFFlexEstimatorIMU::getStateSize() const
+    Index ModelBaseEKFFlexEstimatorIMU::getStateSize() const
     {
       return stateSize;
     }
 
 
-    unsigned ModelBaseEKFFlexEstimatorIMU::getInputSize() const
+    Index ModelBaseEKFFlexEstimatorIMU::getInputSize() const
     {
       return ekf_.getInputSize();
     }
 
-    unsigned ModelBaseEKFFlexEstimatorIMU::getMeasurementSize() const
+    Index ModelBaseEKFFlexEstimatorIMU::getMeasurementSize() const
     {
       return functor_.getMeasurementSize();
     }
@@ -417,10 +416,10 @@ namespace stateObservation
               for(int i=0; i<3; i++)
               {
                 // Saturation for bounded forces and torques
-                lastX_[state::fc+6+i]=std::min(lastX_[state::fc+6+i],limitTorques_[i]);
-                lastX_[state::fc+i]=std::min(lastX_[state::fc+i],limitForces_[i]);
-                lastX_[state::fc+6+i]=std::max(lastX_[state::fc+6+i],-limitTorques_[i]);
-                lastX_[state::fc+i]=std::max(lastX_[state::fc+i],-limitForces_[i]);
+                lastX_[Index(state::fc+6+i)]=std::min(lastX_[Index(state::fc+6+i)],limitTorques_[i]);
+                lastX_[Index(state::fc+i)]=std::min(lastX_[Index(state::fc+i)],limitForces_[i]);
+                lastX_[Index(state::fc+6+i)]=std::max(lastX_[Index(state::fc+6+i)],-limitTorques_[i]);
+                lastX_[Index(state::fc+i)]=std::max(lastX_[Index(state::fc+i)],-limitForces_[i]);
               }
             }
             ekf_.setState(lastX_,ekf_.getCurrentTime());

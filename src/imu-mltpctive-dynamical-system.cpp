@@ -7,7 +7,7 @@ namespace stateObservation
 {
 
   IMUMltpctiveDynamicalSystem::IMUMltpctiveDynamicalSystem()
-    :processNoise_(0x0),dt_(1)
+    :opt_(stateTangentSize_,measurementSize_),processNoise_(0x0),dt_(1)
   {
 #ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
     std::cout<<std::endl<<"IMUFixedContactDynamicalSystem Constructor"<<std::endl;
@@ -61,13 +61,11 @@ namespace stateObservation
     Vector3 accelerationInput =u.head(3);
     Vector3 angularAccelerationInput =u.tail(3);
 
-    xk1.segment(indexes::linAcc,3)+=accelerationInput;
-    xk1.segment(indexes::angAcc,3)+=angularAccelerationInput;
-
-
+    xk1.segment<3>(indexes::linAcc)=accelerationInput;
+    xk1.segment<3>(indexes::angAcc)=angularAccelerationInput;
 
     if (processNoise_!=0x0)
-      return processNoise_->addNoise(xk1);
+      return processNoise_->getNoisy(xk1);
     else
       return xk1;
 
@@ -98,6 +96,51 @@ namespace stateObservation
     return sensor_.getMeasurements();
   }
 
+
+  Matrix IMUMltpctiveDynamicalSystem::getAMatrix (const Vector& xh)
+  {
+
+
+    opt_.deltaR=xh.segment<3>(indexes::angVel)*dt_+xh.segment<3>(indexes::angAcc)*dt_*dt_/2;
+
+    kine::derivateRotationMultiplicative(opt_.deltaR, opt_.jRR, opt_.jRv);
+
+
+    opt_.AJacobian.block<3,3>(indexesTangent::ori,indexesTangent::ori)=opt_.jRR;
+
+
+
+    opt_.AJacobian.block<3,3>(indexesTangent::pos,indexesTangent::linVel).diagonal().setConstant(dt_);
+    opt_.AJacobian.block<3,3>(indexesTangent::ori,indexesTangent::angVel)=opt_.jRv*dt_;
+    opt_.AJacobian.block<6,6>(indexesTangent::linVel,indexesTangent::linAcc).diagonal().setConstant(dt_);
+
+
+    opt_.AJacobian.block< 3, 3>(indexesTangent::pos,indexesTangent::linAcc).diagonal().setConstant(dt_*dt_*0.5);
+    opt_.AJacobian.block< 3, 3>(indexesTangent::ori,indexesTangent::angAcc)=opt_.jRv*dt_*dt_/2;
+
+    return opt_.AJacobian;
+  }
+
+  Matrix IMUMltpctiveDynamicalSystem::getCMatrix (const Vector& xp)
+  {
+    opt_.Rt = Quaternion(xp.segment<4>(indexes::ori)).toRotationMatrix().transpose();
+
+    opt_.CJacobian.block<3,3>(0,indexesTangent::ori).noalias()=
+              opt_.Rt*kine::skewSymmetric(xp.segment<3>(indexes::linAcc)+cst::gravity);
+
+    opt_.CJacobian.block<3,3>(0,indexesTangent::linAcc).noalias()= opt_.Rt;
+
+    opt_.CJacobian.block<3,3>(3,indexesTangent::ori).noalias()=
+              opt_.Rt*kine::skewSymmetric(xp.segment<3>(indexes::angVel));
+
+
+    opt_.CJacobian.block<3,3>(3,indexesTangent::angVel).noalias()= opt_.Rt;
+
+    return opt_.CJacobian;
+  }
+
+
+
   void IMUMltpctiveDynamicalSystem::setProcessNoise( NoiseBase * n)
   {
     processNoise_=n;
@@ -122,17 +165,17 @@ namespace stateObservation
     dt_=dt;
   }
 
-  unsigned IMUMltpctiveDynamicalSystem::getStateSize() const
+  Index IMUMltpctiveDynamicalSystem::getStateSize() const
   {
     return stateSize_;
   }
 
-  unsigned IMUMltpctiveDynamicalSystem::getInputSize() const
+  Index IMUMltpctiveDynamicalSystem::getInputSize() const
   {
     return inputSize_;
   }
 
-  unsigned IMUMltpctiveDynamicalSystem::getMeasurementSize() const
+  Index IMUMltpctiveDynamicalSystem::getMeasurementSize() const
   {
     return measurementSize_;
   }

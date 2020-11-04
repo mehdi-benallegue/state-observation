@@ -14,6 +14,7 @@
 #ifndef FLEXIBILITYESTIMATION_OFFLINEMODELBASEFLEXESTIMATOR_H
 #define FLEXIBILITYESTIMATION_OFFLINEMODELBASEFLEXESTIMATOR_H
 
+#include <state-observation/api.h>
 #include <state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp>
 #include <vector>
 

@@ -15,7 +15,7 @@ typedef kine::indexes<kine::rotationVector> indexes;
 int test()
 {
     /// The number of samples
-    const unsigned kmax=3000;
+    const Index kmax=1000;
 
     ///sampling period
     const double dt=5e-3;
@@ -35,13 +35,11 @@ int test()
     IndexedVectorArray prediMea;
 
     ///Contact vector
-    Vector3 contact(Vector3::Random());
+    Vector3 contact(-1,0,0);
 
     ///Generation
     {
-        Quaternion q(Vector4::Random());
-        q.normalize();
-        q = Quaternion::Identity();
+        Quaternion q(Quaternion::Identity());
         Vector3 odoti(Vector3::Zero());
         Vector3 oi(Vector3::Zero());
         Vector3 pos;
@@ -62,12 +60,10 @@ int test()
         x.setValue(Xi,0);
 
 
-        Quaternion qCtrl(Vector4::Random());
-        qCtrl.normalize();
-        qCtrl = Quaternion::Identity();
+        Quaternion qCtrl(Quaternion::Identity());
         Vector3 odotCtrl(Vector3::Zero());
         Vector3 oCtrl(Vector3::Zero());
-        Vector3 posCtrl(Vector3::Zero());
+        Vector3 posCtrl(contact);
         Vector3 velCtrl(Vector3::Zero());
         Vector3 accCtrl(Vector3::Zero());
 
@@ -81,17 +77,14 @@ int test()
 
         AccelerometerGyrometer imu;
 
-
-
-
-
-        for (unsigned i=1; i<kmax; ++i)
+        for (Index i=1; i<kmax; ++i)
         {
             q = kine::rotationVectorToAngleAxis(oi*dt)*q;
             aa=q;
             oi+=odoti*dt;
-            odoti << 0.1*sin(0.007*i),  0.2*sin(0.03*i),  0.25*sin(0.02*i);
-            odoti *= 5;
+            double id = double(i);
+            odoti << 0.1*sin(0.007*id),  0.2*sin(0.03*id),  0.25*sin(0.02*id);
+
             kine::fixedPointRotationToTranslation(q.matrix() , oi, odoti,
                                                         contact, pos, vel, acc);
 
@@ -108,10 +101,11 @@ int test()
             qCtrl = kine::rotationVectorToAngleAxis(oCtrl*dt)*qCtrl;
             AngleAxis aaCtrl(qCtrl);
             oCtrl+=odotCtrl*dt;
-            odotCtrl << 0.15*sin(0.008*i), 0.1*sin(0.023*i), 0.2*sin(0.025*i);
+
+            odotCtrl << 0.15*sin(0.008*id), 0.1*sin(0.023*id), 0.2*sin(0.025*id);
             posCtrl += velCtrl*dt;
             velCtrl += accCtrl*dt;
-            accCtrl << 0.12*sin(0.018*i), 0.08*sin(0.035*i), 0.3*sin(0.027*i);
+            accCtrl << 0.12*sin(0.018*id), 0.08*sin(0.035*id), 0.3*sin(0.027*id);
 
             Vector Ui (Vector::Zero(inputSize,1));
             Ui.segment(indexes::pos,3) = posCtrl;
@@ -144,7 +138,7 @@ int test()
         }
     }
 
-    ///the initalization of a random estimation of the initial state
+    ///the initalization of an estimation of the initial state
     Vector xh0=Vector::Zero(stateSize,1);
 
     std::vector<Vector3, Eigen::aligned_allocator<Vector3> > contactPositions;
@@ -156,25 +150,11 @@ int test()
         stateObservation::examples::offlineEKFFlexibilityEstimation
             (y,u,xh0,1,contactPositions,dt,&ino, &prediMea);
 
-    ///file of output
-    std::ofstream f[10];
-    f[0].open("realState.dat");
-    f[1].open("estimatedState.dat");
-    f[2].open("gravity.dat");
-    f[3].open("estimatedGravity.dat");
-    f[4].open("error.dat");
-    f[5].open("measurement.dat");
-    f[6].open("predictedMeasurement.dat");
-    f[7].open("inovation.dat");
-    f[8].open("stateImu.dat");
-    f[9].open("input.dat");
-
-    double error;
+    double error=0;
 
     ///the reconstruction of the state
     for (TimeIndex i=y.getFirstIndex();i<y.getNextIndex();++i)
     {
-        ///display part, useless
         Vector3 g;
         {
             Matrix3 R;
@@ -203,22 +183,11 @@ int test()
         }
 
         error = acos(double(g.transpose()*gh)) * 180 / M_PI;
-
-        f[0]<< i<< " \t "<< x[i].transpose()<< std::endl;
-        f[1]<< i<< " \t "<< xh[i].transpose()<< std::endl;
-        f[2]<< i<< " \t "<< g.transpose()<< std::endl;
-        f[3]<< i<< " \t "<< gh.transpose()<< std::endl;
-        f[4]<< i<< " \t "<< error << std::endl;
-        f[5]<< i<< " \t "<< y[i].transpose()<< std::endl;
-        f[6]<< i<< " \t "<< prediMea[i].transpose()<< std::endl;
-        f[7]<< i<< " \t "<< ino[i].transpose()<< std::endl;
-        f[8]<< i<< " \t "<< z[i].transpose()<< std::endl;
-        f[9]<< i<< " \t "<< u[i].transpose()<< std::endl;
     }
 
     std::cout << "Error " << error << ", test: " ;
 
-    if (error > 2)
+    if (error > 2.)
     {
         std::cout << "FAILED !!!!!!!";
         return 1;

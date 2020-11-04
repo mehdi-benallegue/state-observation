@@ -15,10 +15,9 @@
 #include <Eigen/Core>
 #include <boost/assert.hpp>
 
+#include <state-observation/api.h>
 #include <state-observation/sensors-simulation/algebraic-sensor.hpp>
-
 #include <state-observation/sensors-simulation/algorithm/linear-acceleration.hpp>
-
 #include <state-observation/sensors-simulation/algorithm/rotation-velocity.hpp>
 
 namespace stateObservation
@@ -33,7 +32,7 @@ namespace stateObservation
      *
      */
 
-    class AccelerometerGyrometer : public AlgebraicSensor,
+    class STATE_OBSERVATION_DLLAPI AccelerometerGyrometer : public AlgebraicSensor,
         protected algorithm::LinearAcceleration,
         protected algorithm::RotationVelocity
     {
@@ -50,10 +49,10 @@ namespace stateObservation
 
     protected:
         ///Gets the state vector Size
-        virtual unsigned getStateSize_() const;
+        virtual Index getStateSize_() const;
 
         ///Gets the measurements vector size
-        virtual unsigned getMeasurementSize_() const;
+        virtual Index getMeasurementSize_() const;
 
 
         virtual Vector computeNoiselessMeasurement_();
@@ -65,12 +64,12 @@ namespace stateObservation
 
         bool matrixMode_;
 
-        static const int stateSize_= 10;
-        static const int stateSizeMatrix_= 15;
+        static const Index stateSize_= 10;
+        static const Index stateSizeMatrix_= 15;
 
-        static const int measurementSize_=6;
+        static const Index measurementSize_=6;
 
-        int currentStateSize_;
+        Index currentStateSize_;
 
     };
 

@@ -4,9 +4,25 @@
 #include <state-observation/flexibility-estimation/model-base-ekf-flex-estimator-imu.hpp>
 #include <state-observation/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp>
 
-#include <time.h>
 
 using namespace stateObservation;
+
+inline Matrix3 buildInertiaTensor(const Vector6 inputInertia, Matrix3& inertiaTensor)
+{
+
+  const double & Ixx=inputInertia[0];
+  const double & Iyy=inputInertia[1];
+  const double & Izz=inputInertia[2];
+  const double & Ixy=inputInertia[3];
+  const double & Ixz=inputInertia[4];
+  const double & Iyz=inputInertia[5];
+
+  inertiaTensor   <<    Ixx, Ixy, Ixz,
+                  Ixy, Iyy, Iyz,
+                  Ixz, Iyz, Izz;
+
+  return inertiaTensor;
+}
 
 Vector computeZmp (unsigned footNumber, IndexedMatrixArray& forces, IndexedMatrixArray& sensorPositions)
 {
@@ -84,8 +100,8 @@ Vector3 computeFc(unsigned nbContacts, stateObservation::Vector x, stateObservat
     ddcl = u.segment(6,3);
     AngMomentum=u.segment<3>(stateObservation::flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::input::angMoment);
     dotAngMomentum=u.segment<3>(stateObservation::flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::input::dotAngMoment);
-    kine::computeInertiaTensor(u.segment<6>(stateObservation::flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::input::inertia), inertia);
-    kine::computeInertiaTensor(u.segment<6>(stateObservation::flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::input::dotInertia), dotInertia);
+    buildInertiaTensor(u.segment<6>(stateObservation::flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::input::inertia), inertia);
+    buildInertiaTensor(u.segment<6>(stateObservation::flexibilityEstimation::IMUElasticLocalFrameDynamicalSystem::input::dotInertia), dotInertia);
 
     for (unsigned i = 0; i<nbContacts ; ++i)
     {
@@ -216,7 +232,8 @@ int test()
     stateObservation::Vector input, measurement;
     Vector x; x.resize(stateSize);
     Vector xPredicted; xPredicted.resize(stateSize);
-    unsigned contactNbr, inputSize, measurementSize;
+    unsigned contactNbr;
+    Index inputSize, measurementSize;
 
     stateObservation::IndexedMatrixArray measurementForces, filteredForces, inputFeetPositions;
     stateObservation::Vector sensorZmp, filteredZmp;
@@ -268,8 +285,8 @@ int test()
 
             measurementForces.setValue(measurementForcesk,i);
             filteredForces.setValue(filteredForcesk,i);
-            stateObservation::Matrix4 identity; identity.setIdentity();
-            inputFeetPositions.setValue(identity,i);
+            stateObservation::Matrix4 identity(stateObservation::Matrix4::Identity());
+            inputFeetPositions.setValue(identity,TimeIndex(i));
         }
         sensorZmp=computeZmp(contactNbr, measurementForces, inputFeetPositions);
         filteredZmp=computeZmp(contactNbr, filteredForces, inputFeetPositions);
@@ -300,4 +317,3 @@ int main()
 {
     return test();
 }
-

@@ -17,6 +17,7 @@
 #include <vector>
 #include <deque>
 #include <stdexcept>
+#include <chrono>
 
 #ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
 #   include <iostream>
@@ -28,6 +29,12 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#ifndef M_PI
+#  include <boost/math/constants/constants.hpp>
+#  define M_PI boost::math::constants::pi<double>()
+#endif
+
+#include <state-observation/api.h>
 
 
 // basic file operations
@@ -40,6 +47,9 @@ namespace stateObservation
 
   ///1D Vector
   typedef Eigen::Matrix<double,1,1> Vector1;
+
+  ///2d Vector
+  typedef Eigen::Matrix<double,2,1> Vector2;
 
   ///3D vector
   typedef Eigen::Vector3d Vector3;
@@ -56,20 +66,26 @@ namespace stateObservation
   ///Dynamic sized Matrix
   typedef Eigen::MatrixXd Matrix;
 
+  ///1D scalar Matrix
+  typedef Eigen::Matrix<double,1,1> Matrix1;
+
+  ///2D scalar Matrix
+  typedef Eigen::Matrix2d Matrix2;
+
   ///3x3 Scalar Matrix
   typedef Eigen::Matrix3d Matrix3;
-
-  ///6x6 Scalar Matrix
-  typedef Eigen::Matrix<double, 6, 6> Matrix6;
 
   ///3x3 Scalar Matrix Unaligned
   typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix3Unaligned;
 
-  ///3x3 Scalar Matrix
-  typedef Eigen::Matrix3d Matrix3;
-
   ///4x4 Scalar Matrix
   typedef Eigen::Matrix4d Matrix4;
+
+  ///6x6 Scalar Matrix
+  typedef Eigen::Matrix<double, 6, 6> Matrix6;
+
+  ///12x12 scalar Matrix
+  typedef Eigen::Matrix<double, 12, 12> Matrix12;
 
   ///Quaternion
   typedef Eigen::Quaterniond Quaternion;
@@ -80,8 +96,10 @@ namespace stateObservation
   ///Euler Axis/Angle representation of orientation
   typedef Eigen::AngleAxis<double> AngleAxis;
 
+
+  typedef Eigen::Index Index;
   typedef long int TimeIndex;
-  typedef size_t TimeSize;
+  typedef Index TimeSize;
 
 
 #ifndef NDEBUG
@@ -90,13 +108,91 @@ namespace stateObservation
   static const bool isDebug=false;
 #endif // NDEBUG
 
-  template <typename T, const T& defaultValue=T(), bool debug=true>
+
+/// Debug item default value is just a way to give a default value to debug item
+///this was required by a compilation issue on Visual Studio
+template <typename T, const T defaultValue=T()>
+class DebugItemDefaultValue
+{
+  public:
+    static const T v;
+};
+
+template <typename T, const T defaultValue>
+    const T DebugItemDefaultValue<T,defaultValue>::v=defaultValue;
+
+namespace detail
+{
+  typedef DebugItemDefaultValue<bool,true> defaultTrue;
+
+  enum errorType
+  {
+    message,
+    exception,
+    exceptionAddr
+  };
+
+  template <errorType i = message, int dummy=0>
+  class DebugItemDefaultError
+  {
+  };
+
+  template <int dummy>
+  class DebugItemDefaultError<message, dummy>
+  {
+  public:
+    static const char* v;
+  };
+
+  template <int dummy>
+  class DebugItemDefaultError<exception, dummy>
+  {
+  public:
+    static const std::runtime_error v;
+  };
+
+
+  template <int dummy>
+  class DebugItemDefaultError<exceptionAddr, dummy>
+  {
+  public:
+    static const std::runtime_error * v;
+  };
+
+  template <int dummy>
+  const char * DebugItemDefaultError<message, dummy>::v = "The Object is not initialized. \
+       If this happened during initialization then run command chckitm_set() \
+       to switch it to set. And if the initialization is incomplete, run \
+       chckitm_reset() afterwards.";
+
+  template <int dummy>
+  const std::runtime_error DebugItemDefaultError< exception, dummy>::v = std::runtime_error(DebugItemDefaultError<message>::v);
+
+  template <int dummy>
+  const std::runtime_error * DebugItemDefaultError<exceptionAddr, dummy>::v = &DebugItemDefaultError<exception>::v;
+
+
+
+
+  typedef DebugItemDefaultError<message> defaultErrorMSG;
+  typedef DebugItemDefaultError<exception> defaultException;
+  typedef DebugItemDefaultError<exceptionAddr> defaultExceptionAddr;
+
+  void STATE_OBSERVATION_DLLAPI defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
+  void STATE_OBSERVATION_DLLAPI defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
+
+}
+
+
+/// Debug item is an item that exists when the debug variable is true,
+///otherwise it is empty and returns only the default value
+  template <typename T, typename defaultValue = DebugItemDefaultValue<T>, bool debug=true>
   class DebugItem
   {
   public:
-    DebugItem():b_(defaultValue) {}
+    DebugItem():b_(defaultValue::v) {}
     explicit DebugItem(const T& v):b_(v) {}
-    inline T operator=(T v)
+    inline T& operator=(T v)
     {
       return b_=v;
     }
@@ -117,45 +213,36 @@ namespace stateObservation
 
   };
 
-  template <typename T, const T& defaultValue>
+  ///this specialization contains no object
+    template <typename T, typename defaultValue >
   class DebugItem<T,defaultValue,false>
   {
+  public:
     DebugItem() {}
-    explicit DebugItem(T v) {}
-    inline T operator=(T v)
+    explicit DebugItem(T ) {}
+    inline T& operator=(T v)
     {
-      return defaultValue;
+      /// I am not sure what is the best behaviour, is it to return v ot defaultValue::v?
+      return v;
     }
     inline operator T() const
     {
-      return defaultValue;
+      return defaultValue::v;
     }
-    inline T set(T v)
+    inline T set(const T& )
     {
-      return defaultValue;
+      return defaultValue::v;
     }
     T get()const
     {
-      return defaultValue;
+      return defaultValue::v;
     }
   private:
-    ///no boolean
+     ///no object
   };
 
-  namespace detail
-  {
-    extern const bool defaultTrue;
-    extern const char* defaultErrorMSG;
-    extern const std::runtime_error defaultException;
-    extern const std::exception* defaultExcepionAddr;
-
-    void defaultSum(const  Vector& stateVector, const Vector& tangentVector, Vector& sum);
-    void defaultDifference(const  Vector& stateVector1, const Vector& stateVector2, Vector& difference);
-
-  }
-
   ///this is simply a structure allowing for automatically verifying that
-  /// the item has been initialized or not. The reset() function allows to
+  /// the item has been initialized or not. The chckitm_reset() function allows to
   /// set it back to "not initialized" state.
   /// -lazy means that the "set" value is true all the time if NDEBUG is defined
   /// -alwaysCheck means that the check is always performed and throws exception
@@ -166,40 +253,70 @@ namespace stateObservation
   /// new operator (see eigen documentation)
   template <typename T, bool lazy=false, bool alwaysCheck = false,
                   bool assertion=true, bool eigenAlignedNew=false>
-  class CheckedItem:
-    protected DebugItem<bool,detail::defaultTrue,!lazy || isDebug>,
-    protected DebugItem<const char*,detail::defaultErrorMSG,
-    ( !lazy || isDebug ) && assertion>,
-    protected DebugItem<const std::exception*,detail::defaultExcepionAddr,
-    ( !lazy || isDebug ) && !assertion>
+  class CheckedItem
   {
   public:
-    typedef DebugItem<bool,detail::defaultTrue,!lazy || isDebug> IsSet;
-    typedef DebugItem<const char*,detail::defaultErrorMSG,
-            ( !lazy || isDebug ) && !assertion> AssertMsg;
-    typedef DebugItem<const std::exception*,detail::defaultExcepionAddr,
-            ( !lazy || isDebug ) && !assertion> ExceptionPtr;
-    CheckedItem();
+
+    /// The parameter initialize sets whether the isSet() parameter is initialized to false
+    CheckedItem( bool initialize = true);
     explicit CheckedItem(const T&);
+    CheckedItem( const CheckedItem &);
     virtual ~CheckedItem() {}
-    inline T operator=(const T&);
+
+    inline CheckedItem& operator=(const CheckedItem & );
+    inline T& operator=(const T&);
     inline operator T() const ;
+    inline operator const T&() const ;
 
-    inline bool chckitm_isSet() const;
-    inline void chckitm_reset();
-    inline void chckitm_set(bool value=true);
+    inline T chckitm_getValue() const;
 
-    void chckitm_setAssertMessage(std::string s);
-    void chckitm_setExceptionPtr(std::exception* e);
+    inline T& operator()();
+    inline const T& operator()() const;
+
+    inline bool isSet() const;
+    inline void reset();
+
+    /// set the value of the initialization check boolean
+    inline void set(bool value);
+
+    void setAssertMessage(std::string s);
+    void setExceptionPtr(std::exception* e);
+
+    /// allows to set the initialization boolean to true and give a reference
+    /// to the object with the same instruction
+    /// should be used to initialize the object without using the
+    /// assignment operator
+    inline T& set();
+
+  protected:
+
+    static const bool do_check_ = !lazy || isDebug;
+    static const bool do_assert_ = do_check_ && assertion;
+    static const bool do_exception_ = do_check_ && !assertion;
+
+    typedef DebugItem<bool,detail::defaultTrue,do_check_> IsSet;
+    typedef DebugItem<const char*,detail::defaultErrorMSG, do_assert_> AssertMsg;
+    typedef DebugItem<const std::exception*,detail::defaultExceptionAddr,
+                                                    do_exception_> ExceptionPtr;
+
+
+
+    IsSet isSet_;
+    AssertMsg assertMsg_;
+    ExceptionPtr exceptionPtr_;
+
+    bool chckitm_check_() const; /// this can throw(std::exception)
+    T v_;
+  public:
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF(eigenAlignedNew)
-  protected:
-    bool chckitm_check_() const throw(std::exception);
-    T v_;
   };
 
   typedef CheckedItem<Matrix3,false,false,true,true> CheckedMatrix3;
+  typedef CheckedItem<Matrix6,false,false,true,true> CheckedMatrix6;
+  typedef CheckedItem<Matrix12,false,false,true,true> CheckedMatrix12;
   typedef CheckedItem<Vector3,false,false,true,true> CheckedVector3;
+  typedef CheckedItem<Vector6,false,false,true,true> CheckedVector6;
   typedef CheckedItem<Quaternion,false,false,true,true> CheckedQuaternion;
 
 
@@ -207,7 +324,7 @@ namespace stateObservation
    * \class    IndexedMatrixT
    * \brief    This class describes a structure composed by a matrix
    *           of a given size and a time-index parameter. It can tell also if
-   *           it initialized or not.
+   *           it is initialized or not.
    *
    *
    */
@@ -224,7 +341,7 @@ namespace stateObservation
     IndexedMatrixT(const MatrixType& v, TimeIndex k);
 
     ///Set the value of the matrix and the time sample
-    inline void set(const MatrixType& v,TimeIndex k);
+    inline MatrixType set(const MatrixType& v,TimeIndex k);
 
     ///Switch the vector to "initialized" state
     inline void set(bool value=true);
@@ -259,6 +376,8 @@ namespace stateObservation
 
   typedef IndexedMatrixT<Matrix> IndexedMatrix;
   typedef IndexedMatrixT<Vector> IndexedVector;
+  typedef IndexedMatrixT<Vector3> IndexedVector3;
+  typedef IndexedMatrixT<Matrix3> IndexedMatrix3;
 
   /**
    * \class    IndexedMatrixArray
@@ -267,7 +386,7 @@ namespace stateObservation
    *
    */
 
-  template <typename MatrixType=Matrix>
+  template <typename MatrixType=Matrix, typename Allocator = std::allocator<MatrixType>>
   class IndexedMatrixArrayT
   {
   public:
@@ -276,7 +395,7 @@ namespace stateObservation
 
 
 
-    typedef std::vector< MatrixType > Array;
+    typedef std::vector< MatrixType, Allocator > Array;
 
     ///Sets the vector v at the time index k
     ///It checks the time index, the array must have contiguous indexes
@@ -317,7 +436,7 @@ namespace stateObservation
     inline void resize(TimeSize i, const MatrixType & m= MatrixType());
 
     ///Get the time index
-    inline long int getLastIndex() const;
+    inline TimeIndex getLastIndex() const;
 
     ///Get the time index of the next value that will be pushed back
     /// Can be used in for loops
@@ -351,8 +470,8 @@ namespace stateObservation
     ///the line starts with the time index and then the matrix is read
     ///row by row
     ///WARNING: this resets the array
-    void readFromFile(const char * filename, size_t rows, size_t cols=1, bool withTimeStamp = true);
-    void readFromFile(const std::string &  filename, size_t rows, size_t cols=1, bool withTimeStamp = true);
+    void readFromFile(const char * filename, Index rows, Index cols=1, bool withTimeStamp = true);
+    void readFromFile(const std::string &  filename, Index rows, Index cols=1, bool withTimeStamp = true);
 
     ///gets the array from a file
     ///the line starts with the time index and then every line of the file
@@ -376,7 +495,7 @@ namespace stateObservation
     void writeInFile(const std::string & filename, bool clear=false, bool append =false);
 
   protected:
-    typedef std::deque< MatrixType > Deque;
+    typedef std::deque< MatrixType, Allocator > Deque;
 
     ///Asserts that the index is present in the array
     ///does nothing in release mode
@@ -402,13 +521,13 @@ namespace stateObservation
 
   namespace cst
   {
-    const double gravityConstant = 9.8;
+    constexpr double gravityConstant = 9.8;
 
     ///Gravity Vector along Z
     const Vector gravity= gravityConstant * Vector3::UnitZ();
 
     ///angles considered Zero
-    const double epsilonAngle=1e-16;
+    constexpr double epsilonAngle=1e-16;
 
   }
 
@@ -418,33 +537,41 @@ namespace stateObservation
 
   namespace tools
   {
-    struct SimplestStopwatch
+    struct STATE_OBSERVATION_DLLAPI SimplestStopwatch
     {
-      inline void start();
+      /** Always pick a steady clock */
+      using clock = typename std::conditional<std::chrono::high_resolution_clock::is_steady,
+                                        std::chrono::high_resolution_clock,
+                                        std::chrono::steady_clock>::type;
+      using time_ns = clock::time_point;
+      time_ns startTime;
+
+      inline void start()
+      {
+        startTime = clock::now();
+      }
 
       ///provides the time since the start
       ///the value is in nanoseconds
-      inline double stop();
-
-      inline double diff(const timespec & start, const timespec & end);
-
-      timespec time1, time2, time3;
+      inline double stop()
+      {
+        auto elapsed = clock::now() - startTime;
+        return static_cast<double>(elapsed.count());
+      }
     };
 
+    std::string STATE_OBSERVATION_DLLAPI matrixToString(const Matrix& mat);
 
-    std::string matrixToString(const Matrix& mat);
+    std::string STATE_OBSERVATION_DLLAPI vectorToString(const Vector& v);
 
-    std::string vectorToString(const Vector& v);
+    Matrix STATE_OBSERVATION_DLLAPI stringToMatrix(const std::string& str, Index rows, Index cols);
 
-    Matrix stringToMatrix(const std::string& str, unsigned rows, unsigned cols);
+    Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str, Index length);
 
-    Vector stringToVector(const std::string& str, unsigned length);
-
-    Vector stringToVector(const std::string& str);
+    Vector STATE_OBSERVATION_DLLAPI stringToVector(const std::string& str);
   }
 
-
 #include <state-observation/tools/definitions.hxx>
-}
+} //namespace stateObservation
 
 #endif //STATEOBSERVATIONDEFINITIONSHPP

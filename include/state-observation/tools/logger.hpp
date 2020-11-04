@@ -6,13 +6,14 @@
 #include <string>
 #include <stdexcept>
 
+#include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
 namespace stateObservation
 {
   namespace tools
   {
-    class Logger
+    class STATE_OBSERVATION_DLLAPI Logger
     {
     public:
       Logger();
