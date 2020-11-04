@@ -25,9 +25,15 @@ int test()
   Matrix Cov;
   Cov.resize(6, 6);
   double unitCov = 1e-2;
-  Cov << unitCov, 0, 0, 0, 0, 0, 0, unitCov, 0, 0, 0, 0, 0, 0, unitCov, 0, 0, 0, 0, 0, 0, unitCov, 0, 0, 0, 0, 0, 0,
-      unitCov, 0, 0, 0, 0, 0, 0, unitCov;
-
+  // clang-format off
+  Cov <<  unitCov, 0, 0, 0, 0, 0,
+          0, unitCov, 0, 0, 0, 0,
+          0, 0, unitCov, 0, 0, 0,
+          0, 0, 0, unitCov, 0, 0,
+          0, 0, 0, 0, unitCov, 0,
+          0, 0, 0, 0, 0, unitCov;
+  // clang-format on
+  
   /// Initializations
   // Dimensions
   const Index kinit = 0;
@@ -42,11 +48,56 @@ int test()
 
   // Input initialization
   Vector u0 = Vector::Zero(inputSize - 6 * contactNbr, 1);
-  u0 << 0.0135673, 0.001536, 0.80771, -2.63605e-06, -1.09258e-08, 5.71759e-08, 2.71345, 0.3072, 161.542, 48.1348,
-      46.9498, 1.76068, -0.0863332, -0.594871, -0.0402246, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.098, -6.23712e-11,
-      1.1174, 1.58984e-22, -5.43636e-21, 3.9598e-22, -2.99589e-06, -1.24742e-08, -4.7647e-18, 3.17968e-20, -1.08727e-18,
-      7.91959e-20, -0.000299589, -1.24742e-06, -4.7647e-16, 0, 0, 0, 0, 0,
-      0; /// external forces and moments
+  // clang-format off
+  u0 <<  0.0135673,
+         0.001536,
+         0.80771,
+         -2.63605e-06,
+         -1.09258e-08,
+         5.71759e-08,
+         2.71345,
+         0.3072,
+         161.542,
+         48.1348,
+         46.9498,
+         1.76068,
+         -0.0863332,
+         -0.594871,
+         -0.0402246,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0,
+         -0.098,
+         -6.23712e-11,
+         1.1174,
+         1.58984e-22,
+         -5.43636e-21,
+         3.9598e-22,
+         -2.99589e-06,
+         -1.24742e-08,
+         -4.7647e-18,
+         3.17968e-20,
+         -1.08727e-18,
+         7.91959e-20,
+         -0.000299589,
+         -1.24742e-06,
+         -4.7647e-16,
+         0,
+         0,
+         0,
+         0,
+         0,
+         0; ///external forces and moments
+  // clang-format on
 
   stateObservation::flexibilityEstimation::ModelBaseEKFFlexEstimatorIMU est;
   est.setSamplingPeriod(dt);
