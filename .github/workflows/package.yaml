@@ -18,8 +18,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [bionic, focal]
-        arch: [amd64]
+        dist: [xenial, bionic, focal]
+        arch: [i386, amd64]
+        exclude:
+        - dist: focal
+          arch: i386
     runs-on: ubuntu-18.04 
     steps:
     - uses: actions/checkout@v1
