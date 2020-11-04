@@ -1,0 +1,5 @@
+state-observation (1.3.3-1trusty1) trusty; urgency=medium
+
+  * Initial release.
+
+ -- Arnaud Tanguy <arn.tanguy+ppa@gmail.com>  Wed, 04 Nov 2020 18:00:00 +0900

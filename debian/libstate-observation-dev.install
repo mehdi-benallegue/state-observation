@@ -1,0 +1,4 @@
+usr/include/*
+usr/lib/libstate-observation.so
+usr/lib/*/pkgconfig/*
+usr/lib/cmake/*
