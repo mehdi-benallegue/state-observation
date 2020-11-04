@@ -3,28 +3,27 @@
 namespace stateObservation
 {
 
-    DynamicalSystemFunctorBase::DynamicalSystemFunctorBase()
-    {
+DynamicalSystemFunctorBase::DynamicalSystemFunctorBase()
+{
 #ifdef STATEOBSERVATION_VERBOUS_CONSTRUCTORS
-       std::cout<<std::endl<<"DynamicalSystemFunctorBase Constructor"<<std::endl;
-#endif //STATEOBSERVATION_VERBOUS_CONSTRUCTORS
-        //ctor
-    }
-
-    DynamicalSystemFunctorBase::~DynamicalSystemFunctorBase()
-    {
-        //dtor
-    }
-
-    bool DynamicalSystemFunctorBase::checkStateVector(const Vector & v)
-    {
-        return (v.rows()==getStateSize() && v.cols()==1);
-    }
-
-    bool DynamicalSystemFunctorBase::checkInputvector(const Vector & v)
-    {
-        return (v.rows()==getInputSize() && v.cols()==1);
-    }
-
-
+  std::cout << std::endl << "DynamicalSystemFunctorBase Constructor" << std::endl;
+#endif // STATEOBSERVATION_VERBOUS_CONSTRUCTORS
+       // ctor
 }
+
+DynamicalSystemFunctorBase::~DynamicalSystemFunctorBase()
+{
+  // dtor
+}
+
+bool DynamicalSystemFunctorBase::checkStateVector(const Vector & v)
+{
+  return (v.rows() == getStateSize() && v.cols() == 1);
+}
+
+bool DynamicalSystemFunctorBase::checkInputvector(const Vector & v)
+{
+  return (v.rows() == getInputSize() && v.cols() == 1);
+}
+
+} // namespace stateObservation

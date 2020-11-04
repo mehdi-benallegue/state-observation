@@ -17,7 +17,6 @@
  *
  */
 
-
 #ifndef STATEOBSERVER_LINEARKALMANFILTERHPP
 #define STATEOBSERVER_LINEARKALMANFILTERHPP
 
@@ -28,121 +27,112 @@ namespace stateObservation
 {
 
 /**
-     * \class  LinearKalmanFilter
-     * \brief
-     *        The class of a Linear Kalman filter
-     *
-     *        It implements the Kalman filter for linear systems (LTI-LTV).
-     *        This is the class to instanciate when you want to use Kalman filtering
-     *        for linear systems. To use this class, one needs to provide the
-     *        matrices that describe the dynamics of the state and the measurement.
-     *
-     *             x_{k+1}=A_k x_k+ B_k u_k + v_k
-     *
-     *             y_k=C_k x_k + D_k u_k + w_k
-     *
-     *
-     *
-     */
+ * \class  LinearKalmanFilter
+ * \brief
+ *        The class of a Linear Kalman filter
+ *
+ *        It implements the Kalman filter for linear systems (LTI-LTV).
+ *        This is the class to instanciate when you want to use Kalman filtering
+ *        for linear systems. To use this class, one needs to provide the
+ *        matrices that describe the dynamics of the state and the measurement.
+ *
+ *             x_{k+1}=A_k x_k+ B_k u_k + v_k
+ *
+ *             y_k=C_k x_k + D_k u_k + w_k
+ *
+ *
+ *
+ */
 
-    class STATE_OBSERVATION_DLLAPI LinearKalmanFilter: public KalmanFilterBase
-    {
-    public:
+class STATE_OBSERVATION_DLLAPI LinearKalmanFilter : public KalmanFilterBase
+{
+public:
+  /// The constructor
+  ///  \li n : size of the state vector
+  ///  \li m : size of the measurements vector
+  ///  \li p : size of the input vector
+  LinearKalmanFilter(Index n, Index m, Index p = 0) : KalmanFilterBase(n, m, p) {}
 
+  /// Default constructor
+  LinearKalmanFilter() {}
 
+  /// The type of the matrix linking the input to the state
+  typedef Matrix Bmatrix;
 
-        /// The constructor
-        ///  \li n : size of the state vector
-        ///  \li m : size of the measurements vector
-        ///  \li p : size of the input vector
-        LinearKalmanFilter(Index n,Index m,Index p=0)
-            :KalmanFilterBase(n,m,p){}
+  /// The type of the matrix linking the input to the measurement
+  typedef Matrix Dmatrix;
 
-        /// Default constructor
-        LinearKalmanFilter(){}
+  /// Set the value of the input-state matrix
+  virtual void setB(const Bmatrix & B);
 
-        /// The type of the matrix linking the input to the state
-        typedef Matrix Bmatrix;
+  /// Clear the value of the input-state Matrix
+  virtual void clearB();
 
-        /// The type of the matrix linking the input to the measurement
-        typedef Matrix Dmatrix;
+  /// Set the value of the input-measurement matrix
+  virtual void setD(const Dmatrix & D);
 
-        /// Set the value of the input-state matrix
-        virtual void setB(const Bmatrix& B);
+  /// Clear the value of the input-measurement matrix
+  virtual void clearD();
 
-        ///Clear the value of the input-state Matrix
-        virtual void clearB();
+  /// Reset all the observer
+  virtual void reset();
 
-        ///Set the value of the input-measurement matrix
-        virtual void setD(const Dmatrix& D);
+  /// Get a matrix having the size of the B matrix having "c" values
+  Bmatrix getBmatrixConstant(double c) const;
 
-        ///Clear the value of the input-measurement matrix
-        virtual void clearD();
+  /// Get a matrix having the size of the B matrix having random values
+  Bmatrix getBmatrixRandom() const;
 
-        ///Reset all the observer
-        virtual void reset();
+  /// Get a matrix having the size of the B matrix having zero values
+  Bmatrix getBmatrixZero() const;
 
+  /// checks whether or not a matrix has the dimensions of the B matrix
+  bool checkBmatrix(const Bmatrix &) const;
 
-        /// Get a matrix having the size of the B matrix having "c" values
-        Bmatrix getBmatrixConstant(double c) const;
+  /// Get a matrix having the size of the D matrix having "c" values
+  Dmatrix getDmatrixConstant(double c) const;
 
-        /// Get a matrix having the size of the B matrix having random values
-        Bmatrix getBmatrixRandom() const;
+  /// Get a matrix having the size of the D matrix having random values
+  Dmatrix getDmatrixRandom() const;
 
-        /// Get a matrix having the size of the B matrix having zero values
-        Bmatrix getBmatrixZero() const;
+  /// Get a matrix having the size of the D matrix having zero values
+  Dmatrix getDmatrixZero() const;
 
-        ///checks whether or not a matrix has the dimensions of the B matrix
-        bool checkBmatrix(const Bmatrix & ) const;
+  /// checks whether or not a matrix has the dimensions of the D matrix
+  bool checkDmatrix(const Dmatrix &) const;
 
+  /// changes the dimension of the state vector:
+  /// resets the internal container for the state vector and
+  /// the containers for the matrices A, B, C, Q, P
+  virtual void setStateSize(Index n);
 
-        /// Get a matrix having the size of the D matrix having "c" values
-        Dmatrix getDmatrixConstant(double c) const;
+  /// changes the dimension of the measurement vector:
+  /// resets the internal container for the measurement vectors and
+  /// the containers for the matrices C, D, R
+  virtual void setMeasureSize(Index m);
 
-        /// Get a matrix having the size of the D matrix having random values
-        Dmatrix getDmatrixRandom() const;
+  /// changes the dimension of the input vector:
+  /// resets the internal container for the input vectors and
+  /// the containers for the matrices B, D
+  virtual void setInputSize(Index p);
 
-        /// Get a matrix having the size of the D matrix having zero values
-        Dmatrix getDmatrixZero() const;
+protected:
+  /// The implementation of the (linear) prediction (state dynamics)
+  virtual StateVector prediction_(TimeIndex k);
 
-        ///checks whether or not a matrix has the dimensions of the D matrix
-        bool checkDmatrix(const Dmatrix &) const;
+  /// The implementation of the (linear) measurement (state dynamics)
+  virtual MeasureVector simulateSensor_(const StateVector & x, TimeIndex k);
 
+  /// The container of the Input-State matrix
+  Matrix d_;
 
-        ///changes the dimension of the state vector:
-        ///resets the internal container for the state vector and
-        ///the containers for the matrices A, B, C, Q, P
-        virtual void setStateSize(Index n);
+  /// The container of the Input-Measurement matrix
+  Matrix b_;
 
-        ///changes the dimension of the measurement vector:
-        ///resets the internal container for the measurement vectors and
-        ///the containers for the matrices C, D, R
-        virtual void setMeasureSize(Index m);
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
 
-        ///changes the dimension of the input vector:
-        ///resets the internal container for the input vectors and
-        ///the containers for the matrices B, D
-        virtual void setInputSize(Index p);
+} // namespace stateObservation
 
-    protected:
-        /// The implementation of the (linear) prediction (state dynamics)
-        virtual StateVector prediction_(TimeIndex k);
-
-        /// The implementation of the (linear) measurement (state dynamics)
-        virtual MeasureVector simulateSensor_(const StateVector& x, TimeIndex k);
-
-        /// The container of the Input-State matrix
-        Matrix d_;
-
-        /// The container of the Input-Measurement matrix
-        Matrix b_;
-
-    public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-    };
-
-
-}
-
-#endif //STATEOBSERVER_LINEARKALMANFILTERHPP
+#endif // STATEOBSERVER_LINEARKALMANFILTERHPP

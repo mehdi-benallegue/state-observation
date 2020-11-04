@@ -16,79 +16,75 @@
 #include <state-observation/api.h>
 #include <state-observation/dynamical-system/dynamical-system-functor-base.hpp>
 #include <state-observation/noise/noise-base.hpp>
-#include <state-observation/api.h>
 
 namespace stateObservation
 {
 
-     /**
-    * \class  BidimElasticInvPendulum
-    * \brief  The class is an implementation of the dynamical system defined by
-    *         a 2D inverted pendulum with an elastic joint. The input is the
-    *         horizontal acceleration.
-    *
-    */
-    class STATE_OBSERVATION_DLLAPI BidimElasticInvPendulum : public DynamicalSystemFunctorBase
-    {
-    public:
-        ///The constructor
-        BidimElasticInvPendulum();
+/**
+ * \class  BidimElasticInvPendulum
+ * \brief  The class is an implementation of the dynamical system defined by
+ *         a 2D inverted pendulum with an elastic joint. The input is the
+ *         horizontal acceleration.
+ *
+ */
+class STATE_OBSERVATION_DLLAPI BidimElasticInvPendulum : public DynamicalSystemFunctorBase
+{
+public:
+  /// The constructor
+  BidimElasticInvPendulum();
 
-        ///The virtual destructor
-        virtual ~BidimElasticInvPendulum();
+  /// The virtual destructor
+  virtual ~BidimElasticInvPendulum();
 
-        ///Description of the state dynamics
-        virtual Vector stateDynamics
-        (const Vector& x, const Vector& u, TimeIndex k);
+  /// Description of the state dynamics
+  virtual Vector stateDynamics(const Vector & x, const Vector & u, TimeIndex k);
 
-        ///Description of the sensor's dynamics
-        virtual Vector measureDynamics
-        (const Vector& x, const Vector& u, TimeIndex k);
+  /// Description of the sensor's dynamics
+  virtual Vector measureDynamics(const Vector & x, const Vector & u, TimeIndex k);
 
-        ///Sets a noise which disturbs the state dynamics
-        virtual void setProcessNoise( NoiseBase * );
-        ///Removes the process noise
-        virtual void resetProcessNoise();
-        ///Gets the process noise
-        virtual NoiseBase * getProcessNoise() const;
+  /// Sets a noise which disturbs the state dynamics
+  virtual void setProcessNoise(NoiseBase *);
+  /// Removes the process noise
+  virtual void resetProcessNoise();
+  /// Gets the process noise
+  virtual NoiseBase * getProcessNoise() const;
 
-        ///Sets a noise which disturbs the measurements
-        virtual void setMeasurementNoise( NoiseBase * );
-        ///Removes the measurement noise
-        virtual void resetMeasurementNoise();
-        ///Gets a pointer on the measurement noise
-        virtual NoiseBase * getMeasurementNoise() const;
+  /// Sets a noise which disturbs the measurements
+  virtual void setMeasurementNoise(NoiseBase *);
+  /// Removes the measurement noise
+  virtual void resetMeasurementNoise();
+  /// Gets a pointer on the measurement noise
+  virtual NoiseBase * getMeasurementNoise() const;
 
-        ///Set the period of the time discretization
-        virtual void setSamplingPeriod(double dt);
+  /// Set the period of the time discretization
+  virtual void setSamplingPeriod(double dt);
 
-        ///Gets the state size
-        virtual Index getStateSize() const;
-        ///Gets the input size
-        virtual Index getInputSize() const;
-        ///Gets the measurement size
-        virtual Index getMeasurementSize() const;
+  /// Gets the state size
+  virtual Index getStateSize() const;
+  /// Gets the input size
+  virtual Index getInputSize() const;
+  /// Gets the measurement size
+  virtual Index getMeasurementSize() const;
 
-        /// set the height of the com of the pendulum
-        void setHeight(const double & h);
-        /// set the mass of the pendulum
-        void setMass(const double &m);
-        /// set the elasticity of the pendulum
-        void setElasticity(const double &k);
+  /// set the height of the com of the pendulum
+  void setHeight(const double & h);
+  /// set the mass of the pendulum
+  void setMass(const double & m);
+  /// set the elasticity of the pendulum
+  void setElasticity(const double & k);
 
-    protected:
+protected:
+  double k_;
+  double m_;
+  double h_;
 
-        double k_;
-        double m_;
-        double h_;
+  NoiseBase * processNoise_;
 
-        NoiseBase * processNoise_;
+  double dt_;
 
-        double dt_;
-
-        static const Index stateSize_=4;
-        static const Index inputSize_=1;
-        static const Index measurementSize_=0;
-    };
-}
+  static const Index stateSize_ = 4;
+  static const Index inputSize_ = 1;
+  static const Index measurementSize_ = 0;
+};
+} // namespace stateObservation
 #endif // BIDIM_ELASTIC_INV_PENDULUM

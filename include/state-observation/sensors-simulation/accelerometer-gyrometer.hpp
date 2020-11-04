@@ -7,13 +7,11 @@
  *
  */
 
-
-
 #ifndef SIMULATIONACCELEROMETERGYROMETERSENSORHPP
 #define SIMULATIONACCELEROMETERGYROMETERSENSORHPP
 
-#include <Eigen/Core>
 #include <boost/assert.hpp>
+#include <Eigen/Core>
 
 #include <state-observation/api.h>
 #include <state-observation/sensors-simulation/algebraic-sensor.hpp>
@@ -22,57 +20,52 @@
 
 namespace stateObservation
 {
-    /**
-     * \class  AccelerometerGyrometer
-     * \brief  Implements the accelerometer-gyrometer measurements
-     *
-     *
-     *
-     * \details
-     *
-     */
+/**
+ * \class  AccelerometerGyrometer
+ * \brief  Implements the accelerometer-gyrometer measurements
+ *
+ *
+ *
+ * \details
+ *
+ */
 
-    class STATE_OBSERVATION_DLLAPI AccelerometerGyrometer : public AlgebraicSensor,
-        protected algorithm::LinearAcceleration,
-        protected algorithm::RotationVelocity
-    {
-    public:
-        AccelerometerGyrometer();
+class STATE_OBSERVATION_DLLAPI AccelerometerGyrometer : public AlgebraicSensor,
+                                                        protected algorithm::LinearAcceleration,
+                                                        protected algorithm::RotationVelocity
+{
+public:
+  AccelerometerGyrometer();
 
-        ///Virtual destructor
-        virtual ~AccelerometerGyrometer(){}
+  /// Virtual destructor
+  virtual ~AccelerometerGyrometer() {}
 
+  void setMatrixMode(bool matrixMode);
 
+protected:
+  /// Gets the state vector Size
+  virtual Index getStateSize_() const;
 
-        void setMatrixMode(bool matrixMode);
+  /// Gets the measurements vector size
+  virtual Index getMeasurementSize_() const;
 
+  virtual Vector computeNoiselessMeasurement_();
 
-    protected:
-        ///Gets the state vector Size
-        virtual Index getStateSize_() const;
+  Matrix3 r_;
+  Vector3 acc_;
+  Vector3 omega_;
+  Vector output_;
 
-        ///Gets the measurements vector size
-        virtual Index getMeasurementSize_() const;
+  bool matrixMode_;
 
+  static const Index stateSize_ = 10;
+  static const Index stateSizeMatrix_ = 15;
 
-        virtual Vector computeNoiselessMeasurement_();
+  static const Index measurementSize_ = 6;
 
-        Matrix3 r_;
-        Vector3 acc_;
-        Vector3 omega_;
-        Vector output_;
+  Index currentStateSize_;
+};
 
-        bool matrixMode_;
+} // namespace stateObservation
 
-        static const Index stateSize_= 10;
-        static const Index stateSizeMatrix_= 15;
-
-        static const Index measurementSize_=6;
-
-        Index currentStateSize_;
-
-    };
-
-}
-
-#endif //SIMULATIONACCELEROMETERGYROMETERSENSORHPP
+#endif // SIMULATIONACCELEROMETERGYROMETERSENSORHPP
