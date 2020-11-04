@@ -20,11 +20,9 @@ if(POLICY CMP0063)
   cmake_policy(SET CMP0063 NEW)
 endif()
 
-
-
 SET(PROJECT_NAME state-observation)
 SET(PROJECT_DESCRIPTION "General implementation of observers.")
-SET(PROJECT_URL "")
+SET(PROJECT_URL "https://github.com/jrl-umi3218/state-observation")
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(PROJECT_VERSION 1.3.3)
 set(CMAKE_CXX_STANDARD 11)
@@ -39,7 +37,7 @@ INCLUDE(cmake/msvc-specific.cmake)
 list(APPEND CMAKE_MODULE_PATH "C:/devel/install/share/eigen3/cmake")
 message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
-PROJECT(${PROJECT_NAME} LANGUAGES CXX)
+PROJECT(${PROJECT_NAME} LANGUAGES CXX VERSION ${PROJECT_VERSION})
 
 # For MSVC, set local environment variable to enable finding the built dll
 # of the main library when launching ctest with RUN_TESTS
