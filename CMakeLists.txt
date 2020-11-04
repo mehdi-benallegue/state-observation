@@ -15,29 +15,32 @@
 # received a copy of the GNU Lesser General Public License along with
 # state-observation. If not, see <http://www.gnu.org/licenses/>.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.1.3)
 if(POLICY CMP0063)
   cmake_policy(SET CMP0063 NEW)
 endif()
 
-SET(PROJECT_NAME state-observation)
-SET(PROJECT_DESCRIPTION "General implementation of observers.")
-SET(PROJECT_URL "https://github.com/jrl-umi3218/state-observation")
+set(PROJECT_NAME state-observation)
+set(PROJECT_DESCRIPTION "General implementation of observers.")
+set(PROJECT_URL "https://github.com/jrl-umi3218/state-observation")
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(PROJECT_VERSION 1.3.3)
 set(CMAKE_CXX_STANDARD 11)
-SET(CXX_DISABLE_WERROR TRUE)
+set(CXX_DISABLE_WERROR TRUE)
 set(PROJECT_USE_CMAKE_EXPORT TRUE)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set_property(GLOBAL PROPERTY USE_FOLDERS OFF)
 
-INCLUDE(cmake/base.cmake)
+include(cmake/base.cmake)
 #INCLUDE(cmake/eigen.cmake)
-INCLUDE(cmake/msvc-specific.cmake)
+include(cmake/msvc-specific.cmake)
 list(APPEND CMAKE_MODULE_PATH "C:/devel/install/share/eigen3/cmake")
 message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
-PROJECT(${PROJECT_NAME} LANGUAGES CXX VERSION ${PROJECT_VERSION})
+project(
+  ${PROJECT_NAME}
+  LANGUAGES CXX
+  VERSION ${PROJECT_VERSION})
 
 # For MSVC, set local environment variable to enable finding the built dll
 # of the main library when launching ctest with RUN_TESTS
@@ -45,8 +48,17 @@ if(MSVC)
   set(CMAKE_MSVCIDE_RUN_PATH "\$(SolutionDir)/src/\$(Configuration)")
 endif(MSVC)
 
-add_project_dependency(Boost REQUIRED COMPONENTS filesystem system thread program_options timer random)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS})
+add_project_dependency(
+  Boost
+  REQUIRED
+  COMPONENTS
+  filesystem
+  system
+  thread
+  program_options
+  timer
+  random)
+include_directories(${Boost_INCLUDE_DIRS})
 add_project_dependency(Eigen3 QUIET NO_CMAKE_PACKAGE_REGISTRY)
 if(Eigen3_FOUND)
   add_project_dependency(Eigen3 REQUIRED NO_CMAKE_PACKAGE_REGISTRY)
@@ -54,11 +66,13 @@ else()
   add_project_dependency(Eigen3 MODULE REQUIRED)
 endif()
 
-file(GENERATE
-     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h"
-     INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/include/state-observation/config.h.in")
-INSTALL(FILES "${CMAKE_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h" DESTINATION ${INCLUDE_INSTALL_DESTINATION})
+file(
+  GENERATE
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h"
+  INPUT "${CMAKE_CURRENT_SOURCE_DIR}/include/state-observation/config.h.in")
+install(FILES "${CMAKE_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h"
+        DESTINATION ${INCLUDE_INSTALL_DESTINATION})
 
-ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(unit-testings)
-ADD_SUBDIRECTORY(misc-tools)
+add_subdirectory(src)
+add_subdirectory(unit-testings)
+add_subdirectory(misc-tools)
