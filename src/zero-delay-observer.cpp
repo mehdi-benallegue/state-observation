@@ -20,6 +20,14 @@ void ZeroDelayObserver::setState(const ObserverBase::StateVector & x_k, TimeInde
     }
 }
 
+void ZeroDelayObserver::setCurrentState(const ObserverBase::StateVector & x_k)
+{
+  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
+  BOOST_ASSERT(checkStateVector(x_k) && "The size of the state vector is incorrect");
+
+  x_() = x_k;
+}
+
 void ZeroDelayObserver::clearStates()
 {
   x_.reset();
@@ -37,6 +45,23 @@ void ZeroDelayObserver::setMeasurement(const ObserverBase::MeasureVector & y_k, 
                                 (must be [current_time+1])");
 
   y_.setValue(y_k, k);
+}
+
+void ZeroDelayObserver::pushMeasurement(const ObserverBase::MeasureVector & y_k)
+{
+
+  BOOST_ASSERT(checkMeasureVector(y_k) && "The size of the measure vector is incorrect");
+  if(y_.size() > 0)
+  {
+    y_.pushBack(y_k);
+  }
+  else
+  {
+    BOOST_ASSERT(x_.isSet()
+                 && "Unable to initialize measurement without time index, the state vector has not been set.");
+
+    y_.setValue(y_k, x_.getTime() + 1);
+  }
 }
 
 void ZeroDelayObserver::clearMeasurements()
@@ -64,6 +89,24 @@ void ZeroDelayObserver::setInput(const ObserverBase::InputVector & u_k, TimeInde
   }
 }
 
+void ZeroDelayObserver::pushInput(const ObserverBase::InputVector & u_k)
+{
+  if(p_ > 0)
+  {
+    BOOST_ASSERT(checkInputVector(u_k) && "The size of the input vector is incorrect");
+
+    if(u_.size() > 0)
+    {
+      u_.pushBack(u_k);
+    }
+    else
+    {
+      BOOST_ASSERT(x_.isSet() && "Unable to initialize input without time index, the state vector has not been set.");
+      u_.setValue(u_k, x_.getTime() + 1);
+    }
+  }
+}
+
 void ZeroDelayObserver::clearInputs()
 {
   if(p_ > 0) u_.reset();
@@ -84,6 +127,12 @@ ObserverBase::StateVector ZeroDelayObserver::getEstimatedState(TimeIndex k)
       if(u_.getFirstIndex() < k) u_.popFront();
   }
 
+  return x_();
+}
+
+ObserverBase::StateVector ZeroDelayObserver::getCurrentEstimatedState() const
+{
+  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
   return x_();
 }
 

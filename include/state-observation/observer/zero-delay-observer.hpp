@@ -60,12 +60,28 @@ public:
   /// highest index is called the current time k_0
   virtual void setState(const ObserverBase::StateVector & x_k, TimeIndex k);
 
+  /// @brief Modify the value of the state vector at the current time.
+  ///
+  /// @param x_k The new state value
+  ///
+  /// This method should NOT be used for first initialization
+  /// Use setState() instead.
+  ///
+  /// Calling this function will not affect the measurements nor the input vectors. It will only replace the current
+  /// state/estimate with a new one
+  virtual void setCurrentState(const ObserverBase::StateVector & x_k);
+
   /// Remove all the given past values of the state
   virtual void clearStates();
 
   /// Set the value of the measurements vector at time index k. The
   /// measurements have to be inserted in chronological order without gaps.
   virtual void setMeasurement(const ObserverBase::MeasureVector & y_k, TimeIndex k);
+
+  /// @brief Sets the measurement value at the next time index
+  ///
+  /// @param y_k Value of the next measurement
+  virtual void pushMeasurement(const ObserverBase::MeasureVector & y_k);
 
   /// Remove all the given past values of the measurements
   virtual void clearMeasurements();
@@ -74,6 +90,11 @@ public:
   /// inputs have to be inserted in chronological order without gaps.
   /// If there is no input in the system (p==0), this instruction has no effect
   virtual void setInput(const ObserverBase::InputVector & u_k, TimeIndex k);
+
+  /// @brief Set the input value at the next time indext
+  ///
+  /// @param u_k Value of the next input
+  virtual void pushInput(const ObserverBase::InputVector & u_k);
 
   /// Remove all the given past values of the inputs
   /// If there is no input, this instruction has no effect
@@ -96,6 +117,10 @@ public:
   ///
   /// This method sets the current time to k
   virtual ObserverBase::StateVector getEstimatedState(TimeIndex k);
+
+  /// @brief Get the Current Estimated State
+  /// @return ObserverBase::StateVector
+  virtual ObserverBase::StateVector getCurrentEstimatedState() const;
 
   /// Get the value of the current time index
   virtual TimeIndex getCurrentTime() const;
