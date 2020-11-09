@@ -337,7 +337,7 @@ public:
   /// set the index of the matrix
   inline void setIndex(TimeIndex index);
 
-  /// Get the matrix value
+  /// Get the matrix value (const version)
   inline const MatrixType & operator()() const;
 
   /// Get the matrix value
