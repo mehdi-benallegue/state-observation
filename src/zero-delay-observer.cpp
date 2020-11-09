@@ -114,7 +114,9 @@ void ZeroDelayObserver::clearInputs()
 
 ObserverBase::StateVector ZeroDelayObserver::getEstimatedState(TimeIndex k)
 {
-  TimeIndex k0 = x_.getTime();
+  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
+
+  TimeIndex k0 = getCurrentTime();
 
   BOOST_ASSERT(k0 <= k && "ERROR: The observer cannot estimate previous states");
 
@@ -138,6 +140,7 @@ ObserverBase::StateVector ZeroDelayObserver::getCurrentEstimatedState() const
 
 TimeIndex ZeroDelayObserver::getCurrentTime() const
 {
+  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
   return x_.getTime();
 }
 
