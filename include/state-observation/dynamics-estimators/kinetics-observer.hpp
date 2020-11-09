@@ -1,5 +1,5 @@
 /**
- * \file      kinetics-observer-base.hpp
+ * \file      kinetics-observer.hpp
  * \author    Mehdi Benallegue
  * \date      2018
  * \brief     Unified Kinetics estimator
@@ -30,10 +30,8 @@ namespace stateObservation
 {
 
 /**
- * \class  EKFFlexibilityEstimatorBase
- * \brief  This class is the base class of the flexibility estimators that
- *         use an extended Kalman Filter. Several methods require to be overloaded
- *         to derive an implementation from this base class.
+ * \class  KineticsObserver
+ * \brief
  *
  */
 
