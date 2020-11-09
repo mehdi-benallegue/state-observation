@@ -153,14 +153,9 @@ TimeSize ZeroDelayObserver::getInputsNumber() const
 
 TimeIndex ZeroDelayObserver::getInputTime() const
 {
-  if(u_.size() > 0)
-  {
-    return u_.getLastIndex();
-  }
-  else
-  {
-    return 0;
-  }
+
+  BOOST_ASSERT(y_.size() > 0 && "ERROR: There is no measurements registered (past measurements are erased)");
+  return u_.getLastIndex();
 }
 
 Vector ZeroDelayObserver::getMeasurement(TimeIndex k) const
