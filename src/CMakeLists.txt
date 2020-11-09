@@ -55,6 +55,7 @@ set(HEADERS
     ${PROJECT_INCLUDE_DIR}/flexibility-estimation/imu-elastic-local-frame-dynamical-system.hpp
     ${PROJECT_INCLUDE_DIR}/dynamics-estimators/kinetics-observer.hpp
     ${PROJECT_INCLUDE_DIR}/dynamics-estimators/kinetics-observer.hxx
+    ${PROJECT_INCLUDE_DIR}/dynamics-estimators/lipm-dcm-bias-estimator.hpp
     ${PROJECT_INCLUDE_DIR}/examples/imu-attitude-trajectory-reconstruction.hpp
     ${PROJECT_INCLUDE_DIR}/examples/imu-attitude-trajectory-reconstruction.hxx
     ${PROJECT_INCLUDE_DIR}/examples/imu-multiplicative-attitude-reconstruction.hpp
@@ -96,7 +97,8 @@ set(SRC
     stable-imu-fixed-contact-dynamical-system.cpp
     imu-elastic-local-frame-dynamical-system.cpp
     bidim-elastic-inv-pendulum-dyn-sys.cpp
-    kinetics-observer.cpp)
+    kinetics-observer.cpp
+    lipm-dcm-bias-estimator.cpp)
 
 set(LIBRARY_NAME ${PROJECT_NAME})
 add_library(${LIBRARY_NAME} SHARED ${SRC} ${HEADERS})
