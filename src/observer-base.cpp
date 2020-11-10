@@ -3,13 +3,6 @@
 namespace stateObservation
 {
 
-void ObserverBase::reset()
-{
-  clearStates();
-  clearMeasurements();
-  clearInputs();
-}
-
 ObserverBase::ObserverBase()
 {
   n_ = m_ = p_ = 0;
@@ -75,6 +68,13 @@ ObserverBase::InputVector ObserverBase::inputVectorZero() const
 bool ObserverBase::checkInputVector(const InputVector & v) const
 {
   return (v.rows() == p_ && v.cols() == 1);
+}
+
+void ObserverBase::reset()
+{
+  clearStates();
+  clearMeasurements();
+  clearInputs();
 }
 
 void ObserverBase::setStateSize(Index n)
