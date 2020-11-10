@@ -31,16 +31,14 @@ namespace flexibilityEstimation
 {
 using namespace stateObservation;
 
-/**
- * Provide the definition of the static constexpr members of
- * input/state/modelContact struct. This looks odd but is necessary pre-C++17.
- * See https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
- * for further information.
- *
- * Note: this is no-longer necessary from C++17 onwards as "Proposal P0386 Inline Variables" introduces the ability to
- * apply the inline specifier to variables. In particular to this case constexpr implies inline for static member
- * variables. See https://wg21.link/P0386
- */
+/// Provide the definition of the static constexpr members of
+/// input/state/modelContact struct. This looks odd but is necessary pre-C++17.
+/// See https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
+/// for further information.
+/// Note: this is no-longer necessary from C++17 onwards as "Proposal P0386 Inline Variables" introduces the ability to
+/// apply the inline specifier to variables. In particular to this case constexpr implies inline for static member
+/// variables. See https://wg21.link/P0386
+
 constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::posCom;
 constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::velCom;
 constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::accCom;
