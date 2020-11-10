@@ -70,6 +70,12 @@ bool ObserverBase::checkInputVector(const InputVector & v) const
   return (v.rows() == p_ && v.cols() == 1);
 }
 
+void ObserverBase::clearInputsAndMeasurements()
+{
+  clearMeasurements();
+  clearInputs();
+}
+
 void ObserverBase::reset()
 {
   clearStates();

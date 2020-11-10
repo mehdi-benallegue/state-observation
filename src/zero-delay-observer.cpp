@@ -109,7 +109,13 @@ void ZeroDelayObserver::pushInput(const ObserverBase::InputVector & u_k)
 
 void ZeroDelayObserver::clearInputs()
 {
-  if(p_ > 0) u_.reset();
+  u_.reset();
+}
+
+void ZeroDelayObserver::clearInputsAndMeasurements()
+{
+  u_.reset();
+  y_.reset();
 }
 
 ObserverBase::StateVector ZeroDelayObserver::getEstimatedState(TimeIndex k)

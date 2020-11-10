@@ -101,6 +101,10 @@ public:
   /// If there is no input, this instruction has no effect
   virtual void clearInputs();
 
+  /// @brief  Remove all the given values of the inputs and measurements
+  ///
+  virtual void clearInputsAndMeasurements();
+
   /// @brief estimated State
   ///
   /// @param k The time index of the expected state value

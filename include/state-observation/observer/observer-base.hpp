@@ -95,6 +95,9 @@ public:
   /// Remove all the given values of the inputs
   virtual void clearInputs() = 0;
 
+  /// @brief  Remove all the given values of the inputs and measurements
+  virtual void clearInputsAndMeasurements();
+
   /// Run the observer loop and gets the state estimation of the state at
   /// instant k
   virtual StateVector getEstimatedState(TimeIndex k) = 0;
