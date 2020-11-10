@@ -71,7 +71,8 @@ public:
   /// state/estimate with a new one
   virtual void setCurrentState(const ObserverBase::StateVector & x_k);
 
-  /// Remove all the given past values of the state
+  /// @brief  Removes the state estimation
+  /// @details inherited from ObserverBase
   virtual void clearStates();
 
   /// Set the value of the measurements vector at time index k. The
@@ -83,7 +84,7 @@ public:
   /// @param y_k Value of the next measurement
   virtual void pushMeasurement(const ObserverBase::MeasureVector & y_k);
 
-  /// Remove all the given past values of the measurements
+  /// Remove all the given values of the measurements
   virtual void clearMeasurements();
 
   /// Set the value of the input vector at time index k. The
@@ -96,7 +97,7 @@ public:
   /// @param u_k Value of the next input
   virtual void pushInput(const ObserverBase::InputVector & u_k);
 
-  /// Remove all the given past values of the inputs
+  /// Remove all the given values of the inputs
   /// If there is no input, this instruction has no effect
   virtual void clearInputs();
 
