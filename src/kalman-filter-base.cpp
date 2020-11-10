@@ -88,6 +88,12 @@ void KalmanFilterBase::clearQ()
   q_.resize(0, 0);
 }
 
+void KalmanFilterBase::clearStates()
+{
+  ZeroDelayObserver::clearStates();
+  clearStateCovariance();
+}
+
 void KalmanFilterBase::setStateCovariance(const Pmatrix & P)
 {
   BOOST_ASSERT(checkPmatrix(P) && "ERROR: The P matrix dimensions are wrong");

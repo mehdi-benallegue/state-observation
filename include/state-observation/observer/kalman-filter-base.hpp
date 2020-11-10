@@ -151,6 +151,10 @@ public:
   /// Set the covariance matrix of the current time state estimation error
   virtual void setStateCovariance(const Pmatrix & P);
 
+  /// @brief clears the state and the state covariance
+  /// @details they need to be set again using setState() and setStateCovariance() before starting the estimation again
+  virtual void clearStates();
+
   /// Clear the covariace matrix of the current time state estimation
   /// error
   virtual void clearStateCovariance();
