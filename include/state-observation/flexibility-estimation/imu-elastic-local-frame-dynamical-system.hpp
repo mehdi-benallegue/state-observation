@@ -38,45 +38,45 @@ class STATE_OBSERVATION_DLLAPI IMUElasticLocalFrameDynamicalSystem : public stat
 public:
   struct input
   {
-    /// indexes of the different components of a vector of the input state
-    static const unsigned posCom = 0;
-    static const unsigned velCom = 3;
-    static const unsigned accCom = 6;
-    static const unsigned inertia = 9;
-    static const unsigned angMoment = 15;
-    static const unsigned dotInertia = 18;
-    static const unsigned dotAngMoment = 24;
-    static const unsigned posIMU = 27;
-    static const unsigned oriIMU = 30;
-    static const unsigned linVelIMU = 33;
-    static const unsigned angVelIMU = 36;
-    static const unsigned linAccIMU = 39;
-    static const unsigned additionalForces = 42;
-    static const unsigned contacts = 48;
+    /// indices of the different components of a vector of the input state
+    static constexpr unsigned posCom = 0;
+    static constexpr unsigned velCom = 3;
+    static constexpr unsigned accCom = 6;
+    static constexpr unsigned inertia = 9;
+    static constexpr unsigned angMoment = 15;
+    static constexpr unsigned dotInertia = 18;
+    static constexpr unsigned dotAngMoment = 24;
+    static constexpr unsigned posIMU = 27;
+    static constexpr unsigned oriIMU = 30;
+    static constexpr unsigned linVelIMU = 33;
+    static constexpr unsigned angVelIMU = 36;
+    static constexpr unsigned linAccIMU = 39;
+    static constexpr unsigned additionalForces = 42;
+    static constexpr unsigned contacts = 48;
 
-    static const unsigned sizeBase = 48;
+    static constexpr unsigned sizeBase = 48;
   };
 
   struct state
   {
-    static const unsigned pos = 0;
-    static const unsigned ori = 3;
-    static const unsigned linVel = 6;
-    static const unsigned angVel = 9;
-    static const unsigned fc = 12;
-    static const unsigned unmodeledForces = 24;
-    static const unsigned comBias = 30;
-    static const unsigned drift = 32;
+    static constexpr unsigned pos = 0;
+    static constexpr unsigned ori = 3;
+    static constexpr unsigned linVel = 6;
+    static constexpr unsigned angVel = 9;
+    static constexpr unsigned fc = 12;
+    static constexpr unsigned unmodeledForces = 24;
+    static constexpr unsigned comBias = 30;
+    static constexpr unsigned drift = 32;
 
-    static const unsigned size = 35;
+    static constexpr unsigned size = 35;
   };
 
   struct contactModel
   {
-    /// indexes of the different components of a vector of the input state
-    static const unsigned elasticContact = 1;
-    static const unsigned pendulum = 2;
-    static const unsigned none = 0;
+    /// indices of the different components of a vector of the input state
+    static constexpr unsigned elasticContact = 1;
+    static constexpr unsigned pendulum = 2;
+    static constexpr unsigned none = 0;
   };
 
   typedef Eigen::LLT<Matrix3> LLTMatrix3;
@@ -342,9 +342,9 @@ protected:
 
   Matrix3 & computeRotation_(const Vector3 & x, int i);
 
-  static const Index stateSize_ = state::size;
+  static constexpr Index stateSize_ = state::size;
   Index inputSize_;
-  static const Index measurementSizeBase_ = 6;
+  static constexpr Index measurementSizeBase_ = 6;
   unsigned nbContacts_;
   unsigned contactModel_;
 

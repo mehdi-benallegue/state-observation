@@ -31,6 +31,48 @@ namespace flexibilityEstimation
 {
 using namespace stateObservation;
 
+/// Provide the definition of the static constexpr members of
+/// input/state/modelContact struct. This looks odd but is necessary pre-C++17.
+/// See https://stackoverflow.com/questions/8016780/undefined-reference-to-static-constexpr-char
+/// for further information.
+/// Note: this is no-longer necessary from C++17 onwards as "Proposal P0386 Inline Variables" introduces the ability to
+/// apply the inline specifier to variables. In particular to this case constexpr implies inline for static member
+/// variables. See https://wg21.link/P0386
+
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::posCom;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::velCom;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::accCom;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::inertia;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::angMoment;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::dotInertia;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::dotAngMoment;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::posIMU;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::oriIMU;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::linVelIMU;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::angVelIMU;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::linAccIMU;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::additionalForces;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::contacts;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::input::sizeBase;
+
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::pos;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::ori;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::linVel;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::angVel;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::fc;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::unmodeledForces;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::comBias;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::drift;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::state::size;
+
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::contactModel::elasticContact;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::contactModel::pendulum;
+constexpr unsigned IMUElasticLocalFrameDynamicalSystem::contactModel::none;
+
+constexpr Index IMUElasticLocalFrameDynamicalSystem::stateSize_;
+constexpr Index IMUElasticLocalFrameDynamicalSystem::measurementSizeBase_;
+// end of static constexpr definitions
+
 IMUElasticLocalFrameDynamicalSystem::IMUElasticLocalFrameDynamicalSystem(double dt)
 : processNoise_(0x0), dt_(dt), robotMass_(hrp2::m), robotMassInv_(1 / hrp2::m), measurementSize_(measurementSizeBase_),
   withForceMeasurements_(false), withComBias_(false), withAbsolutePos_(false), withUnmodeledForces_(false),
