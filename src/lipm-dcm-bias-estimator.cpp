@@ -49,7 +49,7 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
   updateMatricesABQ_();
   C_ << 1., 1.;
   R_ << square(dcmMeasureErrorStd);
-  filter_.setC(C_);
+  filter_.setC(C_.transpose());
   filter_.setMeasurementCovariance(R_);
   Vector2 x;
 
@@ -185,12 +185,12 @@ void LipmDcmBiasEstimator::LipmDcmBiasEstimator::updateMatricesABQ_()
         0;
 
   Q_ << square(omega0_* dt_ * zmpErrorStd_), 0,
-        0,                                   square(biasDriftStd_);
+        0,                                   square(biasDriftStd_*dt_);
   // clang-format on
 
   filter_.setA(A_);
   filter_.setB(B_);
-  filter_.setStateCovariance(Q_);
+  filter_.setProcessCovariance(Q_);
 }
 
 } // namespace stateObservation
