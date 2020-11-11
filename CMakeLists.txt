@@ -15,7 +15,7 @@
 # received a copy of the GNU Lesser General Public License along with
 # state-observation. If not, see <http://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.1.4)
 if(POLICY CMP0063)
   cmake_policy(SET CMP0063 NEW)
 endif()
