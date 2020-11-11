@@ -59,7 +59,7 @@ void ZeroDelayObserver::pushMeasurement(const ObserverBase::MeasureVector & y_k)
   {
     BOOST_ASSERT(x_.isSet()
                  && "Unable to initialize measurement without time index, the state vector has not been set.");
-
+    /// we need the measurement of the next state to correct for the prediction
     y_.setValue(y_k, x_.getTime() + 1);
   }
 }
@@ -102,7 +102,8 @@ void ZeroDelayObserver::pushInput(const ObserverBase::InputVector & u_k)
     else
     {
       BOOST_ASSERT(x_.isSet() && "Unable to initialize input without time index, the state vector has not been set.");
-      u_.setValue(u_k, x_.getTime() + 1);
+      /// we need the input at the time of the state vector to predict the next one
+      u_.setValue(u_k, x_.getTime());
     }
   }
 }
