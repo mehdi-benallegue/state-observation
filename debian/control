@@ -25,14 +25,14 @@ Suggests: libstate-observation-doc
 Depends: pkg-config,
          libstate-observation (= ${binary:Version}),
          ${misc:Depends}
-Description: Describes interfaces for state observers, and implements some obeservers (including linear and extended Kalman filters)
+Description: Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters)
 
 Package: libstate-observation
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends}
-Description: Implements some common obeservers (including linear and extended Kalman filters)
+Description: Implements some common observers (including linear and extended Kalman filters)
 
 Package: libstate-observation-doc
 Section: doc
@@ -41,5 +41,5 @@ Depends: ${misc:Depends}
 Multi-Arch: foreign
 Suggests: libstate-observation-dev
 Description: state-observation - API documentation
- Describes interfaces for state observers, and implements some obeservers (including linear and extended Kalman filters).
+ Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters).
  This package provides the complete API documentation in HTML format.
