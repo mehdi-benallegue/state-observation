@@ -62,10 +62,11 @@ public:
   LipmDcmBiasEstimator(double omega_0,
                        double dt = defaultDt_,
                        double biasDriftStd = defaultBiasDriftSecond_,
-                       double zmpMeasureErrorStd = defaultZmpErrorStd_,
-                       double dcmMeasureErrorStd = defaultDcmErrorStd_,
+                       double initZMP = 0,
                        double initDcm = 0,
                        double initBias = 0,
+                       double zmpMeasureErrorStd = defaultZmpErrorStd_,
+                       double dcmMeasureErrorStd = defaultDcmErrorStd_,
                        double initDcmUncertainty = defaultDCMUncertainty,
                        double initBiasUncertainty = defaultBiasUncertainty);
 
@@ -84,6 +85,7 @@ public:
   /// @param initBiasUncertainty the uncertainty in the bias initial value in meters
   LipmDcmBiasEstimator(bool measurementIsWithBias,
                        double measuredDcm,
+                       double measuredZMP,
                        double omega_0,
                        double dt = defaultDt_,
                        double biasDriftStd = defaultBiasDriftSecond_,
@@ -187,6 +189,8 @@ private:
   double dt_;
   double biasDriftStd_;
   double zmpErrorStd_;
+
+  double previousZmp_;
 
   LinearKalmanFilter filter_;
   Matrix2 A_;

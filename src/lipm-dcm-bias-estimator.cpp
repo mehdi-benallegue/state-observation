@@ -7,13 +7,15 @@ using namespace tools;
 LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
                                            double dt,
                                            double biasDriftStd,
-                                           double zmpMeasureErrorStd,
-                                           double dcmMeasureErrorStd,
+                                           double initZMP,
                                            double initDcm,
                                            double initBias,
+                                           double zmpMeasureErrorStd,
+                                           double dcmMeasureErrorStd,
                                            double initDcmUncertainty,
                                            double initBiasUncertainty)
-: omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), filter_(2, 1, 1)
+: omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
+  filter_(2, 1, 1)
 {
   updateMatricesABQ_();
   C_ << 1., 1.;
@@ -33,6 +35,7 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
 
 LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
                                            double measuredDcm,
+                                           double measuredZMP,
                                            double omega_0,
                                            double dt,
                                            double biasDriftStd,
@@ -40,7 +43,8 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
                                            double dcmMeasureErrorStd,
                                            double initBias,
                                            double initBiasuncertainty)
-: omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), filter_(2, 1, 1)
+: omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(measuredZMP),
+  filter_(2, 1, 1)
 {
   updateMatricesABQ_();
   C_ << 1., 1.;
@@ -155,8 +159,13 @@ void LipmDcmBiasEstimator::setInputs(double dcm, double zmp)
 {
   Vector1 u;
   Vector1 y;
-  u(0) = zmp;
+
   y(0) = dcm;
+
+  /// The prediction of the state depends on the previous value of the ZMP
+  u(0) = previousZmp_;
+  previousZmp_ = zmp;
+
   filter_.pushMeasurement(y);
   filter_.pushInput(u);
 }
