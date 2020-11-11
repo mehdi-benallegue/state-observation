@@ -3,8 +3,8 @@ Upstream-Name: state-observation
 Source: https://github.com/jrl-umi3218/state-observation
 
 Files: *
-Copyright: 2018-2020 CNRS-UM LIRMM
-           2018-2020 CNRS-AIST JRL
+Copyright: 2013-2020 CNRS LAAS
+           2013-2020 CNRS-AIST JRL
 License: BSD-2-Clause
  BSD 2-Clause License
  .
