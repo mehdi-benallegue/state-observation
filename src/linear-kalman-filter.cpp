@@ -52,10 +52,9 @@ ObserverBase::StateVector LinearKalmanFilter::prediction_(TimeIndex k)
 ObserverBase::MeasureVector LinearKalmanFilter::simulateSensor_(const StateVector & x, TimeIndex k)
 {
 
-  BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C is not initialized");
-  BOOST_ASSERT(checkDmatrix(d_) && "ERROR: The D is not initialized");
+  BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C matrix is not initialized");
 
-  if(p_ > 0 && d_ != getDmatrixZero())
+  if(p_ > 0 && checkDmatrix(d_) && d_ != getDmatrixZero())
   {
     BOOST_ASSERT(u_.checkIndex(k)
                  && "ERROR: The input feedthrough of the measurements is not set "
