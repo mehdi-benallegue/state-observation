@@ -30,7 +30,7 @@ namespace stateObservation
 /// The DCM can be measured using the CoM and its velocity, but the CoM position can be biased.
 /// This estimator uses Kalman Filtering to estimate this bias in one axis.
 
-class LipmDcmBiasEstimator
+class STATE_OBSERVATION_DLLAPI LipmDcmBiasEstimator
 {
 private:
   constexpr static double defaultDt_ = 0.005;
