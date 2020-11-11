@@ -50,18 +50,18 @@ public:
   /// @brief Construct a new Lipm Dcm Bias Estimator object
   /// @details Use this if no DCM measurements are available or when a good guess of its unbiased position is available
   ///
-  /// @param omega_0             the natural frequency of the DCM (rad/s)
-  /// @param dt                  the sampling time in seconds
-  /// @param biasDriftStd        the standard deviation of the drift (m/s)
-  /// @param zmpMeasureErrorStd  the standard deviaiton of the zmp estimation error (m)
-  /// @param dcmMeasureErrorStd  the standard deviation of the dcm estimation error, NOT including the bias (m)
-  /// @param initDCM             the initial value of the DCM
-  /// @param initBias            the initial value of the bias
-  /// @param tinitDcmUncertainty the uncertainty in the DCM initial value in meters
-  /// @param initBiasUncertainty the uncertainty in the bias initial value in meters
+  /// @param omega_0                the natural frequency of the DCM (rad/s)
+  /// @param dt                     the sampling time in seconds
+  /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
+  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
+  /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
+  /// @param initDCM                the initial value of the DCM
+  /// @param initBias               the initial value of the bias
+  /// @param tinitDcmUncertainty    the uncertainty in the DCM initial value in meters
+  /// @param initBiasUncertainty    the uncertainty in the bias initial value in meters
   LipmDcmBiasEstimator(double omega_0,
                        double dt = defaultDt_,
-                       double biasDriftStd = defaultBiasDriftSecond_,
+                       double biasDriftPerSecondStd = defaultBiasDriftSecond_,
                        double initZMP = 0,
                        double initDcm = 0,
                        double initBias = 0,
@@ -78,7 +78,7 @@ public:
   /// @param measuredDcm            the the measured position of the DCM
   /// @param omega_0                the natural frequency of the DCM (rad/s)
   /// @param dt                     the sampling time in seconds
-  /// @param biasDriftStd           the standard deviation of the drift (m/s)
+  /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
   /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param scmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
   /// @param initBias               the initial value of the drift
@@ -88,7 +88,7 @@ public:
                        double measuredZMP,
                        double omega_0,
                        double dt = defaultDt_,
-                       double biasDriftStd = defaultBiasDriftSecond_,
+                       double biasDriftPerSecondStd = defaultBiasDriftSecond_,
                        double zmpMeasureErrorStd = defaultZmpErrorStd_,
                        double dcmMeasureErrorStd = defaultDcmErrorStd_,
                        double initBias = 0,
@@ -202,6 +202,10 @@ private:
 
   /// process noise
   Matrix2 Q_;
+
+  /// @brief Deactivated default constructor
+  ///
+  LipmDcmBiasEstimator() = delete;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
