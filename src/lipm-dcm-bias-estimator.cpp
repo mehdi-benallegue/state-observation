@@ -175,6 +175,11 @@ double LipmDcmBiasEstimator::getUnbiasedDCM() const
   return filter_.getCurrentEstimatedState()(0);
 }
 
+double LipmDcmBiasEstimator::getBias() const
+{
+  return filter_.getCurrentEstimatedState()(1);
+}
+
 void LipmDcmBiasEstimator::LipmDcmBiasEstimator::updateMatricesABQ_()
 {
   // clang-format off
