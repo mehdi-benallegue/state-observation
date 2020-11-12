@@ -1,0 +1,8 @@
+Document: libstate-observation-api-documentation
+Title: API documentation for state-observation
+Author: Mehdi Benallegue 
+Section: Programming/C++
+
+Format: HTML
+Index: /usr/share/doc/state-observation/doxygen-html/index.html
+Files: /usr/share/doc/state-observation/doxygen-html/*.html

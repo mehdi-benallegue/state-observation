@@ -1,0 +1,45 @@
+Source: state-observation
+Priority: optional
+Maintainer: Arnaud Tanguy <arn.tanguy+ppa@gmail.com>
+Standards-Version: 3.9.5
+Section: libs
+Homepage: http://github.com/jrl-umi3218/state-observation
+Vcs-Git: git://github.com/jrl-umi3218/state-observation
+Vcs-Browser: http://github.com/jrl-umi3218/state-observation
+Build-Depends: debhelper (>= 9),
+ pkg-config,
+ cmake,
+ doxygen,
+ libboost-test-dev,
+ libboost-filesystem-dev,
+ libboost-thread-dev,
+ libboost-program-options-dev,
+ libboost-timer-dev,
+ libboost-random-dev,
+ libeigen3-dev (>= 3.2)
+
+Package: libstate-observation-dev
+Section: libdevel
+Architecture: any
+Suggests: libstate-observation-doc
+Depends: pkg-config,
+         libstate-observation (= ${binary:Version}),
+         ${misc:Depends}
+Description: Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters)
+
+Package: libstate-observation
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: Implements some common observers (including linear and extended Kalman filters)
+
+Package: libstate-observation-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends}
+Multi-Arch: foreign
+Suggests: libstate-observation-dev
+Description: state-observation - API documentation
+ Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters).
+ This package provides the complete API documentation in HTML format.
