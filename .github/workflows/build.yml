@@ -100,5 +100,5 @@ jobs:
       if: matrix.os == 'ubuntu-18.04' && matrix.build-type == 'RelWithDebInfo' && matrix.compiler == 'gcc' && github.ref == 'refs/heads/head'
       uses: jrl-umi3218/github-actions/upload-documentation@master
       with:
-        GH_USER: arntanguy
+        GH_USER: gergondet
         GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
