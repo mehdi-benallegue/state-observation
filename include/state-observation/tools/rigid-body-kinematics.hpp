@@ -154,6 +154,21 @@ inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2);
 
 inline Quaternion zeroRotationQuaternion();
 
+/// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the axis with this
+/// rotation
+/// @param rotation The 3x3 rotation matrix
+/// @param axis the axis of rotation (must be normalized)
+/// @param v the vector that is rotated with the rotation (must be orthogonal to axis and normalized)
+/// @return double the angle
+inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & axis, const Vector3 & v);
+
+/// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the upward vertical
+/// axis with this rotation
+/// @param rotation The 3x3 rotation matrix
+/// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
+/// @return double the angle
+inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation, const Vector2 & v);
+
 /// transforms a rotation into translation given a constraint of a fixed point
 inline void fixedPointRotationToTranslation(const Matrix3 & R,
                                             const Vector3 & rotationVelocity,
