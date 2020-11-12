@@ -20,6 +20,7 @@ add_so_test(other-tests)
 add_so_test(test_acceleration_stabilization)
 add_so_test(test_model-base-ekf-flex-estimator-imu)
 add_so_test(test-kinetics-observer)
+add_so_test(test-dcm-bias-estimation)
 
 add_custom_command(
   TARGET test_model-base-ekf-flex-estimator-imu

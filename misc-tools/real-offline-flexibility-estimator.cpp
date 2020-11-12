@@ -219,7 +219,7 @@ int test(const IndexedVectorArray & y, const IndexedVectorArray & u)
   std::ofstream f;
   f.open("trajectory.dat");
 
-  double error;
+  double error = 0;
 
   /// the reconstruction of the state
   for(TimeIndex i = y.getFirstIndex(); i < y.getNextIndex(); ++i)

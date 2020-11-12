@@ -60,14 +60,31 @@ public:
   /// highest index is called the current time k_0
   virtual void setState(const ObserverBase::StateVector & x_k, TimeIndex k);
 
-  /// Remove all the given past values of the state
+  /// @brief Modify the value of the state vector at the current time.
+  ///
+  /// @param x_k The new state value
+  ///
+  /// This method should NOT be used for first initialization
+  /// Use setState() instead.
+  ///
+  /// Calling this function will not affect the measurements nor the input vectors. It will only replace the current
+  /// state/estimate with a new one
+  virtual void setCurrentState(const ObserverBase::StateVector & x_k);
+
+  /// @brief  Removes the state estimation
+  /// @details inherited from ObserverBase
   virtual void clearStates();
 
   /// Set the value of the measurements vector at time index k. The
   /// measurements have to be inserted in chronological order without gaps.
   virtual void setMeasurement(const ObserverBase::MeasureVector & y_k, TimeIndex k);
 
-  /// Remove all the given past values of the measurements
+  /// @brief Sets the measurement value at the next time index
+  ///
+  /// @param y_k Value of the next measurement
+  virtual void pushMeasurement(const ObserverBase::MeasureVector & y_k);
+
+  /// Remove all the given values of the measurements
   virtual void clearMeasurements();
 
   /// Set the value of the input vector at time index k. The
@@ -75,15 +92,32 @@ public:
   /// If there is no input in the system (p==0), this instruction has no effect
   virtual void setInput(const ObserverBase::InputVector & u_k, TimeIndex k);
 
-  /// Remove all the given past values of the inputs
+  /// @brief Set the input value at the next time indext
+  ///
+  /// @param u_k Value of the next input
+  virtual void pushInput(const ObserverBase::InputVector & u_k);
+
+  /// Remove all the given values of the inputs
   /// If there is no input, this instruction has no effect
   virtual void clearInputs();
 
-  /// Run the observer loop and gets the state estimation of the state at
-  /// instant k.
+  /// @brief  Remove all the given values of the inputs and measurements
+  ///
+  virtual void clearInputsAndMeasurements();
+
+  /// @brief estimated State
+  ///
+  /// @param k The time index of the expected state value
+  /// @return ObserverBase::StateVector
+  ///
+  /// @details If k is equal to the current time k_0, this will give the value of the last state/estimate.
+  ///
+  /// If k is larger than the current time k_0, this will run the observer loop and get the state estimation of the
+  /// state at instant k.
+  ///
   /// In order to estimate the state k, two conditions have to be met:
-  /// \li the time index k must be superior to the current time k_0, the
-  ///     does *not* record past values of the state and cannot observe
+  /// \li the time index k must be superior or equal to the current time k_0,
+  ///     the estimator does *not* record past values of the state and cannot observe
   ///     past states.
   /// \li the observer has to be able to reconstruct all the state
   ///     values from k_0 to k. That means all the measurements or input
@@ -92,12 +126,16 @@ public:
   /// That means generally (for most zero delay observers) that when
   /// current time is k_0 (we know an estimation of x_{k_0}) and we want
   /// to reconstruct the state at time k>k_0 we need to have the values of
-  /// y_{k_0+1} to y_{k} and u_{k_0} to u_{k-1}
+  /// y_{k_0+1} to y_{k} and u_{k_0} to u_{k-1} (or u_{k} depending on the measure dynamics)
   ///
   /// This method sets the current time to k
   virtual ObserverBase::StateVector getEstimatedState(TimeIndex k);
 
-  /// Get the value of the current time index
+  /// @brief Get the Current Estimated State
+  /// @return ObserverBase::StateVector
+  virtual ObserverBase::StateVector getCurrentEstimatedState() const;
+
+  /// Get the value of the time index of the current state estimation
   virtual TimeIndex getCurrentTime() const;
 
   /// Get the value of the input of the time index k

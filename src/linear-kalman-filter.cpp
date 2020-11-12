@@ -30,19 +30,19 @@ ObserverBase::StateVector LinearKalmanFilter::prediction_(TimeIndex k)
 {
   (void)k; // unused
 
-  BOOST_ASSERT(checkAmatrix(a_) && "ERROR: The A is not initialized");
-  BOOST_ASSERT(checkBmatrix(b_) && "ERROR: The B is not initialized");
-  BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C is not initialized");
-  BOOST_ASSERT(checkDmatrix(d_) && "ERROR: The D is not initialized");
+  BOOST_ASSERT(checkAmatrix(a_) && "ERROR: The A matrix is not initialized");
+  BOOST_ASSERT(checkBmatrix(b_) && "ERROR: The B matrix is not initialized");
+  BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C matrix is not initialized");
 
   xbar_.set(a_ * x_(), k);
 
   if(p_ > 0 && b_ != getBmatrixZero())
   {
-    BOOST_ASSERT(u_.checkIndex(k - 1) && "ERROR: The input feedthrough of the state dynamics is not set \
-                             (the state at time k+1 needs the input at time k which was not given) \
-                             if you don't need the input in the computation of state, you \
-                             must set B matrix to zero");
+    BOOST_ASSERT(u_.checkIndex(k - 1)
+                 && "ERROR: The input feedthrough of the state dynamics is not set "
+                    "(the state at time k+1 needs the input at time k which was not given) "
+                    "if you don't need the input in the computation of state, you "
+                    "must set B matrix to zero");
     xbar_().noalias() += b_ * this->u_[k - 1];
   }
 
@@ -52,20 +52,20 @@ ObserverBase::StateVector LinearKalmanFilter::prediction_(TimeIndex k)
 ObserverBase::MeasureVector LinearKalmanFilter::simulateSensor_(const StateVector & x, TimeIndex k)
 {
 
-  BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C is not initialized");
-  BOOST_ASSERT(checkDmatrix(d_) && "ERROR: The D is not initialized");
+  BOOST_ASSERT(checkCmatrix(c_) && "ERROR: The C matrix is not initialized");
 
-  if(p_ > 0 && d_ != getDmatrixZero())
+  if(p_ > 0 && checkDmatrix(d_) && d_ != getDmatrixZero())
   {
-    BOOST_ASSERT(u_.checkIndex(k) && "ERROR: The input feedthrough of the measurements is not set \
-                             (the measurement at time k needs the input at time k which was not given) \
-                             if you don't need the input in the computation of measurement, you \
-                             must set D matrix to zero");
+    BOOST_ASSERT(u_.checkIndex(k)
+                 && "ERROR: The input feedthrough of the measurements is not set "
+                    "(the measurement at time k needs the input at time k which was not given) "
+                    "if you don't need the input in the computation of measurement, you "
+                    "must set D matrix to zero");
     ybar_.set(c_ * x + d_ * u_[k], k);
   }
   else
   {
-    ybar_.set(ObserverBase::MeasureVector(c_ * x), k);
+    ybar_.set(c_ * x, k);
   }
   return ybar_();
 }
