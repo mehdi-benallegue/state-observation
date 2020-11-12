@@ -1,13 +1,14 @@
 #include <iostream>
-#include <state-observation/dynamics-estimators/lipm-dcm-bias-estimator.hpp>
+#include <state-observation/dynamics-estimators/unidim-lipm-dcm-bias-estimator.hpp>
 #include <state-observation/tools/probability-law-simulation.hpp>
+#include <state-observation/tools/rigid-body-kinematics.hpp>
 
 using namespace stateObservation;
 
 /// @brief runs the basic test
 ///
 /// @return int : 0 if success, nonzero if fails
-int testDcmBiasEstimator()
+int testUnidimDcmBiasEstimator(int errorCode)
 {
 
   double w0 = sqrt(cst::gravityConstant / 0.9);
@@ -115,15 +116,67 @@ int testDcmBiasEstimator()
   }
 }
 
+/// @brief test rotationMatrix2Angle
+///
+/// @param errorCode
+/// @return int
+int testrotationMatrix2Angle(int errorCode)
+{
+
+  {
+    Vector3 axis = Vector3::Random().normalized();
+    double angle = -1.9745; /// random value
+    Matrix3 m = (AngleAxis(angle, axis)).matrix();
+
+    Vector3 v = Vector3::Random().cross(axis).normalized();
+
+    double error = fabs(angle - kine::rotationMatrixToAngle(m, axis, v));
+    std::cout << "Angle error " << error << std::endl;
+
+    if(error > cst::epsilon1)
+    {
+      return errorCode;
+    }
+  }
+  {
+    double angle = 2.6845; /// random value
+
+    Matrix3 m = (AngleAxis(angle, Vector3::UnitZ())).matrix();
+
+    Vector2 v = Vector2::Random().normalized();
+
+    double error = fabs(angle - kine::rotationMatrixToHorizontalAngle(m, v));
+
+    std::cout << angle << " " << kine::rotationMatrixToHorizontalAngle(m, v) << std::endl;
+
+    std::cout << "Angle error " << error << std::endl;
+
+    if(error > cst::epsilon1)
+    {
+      return errorCode;
+    }
+
+    return 0;
+  }
+}
+
 int main()
 {
   int exitCode;
 
-  exitCode = testDcmBiasEstimator();
+  exitCode = testUnidimDcmBiasEstimator(1);
 
   if(exitCode != 0)
   {
-    std::cout << "Failed, error code: " << exitCode << std::endl;
+    std::cout << "Failed, testUnidimDcmBiasEstimator error code: " << exitCode << std::endl;
+    return exitCode;
+  }
+
+  exitCode = testrotationMatrix2Angle(2);
+
+  if(exitCode != 0)
+  {
+    std::cout << "Failed, testrotationMatrix2Angle error code: " << exitCode << std::endl;
     return exitCode;
   }
 
