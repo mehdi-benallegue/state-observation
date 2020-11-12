@@ -513,6 +513,9 @@ const Vector gravity = gravityConstant * Vector3::UnitZ();
 /// angles considered Zero
 constexpr double epsilonAngle = 1e-16;
 
+/// number considered zero when compared to 1
+constexpr double epsilon1 = 1e-14;
+
 } // namespace cst
 
 typedef boost::timer::auto_cpu_timer auto_cpu_timer;
