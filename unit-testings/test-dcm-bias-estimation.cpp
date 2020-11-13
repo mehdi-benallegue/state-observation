@@ -145,7 +145,25 @@ int testrotationMatrix2Angle(int errorCode)
     v3 << v, 0;
     Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(-1.245, v3).matrix();
 
-    double error = fabs(angle - kine::rotationMatrixToHorizontalAngle(m, v));
+    double error = fabs(angle - kine::rotationMatrixToYaw(m, v));
+
+    std::cout << "Angle error " << error << std::endl;
+
+    if(error > cst::epsilon1)
+    {
+      return errorCode;
+    }
+  }
+  {
+    double angle = 2.6845; /// random value
+
+    Vector2 v = Vector2::UnitX();
+    Vector3 v3;
+    v3 << v, 0;
+    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(-0.689, Vector3::UnitY()).matrix()
+                * AngleAxis(-1.245, v3).matrix();
+
+    double error = fabs(angle - kine::rotationMatrixToYaw(m));
 
     std::cout << "Angle error " << error << std::endl;
 
@@ -163,7 +181,7 @@ int testrotationMatrix2Angle(int errorCode)
 
     Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(3.54, v3).matrix();
 
-    double error = fabs(angle - kine::rotationMatrixToHorizontalAngle(m));
+    double error = fabs(angle - kine::rotationMatrixToYawAxisAgnostic(m));
 
     std::cout << "Angle error " << error << std::endl;
 

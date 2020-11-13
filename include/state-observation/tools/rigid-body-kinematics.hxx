@@ -314,110 +314,123 @@ namespace stateObservation
       return M;
     }
 
-    inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2)
+    inline bool isPureYaw(const Matrix3 & R)
+    {
+      return (fabs(R(2, 0)) < cst::epsilon1 && fabs(R(2, 1)) < cst::epsilon1);
+    }
+
+    inline Vector3 getInvariantHorizontalVector(const Matrix3 & R)
+    {
+      if(isPureYaw(R))
+      { /// Pure yaw, any vector is a solution
+        return Vector3::UnitX();
+      }
+      else
+      {
+        return Vector3(R(2, 1), -R(2, 0), 0);
+      }
+    }
+
+    inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2, const Vector3 & m)
     {
       /*
       R&=\left(\begin{array}{ccc}
-      \frac{m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & \frac{e_{z}\times m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & e_{z}\end{array}\right)\left(\begin{array}{ccc}
-      \frac{m_{l}\times v_{1}}{\left\Vert m_{l}\times v_{1}\right\Vert } & \frac{v_{1}\times m_{l}\times v_{1}}{\left\Vert m_{l}\times v_{1}\right\Vert } & v_{1}\end{array}\right)^{T}\\&v_{1}=R_{1}^{T}e_{z}\qquad m_{l}=R_{2}^{T}m
+      \frac{m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & \frac{e_{z}\times m\times e_{z}}{\left\Vert m\times
+      e_{z}\right\Vert } & e_{z}\end{array}\right)\left(\begin{array}{ccc} \frac{m_{l}\times v_{1}}{\left\Vert
+      m_{l}\times v_{1}\right\Vert } & \frac{v_{1}\times m_{l}\times v_{1}}{\left\Vert m_{l}\times v_{1}\right\Vert } &
+      v_{1}\end{array}\right)^{T}\\&v_{1}=R_{1}^{T}e_{z}\qquad m_{l}=R_{2}^{T}m
       */
-
-      Matrix3 R_temp1,R_temp2;
-
       const Vector3 & ez = Vector3::UnitZ();
 
       const Vector3 & v1 = Rtez;
 
-      Vector3 mlxv1 = (R2.transpose()*Vector3::UnitX()).cross(v1);
+      Vector3 mlxv1 = (R2.transpose() * m).cross(v1);
 
       double n2 = mlxv1.squaredNorm();
 
-      if (n2 > cst::epsilonAngle * cst::epsilonAngle)
+      BOOST_ASSERT((n2 > cst::epsilonAngle * cst::epsilonAngle)
+                   && "Tilt is singular with regard to the provided axis (likely gimbal lock). Please use the "
+                      "angle-agnostic version");
+
+      if(n2 > cst::epsilonAngle * cst::epsilonAngle)
       {
-        ///we take m = ex
-        ///mxez = Vector3::UnitX().cross(ez);
-        ///ezxmxez = ez.cross(mxez);
-        ///R_temp1 << mxez, ezxmxez, ez;
-        R_temp1 << -Vector3::UnitY(), Vector3::UnitX(), ez;
+        /// ezxmxez = ez.cross(mxez);
+        /// R_temp1 << mxez, ezxmxez, ez;
+
+        Matrix3 R_temp1, R_temp2;
+        R_temp1 << m.cross(ez), m, ez;
 
         mlxv1 /= sqrt(n2);
 
-        R_temp2 << mlxv1.transpose(), v1.cross(mlxv1).transpose(), v1.transpose();
+        // clang-format off
+        R_temp2 << mlxv1.transpose(), 
+                   v1.cross(mlxv1).transpose(),
+                   v1.transpose();
+        // clang-format on
 
         return R_temp1*R_temp2;
       }
-      else
+      else 
       {
-        ///we take m = ey
-        ///mxez = Vector3::UnitY().cross(ez);
-        ///ezxmxez = ez.cross(mxez);
-        ///R_temp1 << mxez, ezxmxez, ez;
-
-        mlxv1 = (R2.transpose()*Vector3::UnitY()).cross(v1).normalized();
-
-        R_temp2 << mlxv1.transpose(), v1.cross(mlxv1).transpose(), v1.transpose();
-
-        ///R_temp1.setIdentity();
-        ///return R_temp1*R_temp2.transpose();
-        return R_temp2.transpose();
+        throw std::invalid_argument(
+            "Tilt is singular with regard to the provided axis (likely gimbal lock). Please use the "
+            "angle-agnostic version");
       }
-
     }
 
-    inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2)
+    inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2, const Vector3 v)
     {
-      return mergeTiltWithYaw(R1.transpose()*Vector3::UnitZ(),R2);
+      return mergeTiltWithYaw(R1.transpose() * Vector3::UnitZ(), R2, v);
     }
 
-    inline Quaternion zeroRotationQuaternion()
+    inline Matrix3 mergeTiltWithYawAxisAgnostic(const Vector3 & Rtez, const Matrix3 & R2)
     {
-      return Quaternion(1,0,0,0);
+      return mergeTiltWithYaw(Rtez, R2, getInvariantHorizontalVector(R2));
     }
 
-    /// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the axis with this
-    /// rotation
-    /// @param rotation The 3x3 rotation matrix
-    /// @param axis the axis of rotation (must be normalized)
-    /// @param v the vector that is rotated with the rotation (must be orthogonal to axis and normalized)
-    /// @return double the angle
+    inline Matrix3 mergeRoll1Pitch1WithYaw2AxisAgnostic(const Matrix3 & R1, const Matrix3 & R2)
+    {
+      return mergeTiltWithYawAxisAgnostic(R1.transpose() * Vector3::UnitZ(), R2);
+    }
+
     inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & axis, const Vector3 & v)
     {
       Vector3 rotV_proj = axis.cross((rotation * v).cross(axis)).normalized();
       return atan2(v.cross(rotV_proj).dot(axis), v.dot(rotV_proj));
     }
 
-    /// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the upward vertical
-    /// axis with this rotation
-    /// @param rotation The 3x3 rotation matrix
-    /// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
-    /// @return double the angle
-    inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation, const Vector2 & v)
+    inline double rotationMatrixToYaw(const Matrix3 & rotation, const Vector2 & v)
     {
       Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v).normalized();
       return atan2(v.x() * rotV.y() - v.y() * rotV.x(), v.dot(rotV));
     }
 
-    /// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the upward vertical
-    /// axis with this rotation
-    /// @param rotation The 3x3 rotation matrix
-    /// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
-    /// @return double the angle
-    inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation)
+    inline double rotationMatrixToYaw(const Matrix3 & rotation)
+    {
+      return atan2(rotation(1, 0), rotation(0, 0));
+    }
+
+    inline double rotationMatrixToYawAxisAgnostic(const Matrix3 & rotation)
     {
 
       if(rotation(2, 0) < cst::epsilon1 && rotation(2, 1) < cst::epsilon1)
       { /// this is the case of pure yaw rotationm, so simply extract yaw
-        return atan2(rotation(1, 0), rotation(0, 0));
+        return rotationMatrixToYaw(rotation);
       }
       else
       { /// this is the case where there are non yae rotations
-        Vector2 v;
+
         /// v is the vector that stays horizontal by rotation
-        v << rotation(2, 1), -rotation(2, 0);
+        Vector2 v = getInvariantHorizontalVector(rotation).head<2>();
         double squaredN = v.squaredNorm();
         Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v) / squaredN;
         return atan2(v.x() * rotV.y() - v.y() * rotV.x(), v.dot(rotV));
       }
+    }
+
+    inline Quaternion zeroRotationQuaternion()
+    {
+      return Quaternion(1, 0, 0, 0);
     }
 
     ///transforms a rotation into translation given a constraint of a fixed point

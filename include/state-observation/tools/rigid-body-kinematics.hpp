@@ -145,14 +145,58 @@ inline Vector6 homogeneousMatrixToVector6(const Matrix4 & M);
 /// transforms a 6d vector (position theta mu) into a homogeneous matrix
 inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 
-/// Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation
-/// matrix (minimizes the deviation of the x axis)
-inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2);
+/// @brief checks if this matrix is a pure yaw matrix or not
+///
+/// @param R the rotation matrix
+/// @return true is pure yaw
+/// @return false is not pure yaw
+inline bool isPureYaw(const Matrix3 & R);
 
-/// Merge the roll pitch from R1 with yaw from R2
-inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2);
+/// @brief Gets a vector that remains horizontal with this rotation. This vector is not normalized and if norm == 0
+/// then the rotation is pure yaw and any horizontal vector is a solution
+///
+/// @param R the input rotation
+/// @return Vector3 the output horizontal vector
+inline Vector3 getInvariantHorizontalVector(Matrix3 & R);
 
-inline Quaternion zeroRotationQuaternion();
+/// @brief Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation matrix (minimizes the
+/// deviation of the v vector)
+/// @details throws exception when the orientation is singlular (likely gimbal lock)
+/// to avoid these issues, we recommend to use mergeTiltWithYawAxisAgnostic()
+/// @param Rtez the tilt \f$R_1^T e_z\f$ (the local image of \f$e_z\f$ unit vector)
+/// @param R2 is the second rotation matrix from which the "yaw" needs to be extracted
+/// @param v is the vector to use as reference it must be horizontal and normalized (for a traditional yaw v is by
+/// deftault \f$e_x\f$)
+/// @return Matrix3 the merged rotation matrix
+inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez,
+                                const Matrix3 & R2,
+                                const Vector3 & v = Vector3::UnitX()) noexcept(false);
+
+/// @brief Merge the roll and pitch with the yaw from a rotation matrix (minimizes the deviation of the v vector)
+///
+/// @param R1 is the first rotation to get the roll and pitch
+/// @param R2 is the second rotation matrix from which the "yaw" needs to be extracted
+/// @param v is the vector to use as reference (for a traditional yaw v is initialized to \f$e_x\f$)
+/// @return Matrix3 the merged rotation matrix
+inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2, const Vector3 & v = Vector3::UnitX());
+
+/// @brief Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation matrix (minimizes the deviation
+/// of the v vector)
+/// @details throws exception when the orientation is singlular (likely gimbal lock)
+/// to avoid these issues, we recommend to use mergeTiltWithYawAxisAgnostic()
+/// @param Rtez the tilt \f$R_1^T e_z\f$ (the local image of \f$e_z\f$ unit vector)
+/// @param R2 is the second rotation matrix from which the "yaw" needs to be extracted
+/// @param v is the vector to use as reference (for a traditional yaw v is initialized to \f$e_x\f$)
+/// @return Matrix3 the merged rotation matrix
+inline Matrix3 mergeTiltWithYawAxisAgnostic(const Vector3 & Rtez, const Matrix3 & R2);
+
+/// @brief Merge the roll and pitch with the yaw from a rotation matrix with optimal reference vector
+///
+/// @param R1 is the first rotation to get the roll and pitch
+/// @param R2 is the second rotation matrix from which the "yaw" needs to be extracted
+/// @param v is the vector to use as reference (for a traditional yaw v is initialized to \f$e_x\f$)
+/// @return Matrix3 the merged rotation matrix
+inline Matrix3 mergeRoll1Pitch1WithYaw2AxisAgnostic(const Matrix3 & R1, const Matrix3 & R2);
 
 /// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the axis with this
 /// rotation
@@ -164,17 +208,29 @@ inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & ax
 
 /// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the upward vertical
 /// axis with this rotation
+/// @details this is a generalization of yaw extraction (yaw is equivalent to v = Matrix3::UnitX(), but it is more
+/// efficiant to calll the dedicated  rotationMatrixToYaw() without vector parameter).
 /// @param rotation The 3x3 rotation matrix
 /// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
 /// @return double the angle
-inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation, const Vector2 & v);
+inline double rotationMatrixToYaw(const Matrix3 & rotation, const Vector2 & v);
+
+/// @brief take 3x3 matrix represeting a rotation and gives the yaw angle from roll pitch yaw representation
+/// @details this is a generalization of yaw extraction (yaw is equivalent to v = Matrix3::UnitX())
+/// @param rotation The 3x3 rotation matrix
+/// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
+/// @return double the angle
+inline double rotationMatrixToYaw(const Matrix3 & rotation);
 
 /// @brief take 3x3 matrix represeting a rotation and gives a corresponding angle around upward vertical axis
-/// @details This is similar to yaw angle but here we identify a horizontal vector that stays horizontal after rotation
+/// @details This is similar to yaw angle but here we identify a horizontal vector that stays horizontal after rotation.
+/// this can be called axis agnostic yaw extraction.
 /// and get the angle between them
 /// @param rotation The 3x3 rotation matrix
 /// @return double the angle
-inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation);
+inline double rotationMatrixToYawAxisAgnostic(const Matrix3 & rotation);
+
+inline Quaternion zeroRotationQuaternion();
 
 /// transforms a rotation into translation given a constraint of a fixed point
 inline void fixedPointRotationToTranslation(const Matrix3 & R,
