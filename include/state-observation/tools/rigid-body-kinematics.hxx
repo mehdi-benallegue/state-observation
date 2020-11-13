@@ -394,7 +394,30 @@ namespace stateObservation
     inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation, const Vector2 & v)
     {
       Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v).normalized();
-      return atan2(v(0) * rotV(1) - v(1) * rotV(0), v.dot(rotV));
+      return atan2(v.x() * rotV.y() - v.y() * rotV.x(), v.dot(rotV));
+    }
+
+    /// @brief take 3x3 matrix represeting a rotation and gives the angle that vector v turns around the upward vertical
+    /// axis with this rotation
+    /// @param rotation The 3x3 rotation matrix
+    /// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
+    /// @return double the angle
+    inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation)
+    {
+
+      if(rotation(2, 0) < cst::epsilon1 && rotation(2, 1) < cst::epsilon1)
+      { /// this is the case of pure yaw rotationm, so simply extract yaw
+        return atan2(rotation(1, 0), rotation(0, 0));
+      }
+      else
+      { /// this is the case where there are non yae rotations
+        Vector2 v;
+        /// v is the vector that stays horizontal by rotation
+        v << rotation(2, 1), -rotation(2, 0);
+        double squaredN = v.squaredNorm();
+        Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v) / squaredN;
+        return atan2(v.x() * rotV.y() - v.y() * rotV.x(), v.dot(rotV));
+      }
     }
 
     ///transforms a rotation into translation given a constraint of a fixed point

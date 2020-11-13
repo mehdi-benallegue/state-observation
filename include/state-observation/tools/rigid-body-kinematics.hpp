@@ -169,6 +169,13 @@ inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & ax
 /// @return double the angle
 inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation, const Vector2 & v);
 
+/// @brief take 3x3 matrix represeting a rotation and gives a corresponding angle around upward vertical axis
+/// @details This is similar to yaw angle but here we identify a horizontal vector that stays horizontal after rotation
+/// and get the angle between them
+/// @param rotation The 3x3 rotation matrix
+/// @return double the angle
+inline double rotationMatrixToHorizontalAngle(const Matrix3 & rotation);
+
 /// transforms a rotation into translation given a constraint of a fixed point
 inline void fixedPointRotationToTranslation(const Matrix3 & R,
                                             const Vector3 & rotationVelocity,
