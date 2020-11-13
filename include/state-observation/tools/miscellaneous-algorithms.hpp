@@ -16,7 +16,7 @@
 #include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
 
-    namespace stateObservation
+namespace stateObservation
 {
 namespace tools
 {
