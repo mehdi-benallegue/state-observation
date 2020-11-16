@@ -101,6 +101,10 @@ jobs:
             export PACKAGE_UPLOAD=false
           fi
         fi
+        if [ "${{ github.repository }}" != "jrl-umi3218/state-observation" ]
+        then
+          export PACKAGE_UPLOAD=false
+        fi
         if $USE_HEAD
         then
           echo "BINTRAY_REPO=multi-contact-head" >> $GITHUB_ENV
@@ -171,6 +175,10 @@ jobs:
             export PACKAGE_UPLOAD=false
           fi
         fi
+        if [ "${{ github.repository }}" != "jrl-umi3218/state-observation" ]
+        then
+          export PACKAGE_UPLOAD=false
+        fi
         if $USE_HEAD
         then
           echo "BINTRAY_REPO=multi-contact-head" >> $GITHUB_ENV
@@ -236,6 +244,10 @@ jobs:
           then
             export PACKAGE_UPLOAD=false
           fi
+        fi
+        if [ "${{ github.repository }}" != "jrl-umi3218/state-observation" ]
+        then
+          export PACKAGE_UPLOAD=false
         fi
         if $USE_HEAD
         then
