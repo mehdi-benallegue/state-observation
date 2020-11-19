@@ -3,19 +3,23 @@
 
 namespace stateObservation
 {
+
+const Vector2 defaultDCMUncertainty;
+Vector2 defaultBiasUncertainty;
+
 using namespace tools;
 LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
                                            double dt,
                                            double biasDriftStd,
-                                           double initZMP,
-                                           double initDcm,
-                                           double initBias,
+                                           const Vector2 & initZMP,
+                                           const Vector2 & initDcm,
+                                           const Vector2 & initBias,
                                            double zmpMeasureErrorStd,
                                            double dcmMeasureErrorStd,
-                                           double initDcmUncertainty,
-                                           double initBiasUncertainty)
+                                           const Vector2 & initDcmUncertainty,
+                                           const Vector2 & initBiasUncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
-  filter_(2, 1, 1)
+  filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
 {
   updateMatricesABQ_();
   C_ << 1., 1.;
@@ -25,33 +29,37 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
   Vector2 x;
   x << initDcm, initBias;
   filter_.setState(x, 0);
-  Matrix2 P;
+  Matrix4 P;
   // clang-format off
-  P<< square(initDcmUncertainty),  0,
-      0,                           square(initBiasUncertainty);
+  P<< Vec2ToSqDiag(initDcmUncertainty),  Matrix2::Zero(),
+      Matrix2::Zero(),                   Vec2ToSqDiag(initBiasUncertainty);
   // clang-format on
   filter_.setStateCovariance(P);
 }
 
-LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
-                                           double measuredDcm,
-                                           double measuredZMP,
+LipmDcmBiasEstimator::LipmDcmBiasEstimator(const Vector2 & measuredDcm,
+                                           const Vector2 & measuredZMP,
                                            double omega_0,
                                            double dt,
+                                           bool measurementIsWithBias,
                                            double biasDriftStd,
                                            double zmpMeasureErrorStd,
                                            double dcmMeasureErrorStd,
-                                           double initBias,
-                                           double initBiasuncertainty)
+                                           const Vector2 & initBias,
+                                           const Vector2 & initBiasuncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(measuredZMP),
   filter_(2, 1, 1)
 {
   updateMatricesABQ_();
-  C_ << 1., 1.;
-  R_ << square(dcmMeasureErrorStd);
-  filter_.setC(C_.transpose());
+  // clang-format off
+  C_ << 1., 1., 0., 0.,
+        0., 0.,  1., 1.;
+
+  // clang-format on
+  R_ = dblToSqDiag(dcmMeasureErrorStd);
+  filter_.setC(C_);
   filter_.setMeasurementCovariance(R_);
-  Vector2 x;
+  Vector4 x;
 
   /// initialize the state using the measurement
   if(measurementIsWithBias)
@@ -64,21 +72,22 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
   }
 
   filter_.setState(x, 0);
-  Matrix2 P;
+  Matrix4 P;
 
   if(measurementIsWithBias)
   {
+    Matrix2 initBiasCov = Vec2ToSqDiag(initBiasuncertainty);
     /// The state and the
     // clang-format off
-    P<< square(dcmMeasureErrorStd) + square(initBiasuncertainty),  -square(initBiasuncertainty),
-        -square(initBiasuncertainty),                               square(initBiasuncertainty);
+    P<< initBiasCov+dblToSqDiag(dcmMeasureErrorStd), -initBiasCov,
+       -initBiasCov,                                  initBiasCov;
     // clang-format on
   }
   else
   {
     // clang-format off
-    P<< square(dcmMeasureErrorStd),  0,
-        0,                           square(initBiasuncertainty);
+    P<< dblToSqDiag(dcmMeasureErrorStd),  Matrix2::Zero(),
+        Matrix2::Zero(),                  Vec2ToSqDiag(initBiasuncertainty);
     // clang-format on
   }
 
@@ -99,47 +108,48 @@ void LipmDcmBiasEstimator::setSamplingTime(double dt)
   updateMatricesABQ_();
 }
 
-void LipmDcmBiasEstimator::setBias(double bias)
+void LipmDcmBiasEstimator::setBias(const Vector2 & bias)
 {
-  Vector2 x = filter_.getCurrentEstimatedState();
+  Vector4 x = filter_.getCurrentEstimatedState();
   /// update the bias
-  x(1) = bias;
+  x.tail<2>() = bias;
   filter_.setCurrentState(x);
 }
 
-void LipmDcmBiasEstimator::setBias(double bias, double uncertainty)
+void LipmDcmBiasEstimator::setBias(const Vector2 & bias, const Vector2 & uncertainty)
 {
   setBias(bias);
-  Matrix2 P = filter_.getStateCovariance();
+  Matrix4 P = filter_.getStateCovariance();
   /// resetting the non diagonal parts
-  P(0, 1) = P(1, 0) = 0;
-  P(1, 1) = square(uncertainty);
+  P.topRightCorner<2, 2>().setZero();
+  P.bottomLeftCorner<2, 2>().setZero();
+  P.bottomRightCorner<2, 2>() = Vec2ToSqDiag(uncertainty);
   filter_.setStateCovariance(P);
 }
 
 void LipmDcmBiasEstimator::setBiasDriftPerSecond(double driftPerSecond)
 {
-  Matrix2 Q = filter_.getProcessCovariance();
   /// update the corresponding part in the process noise matrix
-  Q(1, 1) = square(driftPerSecond);
-  filter_.setProcessCovariance(Q);
+  Q_.bottomRightCorner<2, 2>() = dblToSqDiag(driftPerSecond);
+  filter_.setProcessCovariance(Q_);
 }
 
-void LipmDcmBiasEstimator::setDCM(double dcm)
+void LipmDcmBiasEstimator::setDCM(const Vector2 & dcm)
 {
-  Vector2 x = filter_.getCurrentEstimatedState();
+  Vector4 x = filter_.getCurrentEstimatedState();
   /// update the bias
-  x(0) = dcm;
+  x.head<2>() = dcm;
   filter_.setCurrentState(x);
 }
 
-void LipmDcmBiasEstimator::setDCM(double dcm, double uncertainty)
+void LipmDcmBiasEstimator::setDCM(const Vector2 & dcm, const Vector2 & uncertainty)
 {
   setDCM(dcm);
-  Matrix2 P = filter_.getStateCovariance();
+  Matrix4 P = filter_.getStateCovariance();
   /// resetting the non diagonal parts
-  P(0, 1) = P(1, 0) = 0;
-  P(0, 0) = square(uncertainty);
+  P.topRightCorner<2, 2>().setZero();
+  P.bottomLeftCorner<2, 2>().setZero();
+  P.topLeftCorner<2, 2>() = Vec2ToSqDiag(uncertainty);
   filter_.setStateCovariance(P);
 }
 
@@ -151,46 +161,56 @@ void LipmDcmBiasEstimator::setZmpMeasureErrorStd(double std)
 
 void LipmDcmBiasEstimator::setDcmMeasureErrorStd(double std)
 {
-  Matrix1 R;
-  R(0, 0) = square(std);
+  Matrix2 R;
+  R = dblToSqDiag(std);
 }
 
-void LipmDcmBiasEstimator::setInputs(double dcm, double zmp)
+void LipmDcmBiasEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp)
 {
-  Vector1 u;
-  Vector1 y;
+  Vector2 u;
+  Vector2 y;
 
-  y(0) = dcm;
+  y = dcm;
 
   /// The prediction of the state depends on the previous value of the ZMP
-  u(0) = previousZmp_;
+  u = previousZmp_;
   previousZmp_ = zmp;
 
   filter_.pushMeasurement(y);
   filter_.pushInput(u);
 }
 
-double LipmDcmBiasEstimator::getUnbiasedDCM() const
+void LipmDcmBiasEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & orientation)
 {
-  return filter_.getCurrentEstimatedState()(0);
+  setInputs(dcm, zmp);
+  A_.bottomRightCorner<2, 2>() =
+      orientation * previousOrientation_.transpose() * A_.bottomRightCorner<2, 2>(); /// add a rotation
+  previousOrientation_ = orientation;
+  filter_.setA(A_);
 }
 
-double LipmDcmBiasEstimator::getBias() const
+Vector2 LipmDcmBiasEstimator::getUnbiasedDCM() const
 {
-  return filter_.getCurrentEstimatedState()(1);
+  return filter_.getCurrentEstimatedState().head<2>();
+}
+
+Vector2 LipmDcmBiasEstimator::getBias() const
+{
+  return filter_.getCurrentEstimatedState().tail<2>();
 }
 
 void LipmDcmBiasEstimator::LipmDcmBiasEstimator::updateMatricesABQ_()
 {
   // clang-format off
-  A_ << 1 + omega0_ * dt_, 0,
-        0,                 1;
 
-  B_ << -omega0_ * dt_,
-        0;
+  ///We only modify a corner to avoid resetting the orientation
+  A_.topLeftCorner<2,2>() = dblToDiag(1 + omega0_ * dt_);
 
-  Q_ << square(omega0_* dt_ * zmpErrorStd_), 0,
-        0,                                   square(biasDriftStd_*dt_);
+  B_ << dblToDiag(-omega0_ * dt_),
+        Matrix2::Zero();
+
+  Q_ << dblToSqDiag(omega0_* dt_ * zmpErrorStd_), Matrix2::Zero(),
+         Matrix2::Zero(),                         dblToSqDiag(biasDriftStd_*dt_);
   // clang-format on
 
   filter_.setA(A_);

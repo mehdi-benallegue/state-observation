@@ -13,7 +13,8 @@
 #define LIPMDCMBIASESTIMATOR_HPP
 
 #include <state-observation/api.h>
-#include <state-observation/observer/linear-kalman-filter.hpp>
+#include <state-observation/dynamics-estimators/unidim-lipm-dcm-bias-estimator.hpp>
+#include <state-observation/tools/rigid-body-kinematics.hpp>
 
 namespace stateObservation
 {
@@ -62,13 +63,13 @@ public:
   LipmDcmBiasEstimator(double omega_0,
                        double dt = defaultDt_,
                        double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                       double initZMP = 0,
-                       double initDcm = 0,
-                       double initBias = 0,
+                       const Vector2 & initZMP = Vector2::Zero(),
+                       const Vector2 & initDcm = Vector2::Zero(),
+                       const Vector2 & initBias = Vector2::Zero(),
                        double zmpMeasureErrorStd = defaultZmpErrorStd_,
                        double dcmMeasureErrorStd = defaultDcmErrorStd_,
-                       double initDcmUncertainty = defaultDCMUncertainty,
-                       double initBiasUncertainty = defaultBiasUncertainty);
+                       const Vector2 & initDcmUncertainty = Vector2::Constant(defaultDCMUncertainty),
+                       const Vector2 & initBiasUncertainty = Vector2::Constant(defaultBiasUncertainty));
 
   /// @brief Construct a new Lipm Dcm Bias Estimator object
   /// @details Use this when initializing with an available DCM (biased) measurement
@@ -83,16 +84,16 @@ public:
   /// @param scmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
   /// @param initBias               the initial value of the drift
   /// @param initBiasUncertainty the uncertainty in the bias initial value in meters
-  LipmDcmBiasEstimator(bool measurementIsWithBias,
-                       double measuredDcm,
-                       double measuredZMP,
+  LipmDcmBiasEstimator(const Vector2 & measuredDcm,
+                       const Vector2 & measuredZMP,
                        double omega_0,
                        double dt = defaultDt_,
+                       bool measurementIsWithBias = true,
                        double biasDriftPerSecondStd = defaultBiasDriftSecond_,
                        double zmpMeasureErrorStd = defaultZmpErrorStd_,
                        double dcmMeasureErrorStd = defaultDcmErrorStd_,
-                       double initBias = 0,
-                       double initBiasuncertainty = defaultBiasUncertainty);
+                       const Vector2 & initBias = Vector2::Constant(0),
+                       const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty));
 
   ///@brief Destroy the Lipm Dcm Bias Estimator object
   ~LipmDcmBiasEstimator();
@@ -110,12 +111,12 @@ public:
   ///@brief Set the Bias object from a guess
   ///
   ///@param bias guess
-  void setBias(double bias);
+  void setBias(const Vector2 & bias);
 
   ///@copydoc setBias(double bias)
   ///
   ///@param the uncertainty you have in this guess in meters
-  void setBias(double bias, double uncertainty);
+  void setBias(const Vector2 & bias, const Vector2 & uncertainty);
 
   /// @brief Set the Bias Drift Per Second
   ///
@@ -125,13 +126,13 @@ public:
   /// @brief set the real DCM position from a guess
   ///
   /// @param dcm guess
-  void setDCM(double dcm);
+  void setDCM(const Vector2 & dcm);
 
   /// @copydoc setDCM(double dcm)
   ///
   /// @param dcm
   /// @param uncertainty the uncertainty in this guess
-  void setDCM(double dcm, double uncertainty);
+  void setDCM(const Vector2 & dcm, const Vector2 & uncertainty);
 
   /// @brief Set the Zmp Measurement Error Stamdard devbiation
   ///
@@ -141,17 +142,50 @@ public:
   ///
   void setDcmMeasureErrorStd(double);
 
-  /// @brief Set the Inputs of the estimator
+  /// @brief Set the Inputs of the estimator with no orientation. The orientation will be assumed to be constant foir
+  /// this sample
   ///
-  /// @param dcm
-  /// @param zmp
-  void setInputs(double dcm, double zmp);
+  /// @param dcm measurement of the DCM
+  /// @param zmp mesaurement of the ZMP
+  void setInputs(const Vector2 & dcm, const Vector2 & zmp);
+
+  /// @brief Set the Inputs of the estimator. The yaw will be extracted from the orientation using the axis agnostic
+  /// approach.
+  ///
+  /// @param dcm         measurement of the DCM
+  /// @param zmp         mesaurement of the ZMP
+  /// @param orientation the 3d orientation from which the yaw will be extracted. This orientation is from local to
+  /// global. i.e. bias_global == orientation * bias*local
+  ///
+  inline void setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix3 & orientation)
+  {
+    setInputs(dcm, zmp, kine::rotationMatrixToYawAxisAgnostic(orientation));
+  }
+
+  /// @brief Set the Inputs of the estimator.
+  ///
+  /// @param dcm measurement of the DCM
+  /// @param zmp mesaurement of the ZMP
+  /// @param yaw is the yaw angle to be used. This orientation is from local to global. i.e. bias_global == R *
+  /// bias*local
+  inline void setInputs(const Vector2 & dcm, const Vector2 & zmp, double yaw)
+  {
+    setInputs(dcm, zmp, Rotation2D(yaw).toRotationMatrix());
+  }
+
+  /// @brief Set the Inputs of the estimator.
+  ///
+  /// @param dcm  measurement of the DCM
+  /// @param zmp  mesaurement of the ZMP
+  /// @param R    the 2x2 Matrix'representing the yaw angle i.e. bias_global == R * bias*local
+  void setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & R);
 
   /// @brief Runs the estimation. Needs to be called every timestep
   ///
   /// @return Vector2
-  inline Vector2 update()
+  inline Vector4 update()
   {
+    A_.bottomRightCorner<2, 2>().setIdentity(); /// reset the rotation part
     return filter_.getEstimatedState(filter_.getMeasurementTime());
   }
 
@@ -159,12 +193,20 @@ public:
   ///
   /// @detailt This is the recommended output to take
   /// @return double
-  double getUnbiasedDCM() const;
+  Vector2 getUnbiasedDCM() const;
 
   /// @brief Get the estimated Bias
   ///
   /// @return double
-  double getBias() const;
+  Vector2 getBias() const;
+
+  /// @brief Get the estimated Bias expressed in the local frame of the robot
+  ///
+  /// @return double
+  inline Vector2 getLocalBias() const
+  {
+    return previousOrientation_.transpose() * getBias();
+  }
 
   /// @brief Get the Kalman Filter object
   /// This can be used to run specific Advanced Kalman filter related funcions
@@ -181,7 +223,10 @@ public:
     return filter_;
   }
 
-private:
+protected:
+  typedef Eigen::Matrix<double, 4, 2> Matrix42;
+  typedef Eigen::Matrix<double, 2, 4> Matrix24;
+
   /// @brief set Matrices: A, B, Q
   void updateMatricesABQ_();
 
@@ -190,21 +235,43 @@ private:
   double biasDriftStd_;
   double zmpErrorStd_;
 
-  double previousZmp_;
+  Vector2 previousZmp_;
 
   LinearKalmanFilter filter_;
-  Matrix2 A_;
-  Vector2 B_;
+  Matrix4 A_;
+  Matrix42 B_;
   /// this needs to be transposed
-  Vector2 C_;
+  Matrix24 C_;
   /// measurement noise
-  Matrix1 R_;
+  Matrix2 R_;
 
   /// process noise
-  Matrix2 Q_;
+  Matrix4 Q_;
+
+  Matrix2 previousOrientation_;
+
+  /// @brief builds a diagonal out of the square valued of the Vec2
+  ///
+  inline static Matrix2 Vec2ToSqDiag(const Vector2 & v)
+  {
+    return Vector2(v.array().square()).asDiagonal();
+  }
+
+  /// @brief builds a constant 2x2 diagonal from a double
+  ///
+  inline static Matrix2 dblToDiag(const double & d)
+  {
+    return Vector2::Constant(d).asDiagonal();
+  }
+
+  /// @brief builds a constant 2x2 diagonal from a square of a double
+  ///
+  inline static Matrix2 dblToSqDiag(const double & d)
+  {
+    return dblToDiag(d * d);
+  }
 
   /// @brief Deactivated default constructor
-  ///
   LipmDcmBiasEstimator() = delete;
 
 public:
