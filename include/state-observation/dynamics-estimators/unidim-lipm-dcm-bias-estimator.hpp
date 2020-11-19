@@ -1,5 +1,5 @@
 
-///\file      lipm-dcm-bias-estimator.hpp
+///\file      unidim-lipm-dcm-bias-estimator.hpp
 ///\author    Mehdi Benallegue
 ///\date      2020
 ///\brief     Estimation of a bias betweeen the divergent component of motion
@@ -18,8 +18,8 @@
 namespace stateObservation
 {
 
-/// \class LipmDcmBiasEstimator
-/// \brief Estimation of a bias betweeen the divergent component of motion
+/// \class UnidimLipmDcmBiasEstimator
+/// \brief 1D version of the estimation of a bias betweeen the divergent component of motion
 ///        and the corresponding zero moment point for a linearized inverted
 ///        pendulum model.
 ///
