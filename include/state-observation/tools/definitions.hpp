@@ -95,6 +95,9 @@ typedef Eigen::Quaternion<double, Eigen::DontAlign> QuaternionUnaligned;
 /// Euler Axis/Angle representation of orientation
 typedef Eigen::AngleAxis<double> AngleAxis;
 
+/// 2D rotations
+typedef Eigen::Rotation2D<double> Rotation2D;
+
 typedef Eigen::Index Index;
 typedef long int TimeIndex;
 typedef Index TimeSize;
