@@ -4,8 +4,17 @@
 namespace stateObservation
 {
 
-const Vector2 defaultDCMUncertainty;
-Vector2 defaultBiasUncertainty;
+constexpr double LipmDcmBiasEstimator::defaultDCMUncertainty;
+constexpr double LipmDcmBiasEstimator::defaultBiasUncertainty;
+
+constexpr double LipmDcmBiasEstimator::defaultDt_;
+
+/// default expected drift of the bias every second
+constexpr double LipmDcmBiasEstimator::defaultBiasDriftSecond_;
+
+/// default error in the estimation of the sensors
+constexpr double LipmDcmBiasEstimator::defaultZmpErrorStd_;
+constexpr double LipmDcmBiasEstimator::defaultDcmErrorStd_;
 
 using namespace tools;
 LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
@@ -14,19 +23,22 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
                                            const Vector2 & initZMP,
                                            const Vector2 & initDcm,
                                            const Vector2 & initBias,
-                                           double zmpMeasureErrorStd,
                                            double dcmMeasureErrorStd,
+                                           double zmpMeasureErrorStd,
                                            const Vector2 & initDcmUncertainty,
                                            const Vector2 & initBiasUncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
   filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
 {
   updateMatricesABQ_();
-  C_ << 1., 1.;
-  R_ << square(dcmMeasureErrorStd);
+  // clang-format off
+  C_ << 1., 1., 0., 0.,
+        0., 0.,  1., 1.;
+  // clang-format on
+  R_ = dblToSqDiag(dcmMeasureErrorStd);
   filter_.setC(C_);
   filter_.setMeasurementCovariance(R_);
-  Vector2 x;
+  Vector4 x;
   x << initDcm, initBias;
   filter_.setState(x, 0);
   Matrix4 P;
@@ -37,24 +49,28 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
   filter_.setStateCovariance(P);
 }
 
-LipmDcmBiasEstimator::LipmDcmBiasEstimator(const Vector2 & measuredDcm,
-                                           const Vector2 & measuredZMP,
-                                           double omega_0,
-                                           double dt,
-                                           bool measurementIsWithBias,
-                                           double biasDriftStd,
-                                           double zmpMeasureErrorStd,
-                                           double dcmMeasureErrorStd,
-                                           const Vector2 & initBias,
-                                           const Vector2 & initBiasuncertainty)
-: omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(measuredZMP),
-  filter_(2, 1, 1)
+void LipmDcmBiasEstimator::resetWithMeasurements(const Vector2 & measuredDcm,
+                                                 const Vector2 & measuredZMP,
+                                                 const Matrix2 & yaw,
+                                                 bool measurementIsWithBias,
+                                                 double biasDriftPerSecondStd,
+                                                 double dcmMeasureErrorStd,
+                                                 double zmpMeasureErrorStd,
+                                                 const Vector2 & initBias,
+                                                 const Vector2 & initBiasuncertainty)
+
 {
+  filter_.reset();
+  biasDriftStd_ = biasDriftPerSecondStd;
+  zmpErrorStd_ = zmpMeasureErrorStd;
+  previousZmp_ = measuredZMP;
+  previousOrientation_ = yaw;
+  A_.setIdentity();
+
   updateMatricesABQ_();
   // clang-format off
   C_ << 1., 1., 0., 0.,
         0., 0.,  1., 1.;
-
   // clang-format on
   R_ = dblToSqDiag(dcmMeasureErrorStd);
   filter_.setC(C_);
