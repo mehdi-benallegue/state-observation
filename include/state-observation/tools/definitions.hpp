@@ -384,6 +384,12 @@ public:
   /// Default constructor
   IndexedMatrixArrayT();
 
+  /// @brief Construct a new Indexed Vector Array T with a predifined size
+  ///
+  /// @param size is the size of the array
+  /// @param initTime is the index of the initial time. It is zero by default
+  IndexedMatrixArrayT(TimeSize size, TimeIndex initTime = 0);
+
   typedef std::vector<MatrixType, Allocator> Array;
 
   /// Sets the vector v at the time index k
