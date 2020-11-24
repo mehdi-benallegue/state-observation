@@ -1,4 +1,5 @@
 #include <iostream>
+#include <state-observation/dynamics-estimators/lipm-dcm-bias-estimator.hpp>
 #include <state-observation/dynamics-estimators/unidim-lipm-dcm-bias-estimator.hpp>
 #include <state-observation/tools/probability-law-simulation.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
@@ -67,8 +68,8 @@ int testUnidimDcmBiasEstimator(int errorCode)
 
   double initbias = 0;
 
-  UnidimLipmDcmBiasEstimator est(true, dcm_m[0], zmp_m[0], w0, dt, biasDriftPerSecondStd, zmpMeasurementErrorStd,
-                                 dcmMeasurementErrorStd, initbias, initBiasstd);
+  UnidimLipmDcmBiasEstimator est(true, dcm_m[0], zmp_m[0], w0, dt, biasDriftPerSecondStd, dcmMeasurementErrorStd,
+                                 zmpMeasurementErrorStd, initbias, initBiasstd);
 
   IndexedVectorArray log;
 
@@ -102,6 +103,137 @@ int testUnidimDcmBiasEstimator(int errorCode)
   for(int i = signallength - 10; i < signallength; ++i)
   {
     error += fabs(dcm_hat[i] - dcm[i]) + fabs(bias_hat[i] - bias[i]);
+  }
+
+  std::cout << "Sum of error on the 10 last samples = " << error << std::endl;
+
+  if(error > 0.04)
+  {
+    return errorCode;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+
+
+/// @brief runs the basic test
+///
+/// @return int : 0 if success, nonzero if fails
+int testDcmBiasEstimator(int errorCode)
+{
+
+  double w0 = sqrt(cst::gravityConstant / 0.9);
+  double dt = 0.005;
+
+  double biasDriftPerSecondStd = 0.005;
+  double zmpMeasurementErrorStd = 0.001;
+  double dcmMeasurementErrorStd = 0.005;
+
+  int signallength = int(120. / dt);
+
+  ///////////////////////////////////////
+  /// Build the ground truth signals
+  ///////////////////////////////////////
+  tools::ProbabilityLawSimulation ran;
+  IndexedVectorArray dcm(signallength), localBias(signallength), bias(signallength), zmp(signallength);
+  std::vector<double> yaw(signallength);
+
+  /// set the desired exponential convergence of the DCM
+  double lambda = 2;
+
+  /// initialize the dcm and localBias to a random value
+  dcm[0] = ran.getGaussianVector(Matrix2::Identity()*2,Vector2::Zero(),2);
+  double initBiasstd = 0.01;
+  
+
+  localBias[0] = ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.01;
+  Vector2 deviation = ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
+  zmp[0] = (lambda / w0 + 1) * dcm[0] + deviation;
+
+  for(int i = 0; i < signallength - 1; ++i)
+  {
+    /// dcm dynamics
+    dcm[i + 1] = dcm[i] + dt * w0 * (dcm[i] - zmp[i]);
+    /// local bias drift
+    localBias[i + 1] = localBias[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
+    /// set a noisy zmp to create  bounded drift of the DCM
+    deviation += ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2)*0.05;
+    zmp[i + 1] = (lambda / w0 + 1) * dcm[i] +  ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2)*0.05 + deviation;
+
+  }
+
+  for(int i = 0; i < signallength; ++i)
+  {
+    /// global-frame bias computation
+    yaw[i] = ran.getGaussianScalar(2 * M_PI)*0;
+    bias[i] = Rotation2D(yaw[i]) * localBias[i];
+  }
+
+  /////////////////////////////////
+  /// Build the measurements
+  /////////////////////////////////
+  IndexedVectorArray dcm_m_unbiased(signallength), dcm_m(signallength), zmp_m(signallength);
+
+
+  for(int i = 0; i < signallength; ++i)
+  {
+  
+    dcm_m_unbiased[i] = dcm[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * dcmMeasurementErrorStd;
+    dcm_m[i] = dcm_m_unbiased[i] + bias[i];
+    zmp_m[i] = zmp[i] +  ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2)*zmpMeasurementErrorStd;
+  }
+
+  /////////////////////////////////
+  /// Run the estimator
+  /////////////////////////////////
+  IndexedVectorArray dcm_hat(signallength), bias_hat(signallength);
+
+  Vector2 initbias{0.0, 0.0};
+
+  LipmDcmBiasEstimator est(w0, dt);
+
+  est.resetWithMeasurements(dcm_m[0], zmp_m[0], yaw[0], true, biasDriftPerSecondStd, dcmMeasurementErrorStd,
+                            zmpMeasurementErrorStd, initbias, Vector2::Constant(initBiasstd));
+
+  IndexedVectorArray log;
+
+  for(int i = 1; i < signallength; i++)
+  {
+    est.setInputs(dcm_m[i], zmp_m[i],yaw[i]);
+    est.update();
+    bias_hat[i] = est.getBias();
+    dcm_hat[i] = est.getUnbiasedDCM();
+
+    std::cout << i << " " << dcm_hat[i].transpose() << " " << dcm[i].transpose() << std::endl;
+
+    /// NaN detection
+    if(dcm_hat[i] != dcm_hat[i])
+    {
+      std::cout << "NaN detected = " << i << " " << dcm_hat[i].transpose() << std::endl;
+      return errorCode;
+    }
+
+    Vector log_k(11);
+
+
+    log_k << i, bias_hat[i], localBias[i], dcm_hat[i], dcm_m_unbiased[i], dcm[i];
+    log.pushBack(log_k);
+  }
+
+  /// uncomment the following line to have a bit of a log
+  // log.writeInFile("dcm.txt");
+
+  /////////////////////////////////
+  /// Check the rror
+  /////////////////////////////////
+  double error = 0;
+
+  for(int i = signallength - 10; i < signallength; ++i)
+  {
+    error += (dcm_hat[i] - dcm[i]).norm() + (bias_hat[i] - localBias[i]).norm();
   }
 
   std::cout << "Sum of error on the 10 last samples = " << error << std::endl;
@@ -191,117 +323,6 @@ int testrotationMatrix2Angle(int errorCode)
     }
   }
   return 0;
-}
-
-/// @brief runs the basic test
-///
-/// @return int : 0 if success, nonzero if fails
-int testDcmBiasEstimator(int errorCode)
-{
-
-  double w0 = sqrt(cst::gravityConstant / 0.9);
-  double dt = 0.005;
-
-  double biasDriftPerSecondStd = 0.005;
-  double zmpMeasurementErrorStd = 0.001;
-  double dcmMeasurementErrorStd = 0.005;
-
-  int signallength = int(120. / dt);
-
-  ///////////////////////////////////////
-  /// Build the ground truth signals
-  ///////////////////////////////////////
-  tools::ProbabilityLawSimulation ran;
-  std::vector<double> dcm(signallength), bias(signallength), zmp(signallength);
-
-  /// set the desired exponential convergence of the DCM
-  double lambda = 2;
-
-  /// initialize the dcm and bias to a random value
-  dcm[0] = ran.getGaussianScalar(2, 0);
-  double initBiasstd = 0.01;
-
-  bias[0] = ran.getGaussianScalar(0.01, 0);
-  double deviation = ran.getGaussianScalar(0.05, 0);
-  zmp[0] = (lambda / w0 + 1) * dcm[0] + deviation;
-
-  for(int i = 0; i < signallength - 1; ++i)
-  {
-    /// dcm dynamics
-    dcm[i + 1] = dcm[i] + dt * w0 * (dcm[i] - zmp[i]);
-    /// drift
-    bias[i + 1] = bias[i] + ran.getGaussianScalar(biasDriftPerSecondStd * dt);
-    /// set a noisy zmp to create  bounded drift of the DCM
-    deviation += ran.getGaussianScalar(0.05, 0);
-    zmp[i + 1] = (lambda / w0 + 1) * dcm[i] + ran.getGaussianScalar(0.05, 0) + deviation;
-  }
-
-  /////////////////////////////////
-  /// Build the measurements
-  /////////////////////////////////
-  std::vector<double> dcm_m_unbiased(signallength), dcm_m(signallength), zmp_m(signallength);
-
-  for(int i = 0; i < signallength; ++i)
-  {
-    dcm_m_unbiased[i] = dcm[i] + ran.getGaussianScalar(dcmMeasurementErrorStd);
-    dcm_m[i] = dcm_m_unbiased[i] + bias[i];
-    zmp_m[i] = zmp[i] + ran.getGaussianScalar(zmpMeasurementErrorStd);
-  }
-
-  /////////////////////////////////
-  /// Run the estimator
-  /////////////////////////////////
-  std::vector<double> dcm_hat(signallength), bias_hat(signallength);
-
-  double initbias = 0;
-
-  UnidimLipmDcmBiasEstimator est(true, dcm_m[0], zmp_m[0], w0, dt, biasDriftPerSecondStd, zmpMeasurementErrorStd,
-                                 dcmMeasurementErrorStd, initbias, initBiasstd);
-
-  IndexedVectorArray log;
-
-  for(int i = 1; i < signallength; i++)
-  {
-    est.setInputs(dcm_m[i], zmp_m[i]);
-    est.update();
-    bias_hat[i] = est.getBias();
-    dcm_hat[i] = est.getUnbiasedDCM();
-
-    /// NaN detection
-    if(dcm_hat[i] != dcm_hat[i])
-    {
-      return errorCode;
-    }
-
-    Vector6 log_k;
-
-    log_k << i, bias_hat[i], bias[i], dcm_hat[i], dcm_m_unbiased[i], dcm[i];
-    log.pushBack(log_k);
-  }
-
-  /// uncomment the following line to have a bit of a log
-  // log.writeInFile("dcm.txt");
-
-  /////////////////////////////////
-  /// Check the rror
-  /////////////////////////////////
-  double error = 0;
-
-  for(int i = signallength - 10; i < signallength; ++i)
-  {
-    error += fabs(dcm_hat[i] - dcm[i]) + fabs(bias_hat[i] - bias[i]);
-  }
-
-  std::cout << "Sum of error on the 10 last samples = " << error << std::endl;
-
-  if(error > 0.04)
-  {
-    return errorCode;
-  }
-  else
-  {
-    return 0;
-  }
 }
 
 int main()
