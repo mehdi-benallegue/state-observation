@@ -11,7 +11,6 @@ using namespace stateObservation;
 /// @return int : 0 if success, nonzero if fails
 int testUnidimDcmBiasEstimator(int errorCode)
 {
-
   double w0 = sqrt(cst::gravityConstant / 0.9);
   double dt = 0.005;
 
@@ -117,8 +116,6 @@ int testUnidimDcmBiasEstimator(int errorCode)
   }
 }
 
-
-
 /// @brief runs the basic test
 ///
 /// @return int : 0 if success, nonzero if fails
@@ -145,9 +142,8 @@ int testDcmBiasEstimator(int errorCode)
   double lambda = 2;
 
   /// initialize the dcm and localBias to a random value
-  dcm[0] = ran.getGaussianVector(Matrix2::Identity()*2,Vector2::Zero(),2);
+  dcm[0] = ran.getGaussianVector(Matrix2::Identity() * 2, Vector2::Zero(), 2);
   double initBiasstd = 0.01;
-  
 
   localBias[0] = ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.01;
   Vector2 deviation = ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
@@ -158,17 +154,18 @@ int testDcmBiasEstimator(int errorCode)
     /// dcm dynamics
     dcm[i + 1] = dcm[i] + dt * w0 * (dcm[i] - zmp[i]);
     /// local bias drift
-    localBias[i + 1] = localBias[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
+    localBias[i + 1] =
+        localBias[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * biasDriftPerSecondStd * dt;
     /// set a noisy zmp to create  bounded drift of the DCM
-    deviation += ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2)*0.05;
-    zmp[i + 1] = (lambda / w0 + 1) * dcm[i] +  ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2)*0.05 + deviation;
-
+    deviation += ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
+    zmp[i + 1] =
+        (lambda / w0 + 1) * dcm[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05 + deviation;
   }
 
   for(int i = 0; i < signallength; ++i)
   {
     /// global-frame bias computation
-    yaw[i] = ran.getGaussianScalar(2 * M_PI)*0;
+    yaw[i] = ran.getGaussianScalar(2 * M_PI);
     bias[i] = Rotation2D(yaw[i]) * localBias[i];
   }
 
@@ -177,13 +174,13 @@ int testDcmBiasEstimator(int errorCode)
   /////////////////////////////////
   IndexedVectorArray dcm_m_unbiased(signallength), dcm_m(signallength), zmp_m(signallength);
 
-
   for(int i = 0; i < signallength; ++i)
   {
-  
-    dcm_m_unbiased[i] = dcm[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * dcmMeasurementErrorStd;
+
+    dcm_m_unbiased[i] =
+        dcm[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * dcmMeasurementErrorStd;
     dcm_m[i] = dcm_m_unbiased[i] + bias[i];
-    zmp_m[i] = zmp[i] +  ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2)*zmpMeasurementErrorStd;
+    zmp_m[i] = zmp[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * zmpMeasurementErrorStd;
   }
 
   /////////////////////////////////
@@ -202,12 +199,10 @@ int testDcmBiasEstimator(int errorCode)
 
   for(int i = 1; i < signallength; i++)
   {
-    est.setInputs(dcm_m[i], zmp_m[i],yaw[i]);
+    est.setInputs(dcm_m[i], zmp_m[i], yaw[i]);
     est.update();
     bias_hat[i] = est.getBias();
     dcm_hat[i] = est.getUnbiasedDCM();
-
-    std::cout << i << " " << dcm_hat[i].transpose() << " " << dcm[i].transpose() << std::endl;
 
     /// NaN detection
     if(dcm_hat[i] != dcm_hat[i])
@@ -218,7 +213,6 @@ int testDcmBiasEstimator(int errorCode)
 
     Vector log_k(11);
 
-
     log_k << i, bias_hat[i], localBias[i], dcm_hat[i], dcm_m_unbiased[i], dcm[i];
     log.pushBack(log_k);
   }
@@ -227,13 +221,13 @@ int testDcmBiasEstimator(int errorCode)
   // log.writeInFile("dcm.txt");
 
   /////////////////////////////////
-  /// Check the rror
+  /// Check the error
   /////////////////////////////////
   double error = 0;
 
   for(int i = signallength - 10; i < signallength; ++i)
   {
-    error += (dcm_hat[i] - dcm[i]).norm() + (bias_hat[i] - localBias[i]).norm();
+    error += (dcm_hat[i] - dcm[i]).norm() + (bias_hat[i] - bias[i]).norm();
   }
 
   std::cout << "Sum of error on the 10 last samples = " << error << std::endl;
@@ -329,19 +323,19 @@ int main()
 {
   int exitCode;
 
-  exitCode = testUnidimDcmBiasEstimator(1);
-
-  if(exitCode != 0)
-  {
-    std::cout << "Failed, testUnidimDcmBiasEstimator error code: " << exitCode << std::endl;
-    return exitCode;
-  }
-
-  exitCode = testrotationMatrix2Angle(2);
+  exitCode = testrotationMatrix2Angle(1);
 
   if(exitCode != 0)
   {
     std::cout << "Failed, testrotationMatrix2Angle error code: " << exitCode << std::endl;
+    return exitCode;
+  }
+
+  exitCode = testUnidimDcmBiasEstimator(2);
+
+  if(exitCode != 0)
+  {
+    std::cout << "Failed, testUnidimDcmBiasEstimator error code: " << exitCode << std::endl;
     return exitCode;
   }
 
