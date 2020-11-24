@@ -395,13 +395,13 @@ namespace stateObservation
 
     inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & axis, const Vector3 & v)
     {
-      Vector3 rotV_proj = axis.cross((rotation * v).cross(axis)).normalized();
+      Vector3 rotV_proj = axis.cross((rotation * v).cross(axis)); /// no need to normalize for atan2
       return atan2(v.cross(rotV_proj).dot(axis), v.dot(rotV_proj));
     }
 
     inline double rotationMatrixToYaw(const Matrix3 & rotation, const Vector2 & v)
     {
-      Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v).normalized();
+      Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v);
       return atan2(v.x() * rotV.y() - v.y() * rotV.x(), v.dot(rotV));
     }
 
@@ -422,8 +422,7 @@ namespace stateObservation
 
         /// v is the vector that stays horizontal by rotation
         Vector2 v = getInvariantHorizontalVector(rotation).head<2>();
-        double squaredN = v.squaredNorm();
-        Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v) / squaredN;
+        Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v);
         return atan2(v.x() * rotV.y() - v.y() * rotV.x(), v.dot(rotV));
       }
     }
