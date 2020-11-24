@@ -65,8 +65,8 @@ public:
                              double initZMP = 0,
                              double initDcm = 0,
                              double initBias = 0,
-                             double zmpMeasureErrorStd = defaultZmpErrorStd_,
                              double dcmMeasureErrorStd = defaultDcmErrorStd_,
+                             double zmpMeasureErrorStd = defaultZmpErrorStd_,
                              double initDcmUncertainty = defaultDCMUncertainty,
                              double initBiasUncertainty = defaultBiasUncertainty);
 
@@ -89,8 +89,8 @@ public:
                              double omega_0,
                              double dt = defaultDt_,
                              double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                             double zmpMeasureErrorStd = defaultZmpErrorStd_,
                              double dcmMeasureErrorStd = defaultDcmErrorStd_,
+                             double zmpMeasureErrorStd = defaultZmpErrorStd_,
                              double initBias = 0,
                              double initBiasuncertainty = defaultBiasUncertainty);
 

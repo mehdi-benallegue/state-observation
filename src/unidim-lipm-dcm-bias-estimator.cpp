@@ -3,6 +3,20 @@
 
 namespace stateObservation
 {
+
+constexpr double UnidimLipmDcmBiasEstimator::defaultDt_;
+
+/// default expected drift of the bias every second
+constexpr double UnidimLipmDcmBiasEstimator::defaultBiasDriftSecond_;
+
+/// default error in the estimation of the sensors
+constexpr double UnidimLipmDcmBiasEstimator::defaultZmpErrorStd_;
+constexpr double UnidimLipmDcmBiasEstimator::defaultDcmErrorStd_;
+
+/// default uncertainty in the initial values of DCM and Bias
+constexpr double UnidimLipmDcmBiasEstimator::defaultDCMUncertainty;
+constexpr double UnidimLipmDcmBiasEstimator::defaultBiasUncertainty;
+
 using namespace tools;
 UnidimLipmDcmBiasEstimator::UnidimLipmDcmBiasEstimator(double omega_0,
                                                        double dt,
@@ -10,8 +24,8 @@ UnidimLipmDcmBiasEstimator::UnidimLipmDcmBiasEstimator(double omega_0,
                                                        double initZMP,
                                                        double initDcm,
                                                        double initBias,
-                                                       double zmpMeasureErrorStd,
                                                        double dcmMeasureErrorStd,
+                                                       double zmpMeasureErrorStd,
                                                        double initDcmUncertainty,
                                                        double initBiasUncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
@@ -39,8 +53,8 @@ UnidimLipmDcmBiasEstimator::UnidimLipmDcmBiasEstimator(bool measurementIsWithBia
                                                        double omega_0,
                                                        double dt,
                                                        double biasDriftStd,
-                                                       double zmpMeasureErrorStd,
                                                        double dcmMeasureErrorStd,
+                                                       double zmpMeasureErrorStd,
                                                        double initBias,
                                                        double initBiasuncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(measuredZMP),
