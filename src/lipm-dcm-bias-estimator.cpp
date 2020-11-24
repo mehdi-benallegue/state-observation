@@ -31,10 +31,7 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
   filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
 {
   updateMatricesABQ_();
-  // clang-format off
-  C_ << 1., 1., 0., 0.,
-        0., 0.,  1., 1.;
-  // clang-format on
+  C_ << Matrix2::Identity(), Matrix2::Identity();
   R_ = dblToSqDiag(dcmMeasureErrorStd);
   filter_.setC(C_);
   filter_.setMeasurementCovariance(R_);
@@ -68,10 +65,7 @@ void LipmDcmBiasEstimator::resetWithMeasurements(const Vector2 & measuredDcm,
   A_.setIdentity();
 
   updateMatricesABQ_();
-  // clang-format off
-  C_ << 1., 1., 0., 0.,
-        0., 0.,  1., 1.;
-  // clang-format on
+  C_ << Matrix2::Identity(), Matrix2::Identity();
   R_ = dblToSqDiag(dcmMeasureErrorStd);
   filter_.setC(C_);
   filter_.setMeasurementCovariance(R_);
