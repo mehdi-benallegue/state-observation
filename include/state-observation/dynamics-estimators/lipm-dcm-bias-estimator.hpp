@@ -166,6 +166,11 @@ public:
   ///@brief Set the Sampling Time
   ///
   ///@param dt sampling time
+  void setSamplingTime(double dt);
+
+  ///@brief Set the Bias object from a guess
+  ///
+  ///@param bias guess
   void setBias(const Vector2 & bias);
 
   ///@copydoc setBias(double bias)
