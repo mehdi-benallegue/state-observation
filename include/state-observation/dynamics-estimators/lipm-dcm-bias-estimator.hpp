@@ -245,10 +245,9 @@ public:
   /// @brief Runs the estimation. Needs to be called every timestep
   ///
   /// @return Vector2
-  inline Vector4 update()
+  inline void update()
   {
-    A_.bottomRightCorner<2, 2>().setIdentity(); /// reset the rotation part
-    return filter_.getEstimatedState(filter_.getMeasurementTime());
+    filter_.estimateState();
   }
 
   /// @brief Get the Unbiased DCM filtered by the estimator
