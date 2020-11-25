@@ -155,14 +155,17 @@ public:
   ///@param omega_0  is the sampling time in seconds
   void setLipmNaturalFrequency(double omega_0);
 
+  /// @brief Get the Lipm Natural Frequency
+  ///
+  /// @return double
+  inline double getLipmNaturalFrequency() const
+  {
+    return omega0_;
+  }
+
   ///@brief Set the Sampling Time
   ///
   ///@param dt sampling time
-  void setSamplingTime(double dt);
-
-  ///@brief Set the Bias object from a guess
-  ///
-  ///@param bias guess
   void setBias(const Vector2 & bias);
 
   ///@copydoc setBias(double bias)
