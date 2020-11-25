@@ -1,8 +1,8 @@
 
-///\file      lipm-dcm-bias-estimator.hpp
+///\file      lipm-dcm-estimator.hpp
 ///\author    Mehdi Benallegue
 ///\date      2020
-///\brief     Estimation of a bias betweeen the divergent component of motion
+///\brief     Filtering of divergent component of motion (DCM) and estimation of a bias betweeen the DCM
 ///           and the corresponding zero moment point for a linearized inverted
 ///           pendulum model
 ///
@@ -13,15 +13,16 @@
 #define LIPMDCMBIASESTIMATOR_HPP
 
 #include <state-observation/api.h>
-#include <state-observation/dynamics-estimators/unidim-lipm-dcm-bias-estimator.hpp>
+#include <state-observation/observer/linear-kalman-filter.hpp>
+#include <state-observation/tools/miscellaneous-algorithms.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 
 namespace stateObservation
 {
 
 /// \class LipmDcmBiasEstimator
-/// \brief Estimation of a bias betweeen the divergent component of motion
-///        and the corresponding zero moment point for a linearized inverted
+/// \brief Filtering of divergent component of motion (DCM) and estimation of a bias betweeen the DCM
+///           and the corresponding zero moment point for a linearized inverted
 ///        pendulum model.
 ///
 /// \details
@@ -29,27 +30,29 @@ namespace stateObservation
 /// linearized to obtain a dynamics with a convergent and a divergent component of motion (DCN).
 /// The dynamics of the DCM depends on the Zero Moment Point.
 /// The DCM can be measured using the CoM and its velocity, but the CoM position can be biased.
-/// This estimator uses Kalman Filtering to estimate this bias in one axis.
+/// This estimator uses Kalman Filtering to estimate this bias and give a delay-free filtering of the DCM.
 
-class STATE_OBSERVATION_DLLAPI LipmDcmBiasEstimator
+class STATE_OBSERVATION_DLLAPI LipmDcmEstimator
 {
 private:
   constexpr static double defaultDt_ = 0.005;
+  constexpr static double defaultOmega_ = tools::sqrt(cst::gravityConstant);
 
+public:
   /// default expected drift of the bias every second
-  constexpr static double defaultBiasDriftSecond_ = 0.002;
+  constexpr static double defaultBiasDriftSecond = 0.002;
 
   /// default error in the estimation of the sensors
-  constexpr static double defaultZmpErrorStd_ = 0.005;
-  constexpr static double defaultDcmErrorStd_ = 0.01;
+  constexpr static double defaultZmpErrorStd = 0.005;
+  constexpr static double defaultDcmErrorStd = 0.01;
 
   /// default uncertainty in the initial values of DCM and Bias
   constexpr static double defaultDCMUncertainty = 0.01;
   constexpr static double defaultBiasUncertainty = 0.01;
 
-public:
-  /// @brief Construct a new Lipm Dcm Bias Estimator object
-  /// @details Use this if no DCM measurements are available or when a good guess of its unbiased position is available
+  /// @brief Construct a new Lipm Dcm Estimator object
+  /// @details Use this if no DCM measurements are available or when a good guess of its unbiased position is
+  /// available
   ///
   /// @param dt                     the sampling time in seconds
   /// @param omega_0                the natural frequency of the DCM (rad/s)
@@ -60,16 +63,16 @@ public:
   /// @param initBias               the initial value of the bias
   /// @param tinitDcmUncertainty    the uncertainty in the DCM initial value in meters
   /// @param initBiasUncertainty    the uncertainty in the bias initial value in meters
-  LipmDcmBiasEstimator(double dt = defaultDt_,
-                       double omega_0 = 3.0,
-                       double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                       const Vector2 & initZMP = Vector2::Zero(),
-                       const Vector2 & initDcm = Vector2::Zero(),
-                       const Vector2 & initBias = Vector2::Zero(),
-                       double dcmMeasureErrorStd = defaultDcmErrorStd_,
-                       double zmpMeasureErrorStd = defaultZmpErrorStd_,
-                       const Vector2 & initDcmUncertainty = Vector2::Constant(defaultDCMUncertainty),
-                       const Vector2 & initBiasUncertainty = Vector2::Constant(defaultBiasUncertainty));
+  LipmDcmEstimator(double dt = defaultDt_,
+                   double omega_0 = defaultOmega_,
+                   double biasDriftPerSecondStd = defaultBiasDriftSecond,
+                   const Vector2 & initZMP = Vector2::Zero(),
+                   const Vector2 & initDcm = Vector2::Zero(),
+                   const Vector2 & initBias = Vector2::Zero(),
+                   double dcmMeasureErrorStd = defaultDcmErrorStd,
+                   double zmpMeasureErrorStd = defaultZmpErrorStd,
+                   const Vector2 & initDcmUncertainty = Vector2::Constant(defaultDCMUncertainty),
+                   const Vector2 & initBiasUncertainty = Vector2::Constant(defaultBiasUncertainty));
 
   /// @brief Resets the estimator with first measurements
   /// @details Use this when initializing with an available DCM (biased / or not) measurement
@@ -85,11 +88,27 @@ public:
   /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
   void resetWithMeasurements(const Vector2 & measuredDcm,
                              const Vector2 & measuredZMP,
+                             const Matrix2 & yaw,
+                             bool measurementIsWithBias,
+                             double biasDriftPerSecondStd,
+                             double dcmMeasureErrorStd,
+                             double zmpMeasureErrorStd,
+                             const Vector2 & initBias = Vector2::Constant(0),
+                             const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty));
+
+  /// @brief Resets the estimator with first measurements
+  /// @details Use this when initializing with an available DCM (biased / or not) measurement
+  ///
+  /// @param measuredDcm            the the measured position of the DCM in the world frame
+  /// @param measuredZMP            the the measured position of the ZMP in the world frame
+  /// @param yaw                    the initial yaw angle in the form of a rotation matrix
+  /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
+  /// @param initBias               the initial value of the drift
+  /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
+  void resetWithMeasurements(const Vector2 & measuredDcm,
+                             const Vector2 & measuredZMP,
                              const Matrix2 & yaw = Matrix2::Identity(),
                              bool measurementIsWithBias = true,
-                             double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                             double dcmMeasureErrorStd = defaultDcmErrorStd_,
-                             double zmpMeasureErrorStd = defaultZmpErrorStd_,
                              const Vector2 & initBias = Vector2::Constant(0),
                              const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty));
 
@@ -109,9 +128,9 @@ public:
                                     const Vector2 & measuredZMP,
                                     double yaw,
                                     bool measurementIsWithBias = true,
-                                    double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                                    double dcmMeasureErrorStd = defaultDcmErrorStd_,
-                                    double zmpMeasureErrorStd = defaultZmpErrorStd_,
+                                    double biasDriftPerSecondStd = defaultBiasDriftSecond,
+                                    double dcmMeasureErrorStd = defaultDcmErrorStd,
+                                    double zmpMeasureErrorStd = defaultZmpErrorStd,
                                     const Vector2 & initBias = Vector2::Constant(0),
                                     const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
   {
@@ -136,9 +155,9 @@ public:
                                     const Vector2 & measuredZMP,
                                     const Matrix3 & rotation,
                                     bool measurementIsWithBias = true,
-                                    double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                                    double zmpMeasureErrorStd = defaultZmpErrorStd_,
-                                    double dcmMeasureErrorStd = defaultDcmErrorStd_,
+                                    double biasDriftPerSecondStd = defaultBiasDriftSecond,
+                                    double zmpMeasureErrorStd = defaultZmpErrorStd,
+                                    double dcmMeasureErrorStd = defaultDcmErrorStd,
                                     const Vector2 & initBias = Vector2::Constant(0),
                                     const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
   {
@@ -148,7 +167,7 @@ public:
   }
 
   ///@brief Destroy the Lipm Dcm Bias Estimator object
-  ~LipmDcmBiasEstimator();
+  ~LipmDcmEstimator();
 
   ///@brief Set the Lipm Natural Frequency
   ///

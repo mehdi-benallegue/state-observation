@@ -129,6 +129,27 @@ inline Vector STATE_OBSERVATION_DLLAPI finiteTimeAccControl(const Vector & x,
   }
   return xdd;
 }
+
+namespace Detail
+{
+double constexpr sqrtNewtonRaphson(double x, double curr, double prev)
+{
+  return curr == prev ? curr : sqrtNewtonRaphson(x, 0.5 * (curr + x / curr), curr);
+}
+} // namespace Detail
+
+/// @brief Constexpr version of the square root
+/// @details For a finite and non-negative value of "x", returns an approximation for the square root of "x"
+///-Otherwise, returns NaN
+///
+/// @param x
+/// @return double constexpr
+double constexpr sqrt(double x)
+{
+  return x >= 0 && x < std::numeric_limits<double>::infinity() ? Detail::sqrtNewtonRaphson(x, x, 0)
+                                                               : std::numeric_limits<double>::quiet_NaN();
+}
+
 } // namespace tools
 
 } // namespace stateObservation

@@ -70,14 +70,6 @@ ObserverBase::MeasureVector LinearKalmanFilter::simulateSensor_(const StateVecto
   return ybar_();
 }
 
-void LinearKalmanFilter::reset()
-{
-  KalmanFilterBase::reset();
-
-  clearB();
-  clearD();
-}
-
 LinearKalmanFilter::Bmatrix LinearKalmanFilter::getBmatrixConstant(double c) const
 {
   return Bmatrix::Constant(n_, p_, c);

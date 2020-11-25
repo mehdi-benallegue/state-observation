@@ -121,7 +121,10 @@ void ZeroDelayObserver::clearInputsAndMeasurements()
 
 TimeIndex ZeroDelayObserver::estimateState()
 {
-  getEstimatedState(getMeasurementTime());
+  if(getMeasurementsNumber() > 0)
+  {
+    getEstimatedState(getMeasurementTime());
+  }
   return getCurrentTime();
 }
 

@@ -1,6 +1,6 @@
 #include <iostream>
-#include <state-observation/dynamics-estimators/lipm-dcm-bias-estimator.hpp>
-#include <state-observation/dynamics-estimators/unidim-lipm-dcm-bias-estimator.hpp>
+#include <state-observation/dynamics-estimators/lipm-dcm-estimator.hpp>
+#include <state-observation/dynamics-estimators/unidim-lipm-dcm-estimator.hpp>
 #include <state-observation/tools/probability-law-simulation.hpp>
 #include <state-observation/tools/rigid-body-kinematics.hpp>
 
@@ -67,8 +67,10 @@ int testUnidimDcmBiasEstimator(int errorCode)
 
   double initbias = 0;
 
-  UnidimLipmDcmBiasEstimator est(true, dcm_m[0], zmp_m[0], w0, dt, biasDriftPerSecondStd, dcmMeasurementErrorStd,
-                                 zmpMeasurementErrorStd, initbias, initBiasstd);
+  UnidimLipmDcmEstimator est(dt, w0);
+
+  est.resetWithInputs(dcm_m[0], zmp_m[0], biasDriftPerSecondStd, dcmMeasurementErrorStd, zmpMeasurementErrorStd,
+                      initbias, initBiasstd);
 
   IndexedVectorArray log;
 
@@ -189,7 +191,7 @@ int testDcmBiasEstimator(int errorCode)
 
   Vector2 initbias{0.0, 0.0};
 
-  LipmDcmBiasEstimator est(dt, w0);
+  LipmDcmEstimator est(dt, w0);
 
   est.resetWithMeasurements(dcm_m[0], zmp_m[0], yaw[0], true, biasDriftPerSecondStd, dcmMeasurementErrorStd,
                             zmpMeasurementErrorStd, initbias, Vector2::Constant(initBiasstd));
