@@ -197,14 +197,16 @@ public:
   ///
   void setDcmMeasureErrorStd(double);
 
-  /// @brief Set the Inputs of the estimator with no orientation. The orientation will be assumed to be constant foir
+  /// @brief Set the Inputs of the estimator
+  /// @details this version is with no orientation. The orientation will be assumed to be constant foir
   /// this sample
   ///
   /// @param dcm measurement of the DCM in the world frame
   /// @param zmp mesaurement of the ZMP in the world frame
   void setInputs(const Vector2 & dcm, const Vector2 & zmp);
 
-  /// @brief Set the Inputs of the estimator. The yaw will be extracted from the orientation using the axis agnostic
+  /// @brief Set the Inputs of the estimator.
+  /// @details The yaw will be extracted from the orientation using the axis agnostic
   /// approach.
   ///
   /// @param dcm         measurement of the DCM in the world frame

@@ -121,7 +121,6 @@ int testUnidimDcmBiasEstimator(int errorCode)
 /// @return int : 0 if success, nonzero if fails
 int testDcmBiasEstimator(int errorCode)
 {
-
   double w0 = sqrt(cst::gravityConstant / 0.9);
   double dt = 0.005;
 
