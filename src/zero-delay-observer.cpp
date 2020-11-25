@@ -119,6 +119,12 @@ void ZeroDelayObserver::clearInputsAndMeasurements()
   y_.reset();
 }
 
+TimeIndex ZeroDelayObserver::estimateState()
+{
+  getEstimatedState(getMeasurementTime());
+  return getCurrentTime();
+}
+
 ObserverBase::StateVector ZeroDelayObserver::getEstimatedState(TimeIndex k)
 {
   BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
