@@ -177,6 +177,8 @@ void LipmDcmBiasEstimator::setDcmMeasureErrorStd(double std)
 
 void LipmDcmBiasEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp)
 {
+  update(); /// update the estimation of the state
+
   Vector2 u;
   Vector2 y;
 
@@ -193,8 +195,7 @@ void LipmDcmBiasEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp)
 void LipmDcmBiasEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & orientation)
 {
   setInputs(dcm, zmp);
-  A_.bottomRightCorner<2, 2>() =
-      orientation * previousOrientation_.transpose() * A_.bottomRightCorner<2, 2>(); /// add a rotation
+  A_.bottomRightCorner<2, 2>() = orientation * previousOrientation_.transpose(); /// set the rotation differenc
   previousOrientation_ = orientation;
   filter_.setA(A_);
 }
