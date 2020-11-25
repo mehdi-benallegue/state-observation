@@ -17,8 +17,8 @@ constexpr double LipmDcmBiasEstimator::defaultZmpErrorStd_;
 constexpr double LipmDcmBiasEstimator::defaultDcmErrorStd_;
 
 using namespace tools;
-LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
-                                           double dt,
+LipmDcmBiasEstimator::LipmDcmBiasEstimator(double dt,
+                                           double omega_0,
                                            double biasDriftStd,
                                            const Vector2 & initZMP,
                                            const Vector2 & initDcm,

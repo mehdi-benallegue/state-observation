@@ -189,7 +189,7 @@ int testDcmBiasEstimator(int errorCode)
 
   Vector2 initbias{0.0, 0.0};
 
-  LipmDcmBiasEstimator est(w0, dt);
+  LipmDcmBiasEstimator est(dt, w0);
 
   est.resetWithMeasurements(dcm_m[0], zmp_m[0], yaw[0], true, biasDriftPerSecondStd, dcmMeasurementErrorStd,
                             zmpMeasurementErrorStd, initbias, Vector2::Constant(initBiasstd));

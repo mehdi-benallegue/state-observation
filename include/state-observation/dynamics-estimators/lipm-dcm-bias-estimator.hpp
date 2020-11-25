@@ -51,17 +51,17 @@ public:
   /// @brief Construct a new Lipm Dcm Bias Estimator object
   /// @details Use this if no DCM measurements are available or when a good guess of its unbiased position is available
   ///
-  /// @param omega_0                the natural frequency of the DCM (rad/s)
   /// @param dt                     the sampling time in seconds
+  /// @param omega_0                the natural frequency of the DCM (rad/s)
   /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
-  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
+  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param initDCM                the initial value of the DCM
   /// @param initBias               the initial value of the bias
   /// @param tinitDcmUncertainty    the uncertainty in the DCM initial value in meters
   /// @param initBiasUncertainty    the uncertainty in the bias initial value in meters
-  LipmDcmBiasEstimator(double omega_0 = 1,
-                       double dt = defaultDt_,
+  LipmDcmBiasEstimator(double dt = defaultDt_,
+                       double omega_0 = 3.0,
                        double biasDriftPerSecondStd = defaultBiasDriftSecond_,
                        const Vector2 & initZMP = Vector2::Zero(),
                        const Vector2 & initDcm = Vector2::Zero(),
@@ -79,8 +79,8 @@ public:
   /// @param yaw                    the initial yaw angle in the form of a rotation matrix
   /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
   /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
-  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
+  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param initBias               the initial value of the drift
   /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
   void resetWithMeasurements(const Vector2 & measuredDcm,
