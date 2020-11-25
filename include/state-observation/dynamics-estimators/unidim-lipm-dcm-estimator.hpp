@@ -203,9 +203,6 @@ private:
   /// process noise
   Matrix2 Q_;
 
-  /// @brief Deactivated default constructor
-  UnidimLipmDcmEstimator() = delete;
-
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
