@@ -17,19 +17,22 @@ constexpr double LipmDcmEstimator::defaultBiasDriftSecond;
 constexpr double LipmDcmEstimator::defaultZmpErrorStd;
 constexpr double LipmDcmEstimator::defaultDcmErrorStd;
 
+constexpr double LipmDcmEstimator::defaultBiasLimit;
+
 using namespace tools;
 LipmDcmEstimator::LipmDcmEstimator(double dt,
                                    double omega_0,
                                    double biasDriftStd,
                                    double dcmMeasureErrorStd,
                                    double zmpMeasureErrorStd,
+                                   const Vector2 & biasLimit,
                                    const Vector2 & initZMP,
                                    const Vector2 & initDcm,
                                    const Vector2 & initBias,
                                    const Vector2 & initDcmUncertainty,
                                    const Vector2 & initBiasUncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
-  filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
+  biasLimit_(biasLimit), filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
 {
   updateMatricesABQ_();
   C_ << Matrix2::Identity(), Matrix2::Identity();
@@ -134,6 +137,11 @@ void LipmDcmEstimator::setBiasDriftPerSecond(double driftPerSecond)
   filter_.setProcessCovariance(Q_);
 }
 
+void LipmDcmEstimator::setBiasLimit(const Vector2 & biasLimit)
+{
+  biasLimit_ = biasLimit;
+}
+
 void LipmDcmEstimator::setDCM(const Vector2 & dcm)
 {
   Vector4 x = filter_.getCurrentEstimatedState();
@@ -163,6 +171,27 @@ void LipmDcmEstimator::setDcmMeasureErrorStd(double std)
 {
   Matrix2 R;
   R = dblToSqDiag(std);
+}
+
+void LipmDcmEstimator::update()
+{
+  filter_.estimateState();
+  if(biasLimit_.x() > 0 || biasLimit_.y() > 0)
+  {
+    Vector2 localBias = getLocalBias();
+    Vector2 clampedLocalBias;
+    if(biasLimit_.x() > 0)
+    {
+      clampedLocalBias.x() = tools::clampScalar(localBias.x(), biasLimit_.x());
+    }
+    if(biasLimit_.y() > 0)
+    {
+      clampedLocalBias.y() = tools::clampScalar(localBias.y(), biasLimit_.y());
+    }
+
+    setBias(previousOrientation_ * clampedLocalBias);
+    setDCM(getUnbiasedDCM() + localBias - clampedLocalBias);
+  }
 }
 
 void LipmDcmEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & orientation)

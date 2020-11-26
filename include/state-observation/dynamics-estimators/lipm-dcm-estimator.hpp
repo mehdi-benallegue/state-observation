@@ -50,6 +50,9 @@ public:
   constexpr static double defaultDCMUncertainty = 0.01;
   constexpr static double defaultBiasUncertainty = 0.01;
 
+  /// default value for Bias limit (0 means limitless)
+  constexpr static double defaultBiasLimit = 0;
+
   /// @brief Construct a new Lipm Dcm Estimator object
   /// @details Use this if no DCM measurements are available or when a good guess of its unbiased position is
   /// available
@@ -62,8 +65,8 @@ public:
   /// @param initBias               the initial value of the bias
   /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
   /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
-  /// @param initDCM                the initial value of the DCM
-  /// @param initBias               the initial value of the bias
+  /// @param biasLimit              the X and Y (expressed in local frame) largest accepted absolute values of the bias
+  ///                               (zero means no limit)
   /// @param tinitDcmUncertainty    the uncertainty in the DCM initial value in meters
   /// @param initBiasUncertainty    the uncertainty in the bias initial value in meters
   LipmDcmEstimator(double dt = defaultDt_,
@@ -71,6 +74,7 @@ public:
                    double biasDriftPerSecondStd = defaultBiasDriftSecond,
                    double dcmMeasureErrorStd = defaultDcmErrorStd,
                    double zmpMeasureErrorStd = defaultZmpErrorStd,
+                   const Vector2 & biasLimit = Vector2::Constant(defaultBiasLimit),
                    const Vector2 & initZMP = Vector2::Zero(),
                    const Vector2 & initDcm = Vector2::Zero(),
                    const Vector2 & initBias = Vector2::Zero(),
@@ -153,6 +157,12 @@ public:
   /// @param driftPerSecond the standard deviation of the drift (m/s)
   void setBiasDriftPerSecond(double driftPerSecond);
 
+  /// @brief Set the Bias Limit
+  ///
+  /// @param biasLimit the X and Y (expressed in local frame) largest accepted
+  ///                   absolute values of the bias (zero means no limit)
+  void setBiasLimit(const Vector2 & biasLimit);
+
   /// @brief set the real DCM position from a guess
   ///
   /// @param dcm guess
@@ -207,10 +217,7 @@ public:
   /// @brief Runs the estimation. Needs to be called every timestep
   ///
   /// @return Vector2
-  inline void update()
-  {
-    filter_.estimateState();
-  }
+  void update();
 
   /// @brief Get the Unbiased DCM filtered by the estimator
   ///
@@ -259,6 +266,8 @@ protected:
   double zmpErrorStd_;
 
   Vector2 previousZmp_;
+
+  Vector2 biasLimit_;
 
   LinearKalmanFilter filter_;
   Matrix4 A_;
