@@ -136,7 +136,7 @@ void UnidimLipmDcmEstimator::setBiasDriftPerSecond(double driftPerSecond)
   filter_.setProcessCovariance(Q);
 }
 
-void UnidimLipmDcmEstimator::setDCM(double dcm)
+void UnidimLipmDcmEstimator::setUnbiasedDCM(double dcm)
 {
   Vector2 x = filter_.getCurrentEstimatedState();
   /// update the bias
@@ -144,9 +144,9 @@ void UnidimLipmDcmEstimator::setDCM(double dcm)
   filter_.setCurrentState(x);
 }
 
-void UnidimLipmDcmEstimator::setDCM(double dcm, double uncertainty)
+void UnidimLipmDcmEstimator::setUnbiasedDCM(double dcm, double uncertainty)
 {
-  setDCM(dcm);
+  setUnbiasedDCM(dcm);
   Matrix2 P = filter_.getStateCovariance();
   /// resetting the non diagonal parts
   P(0, 1) = P(1, 0) = 0;

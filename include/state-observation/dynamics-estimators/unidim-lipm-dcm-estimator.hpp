@@ -125,13 +125,13 @@ public:
   /// @brief set the real DCM position from a guess
   ///
   /// @param dcm guess
-  void setDCM(double dcm);
+  void setUnbiasedDCM(double dcm);
 
-  /// @copydoc setDCM(double dcm)
+  /// @copydoc setUnbiasedDCM(double dcm)
   ///
   /// @param dcm
   /// @param uncertainty the uncertainty in this guess
-  void setDCM(double dcm, double uncertainty);
+  void setUnbiasedDCM(double dcm, double uncertainty);
 
   /// @brief Set the Zmp Measurement Error Stamdard devbiation
   ///
