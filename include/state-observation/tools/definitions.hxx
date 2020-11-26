@@ -432,6 +432,13 @@ IndexedMatrixArrayT<MatrixType, Allocator>::IndexedMatrixArrayT():
 {
 }
 
+/// size based constructor
+template<typename MatrixType, typename Allocator>
+IndexedMatrixArrayT<MatrixType, Allocator>::IndexedMatrixArrayT(TimeSize size, TimeIndex initial)
+: k_(initial), v_(size)
+{
+}
+
 template <typename MatrixType, typename Allocator>
 typename IndexedMatrixArrayT<MatrixType, Allocator>::Array IndexedMatrixArrayT<MatrixType, Allocator>::getArray() const
 {

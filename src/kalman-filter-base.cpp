@@ -179,10 +179,6 @@ void KalmanFilterBase::reset()
 {
   ZeroDelayObserver::reset();
 
-  clearA();
-  clearC();
-  clearQ();
-  clearR();
   clearStateCovariance();
 }
 

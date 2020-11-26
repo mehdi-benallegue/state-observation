@@ -105,7 +105,15 @@ public:
   ///
   virtual void clearInputsAndMeasurements();
 
-  /// @brief estimated State
+  /// @brief run the observer until the measurement vector is depleted.
+  ///
+  /// @details the observer has to be able to reconstruct all the state values from the current time to the last
+  /// measurement time. That means all the input values reauired have to be provided before.
+  ///
+  /// @return the current time
+  virtual TimeIndex estimateState();
+
+  /// @brief getestimated State
   ///
   /// @param k The time index of the expected state value
   /// @return ObserverBase::StateVector

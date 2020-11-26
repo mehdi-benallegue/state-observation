@@ -95,6 +95,9 @@ typedef Eigen::Quaternion<double, Eigen::DontAlign> QuaternionUnaligned;
 /// Euler Axis/Angle representation of orientation
 typedef Eigen::AngleAxis<double> AngleAxis;
 
+/// 2D rotations
+typedef Eigen::Rotation2D<double> Rotation2D;
+
 typedef Eigen::Index Index;
 typedef long int TimeIndex;
 typedef Index TimeSize;
@@ -381,6 +384,12 @@ public:
   /// Default constructor
   IndexedMatrixArrayT();
 
+  /// @brief Construct a new Indexed Vector Array T with a predifined size
+  ///
+  /// @param size is the size of the array
+  /// @param initTime is the index of the initial time. It is zero by default
+  IndexedMatrixArrayT(TimeSize size, TimeIndex initTime = 0);
+
   typedef std::vector<MatrixType, Allocator> Array;
 
   /// Sets the vector v at the time index k
@@ -512,6 +521,9 @@ const Vector gravity = gravityConstant * Vector3::UnitZ();
 
 /// angles considered Zero
 constexpr double epsilonAngle = 1e-16;
+
+/// number considered zero when compared to 1
+constexpr double epsilon1 = 1e-14;
 
 } // namespace cst
 

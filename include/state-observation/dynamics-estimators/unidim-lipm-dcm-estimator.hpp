@@ -1,5 +1,5 @@
 
-///\file      lipm-dcm-bias-estimator.hpp
+///\file      unidim-lipm-dcm-estimator.hpp
 ///\author    Mehdi Benallegue
 ///\date      2020
 ///\brief     Estimation of a bias betweeen the divergent component of motion
@@ -9,17 +9,18 @@
 ///\detail
 ///
 ///
-#ifndef LIPMDCMBIASESTIMATOR_HPP
-#define LIPMDCMBIASESTIMATOR_HPP
+#ifndef UNIDIMLIPMDCMBIASESTIMATOR_HPP
+#define UNIDIMLIPMDCMBIASESTIMATOR_HPP
 
 #include <state-observation/api.h>
 #include <state-observation/observer/linear-kalman-filter.hpp>
+#include <state-observation/tools/miscellaneous-algorithms.hpp>
 
 namespace stateObservation
 {
 
-/// \class LipmDcmBiasEstimator
-/// \brief Estimation of a bias betweeen the divergent component of motion
+/// \class UnidimLipmDcmEstimator
+/// \brief 1D version of the estimation of a bias betweeen the divergent component of motion
 ///        and the corresponding zero moment point for a linearized inverted
 ///        pendulum model.
 ///
@@ -30,45 +31,46 @@ namespace stateObservation
 /// The DCM can be measured using the CoM and its velocity, but the CoM position can be biased.
 /// This estimator uses Kalman Filtering to estimate this bias in one axis.
 
-class STATE_OBSERVATION_DLLAPI LipmDcmBiasEstimator
+class STATE_OBSERVATION_DLLAPI UnidimLipmDcmEstimator
 {
 private:
   constexpr static double defaultDt_ = 0.005;
+  constexpr static double defaultOmega_ = tools::sqrt(cst::gravityConstant);
 
+public:
   /// default expected drift of the bias every second
-  constexpr static double defaultBiasDriftSecond_ = 0.002;
+  constexpr static double defaultBiasDriftSecond = 0.002;
 
   /// default error in the estimation of the sensors
-  constexpr static double defaultZmpErrorStd_ = 0.005;
-  constexpr static double defaultDcmErrorStd_ = 0.01;
+  constexpr static double defaultZmpErrorStd = 0.005;
+  constexpr static double defaultDcmErrorStd = 0.01;
 
   /// default uncertainty in the initial values of DCM and Bias
   constexpr static double defaultDCMUncertainty = 0.01;
   constexpr static double defaultBiasUncertainty = 0.01;
 
-public:
-  /// @brief Construct a new Lipm Dcm Bias Estimator object
-  /// @details Use this if no DCM measurements are available or when a good guess of its unbiased position is available
+  /// @brief Construct a new Unidimensional Lipm Dcm Estimator
   ///
-  /// @param omega_0                the natural frequency of the DCM (rad/s)
   /// @param dt                     the sampling time in seconds
+  /// @param omega_0                the natural frequency of the DCM (rad/s)
   /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
-  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
-  /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
-  /// @param initDCM                the initial value of the DCM
+  /// @param initDcm                the initial value of the DCM
+  /// @param initZMP                the initial value of the ZMP
   /// @param initBias               the initial value of the bias
-  /// @param tinitDcmUncertainty    the uncertainty in the DCM initial value in meters
+  /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
+  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
+  /// @param initDcmUncertainty     the uncertainty in the DCM initial value in meters
   /// @param initBiasUncertainty    the uncertainty in the bias initial value in meters
-  LipmDcmBiasEstimator(double omega_0,
-                       double dt = defaultDt_,
-                       double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                       double initZMP = 0,
-                       double initDcm = 0,
-                       double initBias = 0,
-                       double zmpMeasureErrorStd = defaultZmpErrorStd_,
-                       double dcmMeasureErrorStd = defaultDcmErrorStd_,
-                       double initDcmUncertainty = defaultDCMUncertainty,
-                       double initBiasUncertainty = defaultBiasUncertainty);
+  UnidimLipmDcmEstimator(double dt = defaultDt_,
+                         double omega_0 = defaultOmega_,
+                         double biasDriftPerSecondStd = defaultBiasDriftSecond,
+                         double initDcm = 0,
+                         double initZMP = 0,
+                         double initBias = 0,
+                         double dcmMeasureErrorStd = defaultDcmErrorStd,
+                         double zmpMeasureErrorStd = defaultZmpErrorStd,
+                         double initDcmUncertainty = defaultDCMUncertainty,
+                         double initBiasUncertainty = defaultBiasUncertainty);
 
   /// @brief Construct a new Lipm Dcm Bias Estimator object
   /// @details Use this when initializing with an available DCM (biased) measurement
@@ -83,19 +85,17 @@ public:
   /// @param scmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
   /// @param initBias               the initial value of the drift
   /// @param initBiasUncertainty the uncertainty in the bias initial value in meters
-  LipmDcmBiasEstimator(bool measurementIsWithBias,
-                       double measuredDcm,
+  void resetWithInputs(double measuredDcm,
                        double measuredZMP,
-                       double omega_0,
-                       double dt = defaultDt_,
-                       double biasDriftPerSecondStd = defaultBiasDriftSecond_,
-                       double zmpMeasureErrorStd = defaultZmpErrorStd_,
-                       double dcmMeasureErrorStd = defaultDcmErrorStd_,
+                       bool measurementIsWithBias = true,
+                       double biasDriftPerSecondStd = defaultBiasDriftSecond,
+                       double dcmMeasureErrorStd = defaultDcmErrorStd,
+                       double zmpMeasureErrorStd = defaultZmpErrorStd,
                        double initBias = 0,
                        double initBiasuncertainty = defaultBiasUncertainty);
 
   ///@brief Destroy the Lipm Dcm Bias Estimator object
-  ~LipmDcmBiasEstimator();
+  ~UnidimLipmDcmEstimator() {}
 
   ///@brief Set the Lipm Natural Frequency
   ///
@@ -202,10 +202,6 @@ private:
 
   /// process noise
   Matrix2 Q_;
-
-  /// @brief Deactivated default constructor
-  ///
-  LipmDcmBiasEstimator() = delete;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

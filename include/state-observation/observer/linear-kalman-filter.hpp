@@ -74,9 +74,6 @@ public:
   /// Clear the value of the input-measurement matrix
   virtual void clearD();
 
-  /// Reset all the observer
-  virtual void reset();
-
   /// Get a matrix having the size of the B matrix having "c" values
   Bmatrix getBmatrixConstant(double c) const;
 

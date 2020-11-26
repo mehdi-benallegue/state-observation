@@ -1,26 +1,41 @@
-#include <state-observation/dynamics-estimators/lipm-dcm-bias-estimator.hpp>
+#include <state-observation/dynamics-estimators/unidim-lipm-dcm-estimator.hpp>
 #include <state-observation/tools/miscellaneous-algorithms.hpp>
 
 namespace stateObservation
 {
+
+constexpr double UnidimLipmDcmEstimator::defaultDt_;
+constexpr double UnidimLipmDcmEstimator::defaultOmega_;
+
+/// default expected drift of the bias every second
+constexpr double UnidimLipmDcmEstimator::defaultBiasDriftSecond;
+
+/// default error in the estimation of the sensors
+constexpr double UnidimLipmDcmEstimator::defaultZmpErrorStd;
+constexpr double UnidimLipmDcmEstimator::defaultDcmErrorStd;
+
+/// default uncertainty in the initial values of DCM and Bias
+constexpr double UnidimLipmDcmEstimator::defaultDCMUncertainty;
+constexpr double UnidimLipmDcmEstimator::defaultBiasUncertainty;
+
 using namespace tools;
-LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
-                                           double dt,
-                                           double biasDriftStd,
-                                           double initZMP,
-                                           double initDcm,
-                                           double initBias,
-                                           double zmpMeasureErrorStd,
-                                           double dcmMeasureErrorStd,
-                                           double initDcmUncertainty,
-                                           double initBiasUncertainty)
+UnidimLipmDcmEstimator::UnidimLipmDcmEstimator(double dt,
+                                               double omega_0,
+                                               double biasDriftStd,
+                                               double initDcm,
+                                               double initZMP,
+                                               double initBias,
+                                               double dcmMeasureErrorStd,
+                                               double zmpMeasureErrorStd,
+                                               double initDcmUncertainty,
+                                               double initBiasUncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
   filter_(2, 1, 1)
 {
   updateMatricesABQ_();
   C_ << 1., 1.;
   R_ << square(dcmMeasureErrorStd);
-  filter_.setC(C_);
+  filter_.setC(C_.transpose());
   filter_.setMeasurementCovariance(R_);
   Vector2 x;
   x << initDcm, initBias;
@@ -33,23 +48,21 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(double omega_0,
   filter_.setStateCovariance(P);
 }
 
-LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
-                                           double measuredDcm,
-                                           double measuredZMP,
-                                           double omega_0,
-                                           double dt,
-                                           double biasDriftStd,
-                                           double zmpMeasureErrorStd,
-                                           double dcmMeasureErrorStd,
-                                           double initBias,
-                                           double initBiasuncertainty)
-: omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(measuredZMP),
-  filter_(2, 1, 1)
+void UnidimLipmDcmEstimator::resetWithInputs(double measuredDcm,
+                                             double measuredZMP,
+                                             bool measurementIsWithBias,
+                                             double biasDriftStd,
+                                             double dcmMeasureErrorStd,
+                                             double zmpMeasureErrorStd,
+                                             double initBias,
+                                             double initBiasuncertainty)
 {
+  filter_.reset();
+  biasDriftStd_ = biasDriftStd;
+  zmpErrorStd_ = zmpMeasureErrorStd;
+  previousZmp_ = measuredZMP;
   updateMatricesABQ_();
-  C_ << 1., 1.;
   R_ << square(dcmMeasureErrorStd);
-  filter_.setC(C_.transpose());
   filter_.setMeasurementCovariance(R_);
   Vector2 x;
 
@@ -85,21 +98,19 @@ LipmDcmBiasEstimator::LipmDcmBiasEstimator(bool measurementIsWithBias,
   filter_.setStateCovariance(P);
 }
 
-LipmDcmBiasEstimator::~LipmDcmBiasEstimator() {}
-
-void LipmDcmBiasEstimator::setLipmNaturalFrequency(double omega_0)
+void UnidimLipmDcmEstimator::setLipmNaturalFrequency(double omega_0)
 {
   omega0_ = omega_0;
   updateMatricesABQ_();
 }
 
-void LipmDcmBiasEstimator::setSamplingTime(double dt)
+void UnidimLipmDcmEstimator::setSamplingTime(double dt)
 {
   dt_ = dt;
   updateMatricesABQ_();
 }
 
-void LipmDcmBiasEstimator::setBias(double bias)
+void UnidimLipmDcmEstimator::setBias(double bias)
 {
   Vector2 x = filter_.getCurrentEstimatedState();
   /// update the bias
@@ -107,7 +118,7 @@ void LipmDcmBiasEstimator::setBias(double bias)
   filter_.setCurrentState(x);
 }
 
-void LipmDcmBiasEstimator::setBias(double bias, double uncertainty)
+void UnidimLipmDcmEstimator::setBias(double bias, double uncertainty)
 {
   setBias(bias);
   Matrix2 P = filter_.getStateCovariance();
@@ -117,7 +128,7 @@ void LipmDcmBiasEstimator::setBias(double bias, double uncertainty)
   filter_.setStateCovariance(P);
 }
 
-void LipmDcmBiasEstimator::setBiasDriftPerSecond(double driftPerSecond)
+void UnidimLipmDcmEstimator::setBiasDriftPerSecond(double driftPerSecond)
 {
   Matrix2 Q = filter_.getProcessCovariance();
   /// update the corresponding part in the process noise matrix
@@ -125,7 +136,7 @@ void LipmDcmBiasEstimator::setBiasDriftPerSecond(double driftPerSecond)
   filter_.setProcessCovariance(Q);
 }
 
-void LipmDcmBiasEstimator::setDCM(double dcm)
+void UnidimLipmDcmEstimator::setDCM(double dcm)
 {
   Vector2 x = filter_.getCurrentEstimatedState();
   /// update the bias
@@ -133,7 +144,7 @@ void LipmDcmBiasEstimator::setDCM(double dcm)
   filter_.setCurrentState(x);
 }
 
-void LipmDcmBiasEstimator::setDCM(double dcm, double uncertainty)
+void UnidimLipmDcmEstimator::setDCM(double dcm, double uncertainty)
 {
   setDCM(dcm);
   Matrix2 P = filter_.getStateCovariance();
@@ -143,19 +154,19 @@ void LipmDcmBiasEstimator::setDCM(double dcm, double uncertainty)
   filter_.setStateCovariance(P);
 }
 
-void LipmDcmBiasEstimator::setZmpMeasureErrorStd(double std)
+void UnidimLipmDcmEstimator::setZmpMeasureErrorStd(double std)
 {
   zmpErrorStd_ = std;
   updateMatricesABQ_();
 }
 
-void LipmDcmBiasEstimator::setDcmMeasureErrorStd(double std)
+void UnidimLipmDcmEstimator::setDcmMeasureErrorStd(double std)
 {
   Matrix1 R;
   R(0, 0) = square(std);
 }
 
-void LipmDcmBiasEstimator::setInputs(double dcm, double zmp)
+void UnidimLipmDcmEstimator::setInputs(double dcm, double zmp)
 {
   Vector1 u;
   Vector1 y;
@@ -170,17 +181,17 @@ void LipmDcmBiasEstimator::setInputs(double dcm, double zmp)
   filter_.pushInput(u);
 }
 
-double LipmDcmBiasEstimator::getUnbiasedDCM() const
+double UnidimLipmDcmEstimator::getUnbiasedDCM() const
 {
   return filter_.getCurrentEstimatedState()(0);
 }
 
-double LipmDcmBiasEstimator::getBias() const
+double UnidimLipmDcmEstimator::getBias() const
 {
   return filter_.getCurrentEstimatedState()(1);
 }
 
-void LipmDcmBiasEstimator::LipmDcmBiasEstimator::updateMatricesABQ_()
+void UnidimLipmDcmEstimator::updateMatricesABQ_()
 {
   // clang-format off
   A_ << 1 + omega0_ * dt_, 0,
