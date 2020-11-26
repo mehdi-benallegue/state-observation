@@ -75,6 +75,12 @@ public:
   /// @details inherited from ObserverBase
   virtual void clearStates();
 
+  /// @brief Returns if the state is set or not. The state being set is mandatory to start the estimator
+  ///
+  /// @return true is set
+  /// @return false is not set
+  bool stateIsSet() const;
+
   /// Set the value of the measurements vector at time index k. The
   /// measurements have to be inserted in chronological order without gaps.
   virtual void setMeasurement(const ObserverBase::MeasureVector & y_k, TimeIndex k);
