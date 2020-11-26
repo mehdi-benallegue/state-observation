@@ -323,7 +323,6 @@ int main()
 {
   int exitCode;
 
-  
   exitCode = testrotationMatrix2Angle(1);
 
   if(exitCode != 0)
