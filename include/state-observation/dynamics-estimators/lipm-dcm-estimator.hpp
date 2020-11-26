@@ -163,16 +163,15 @@ public:
   ///                   absolute values of the bias (zero means no limit)
   void setBiasLimit(const Vector2 & biasLimit);
 
-  /// @brief set the real DCM position from a guess
+  /// @brief set the unbiased DCM position from a guess
   ///
   /// @param dcm guess
-  void setDCM(const Vector2 & dcm);
+  void setUnbiasedDCM(const Vector2 & dcm);
 
-  /// @copydoc setDCM(double dcm)
+  /// @copydoc setUnbiasedDCM(double dcm)
   ///
-  /// @param dcm
   /// @param uncertainty the uncertainty in this guess
-  void setDCM(const Vector2 & dcm, const Vector2 & uncertainty);
+  void setUnbiasedDCM(const Vector2 & dcm, const Vector2 & uncertainty);
 
   /// @brief Set the Zmp Measurement Error Stamdard devbiation
   ///

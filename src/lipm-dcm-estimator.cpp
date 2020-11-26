@@ -142,7 +142,7 @@ void LipmDcmEstimator::setBiasLimit(const Vector2 & biasLimit)
   biasLimit_ = biasLimit;
 }
 
-void LipmDcmEstimator::setDCM(const Vector2 & dcm)
+void LipmDcmEstimator::setUnbiasedDCM(const Vector2 & dcm)
 {
   Vector4 x = filter_.getCurrentEstimatedState();
   /// update the bias
@@ -150,9 +150,9 @@ void LipmDcmEstimator::setDCM(const Vector2 & dcm)
   filter_.setCurrentState(x);
 }
 
-void LipmDcmEstimator::setDCM(const Vector2 & dcm, const Vector2 & uncertainty)
+void LipmDcmEstimator::setUnbiasedDCM(const Vector2 & dcm, const Vector2 & uncertainty)
 {
-  setDCM(dcm);
+  setUnbiasedDCM(dcm);
   Matrix4 P = filter_.getStateCovariance();
   /// resetting the non diagonal parts
   P.topRightCorner<2, 2>().setZero();
@@ -190,7 +190,7 @@ void LipmDcmEstimator::update()
     }
 
     setBias(previousOrientation_ * clampedLocalBias);
-    setDCM(getUnbiasedDCM() + localBias - clampedLocalBias);
+    setUnbiasedDCM(getUnbiasedDCM() + localBias - clampedLocalBias);
   }
 }
 
