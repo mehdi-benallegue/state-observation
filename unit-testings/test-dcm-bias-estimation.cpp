@@ -191,10 +191,9 @@ int testDcmBiasEstimator(int errorCode)
 
   Vector2 initbias{0.0, 0.0};
 
-  LipmDcmEstimator est(dt, w0);
+  LipmDcmEstimator est(dt, w0, biasDriftPerSecondStd, dcmMeasurementErrorStd, zmpMeasurementErrorStd);
 
-  est.resetWithMeasurements(dcm_m[0], zmp_m[0], yaw[0], true, biasDriftPerSecondStd, dcmMeasurementErrorStd,
-                            zmpMeasurementErrorStd, initbias, Vector2::Constant(initBiasstd));
+  est.resetWithMeasurements(dcm_m[0], zmp_m[0], yaw[0], true, initbias, Vector2::Constant(initBiasstd));
 
   IndexedVectorArray log;
 
@@ -324,6 +323,7 @@ int main()
 {
   int exitCode;
 
+  
   exitCode = testrotationMatrix2Angle(1);
 
   if(exitCode != 0)

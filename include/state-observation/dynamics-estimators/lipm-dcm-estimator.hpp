@@ -57,6 +57,9 @@ public:
   /// @param dt                     the sampling time in seconds
   /// @param omega_0                the natural frequency of the DCM (rad/s)
   /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
+  /// @param initZMP                the initial value of the DCM
+  /// @param initDCM                the initial value of the DCM
+  /// @param initBias               the initial value of the bias
   /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
   /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param initDCM                the initial value of the DCM
@@ -66,11 +69,11 @@ public:
   LipmDcmEstimator(double dt = defaultDt_,
                    double omega_0 = defaultOmega_,
                    double biasDriftPerSecondStd = defaultBiasDriftSecond,
+                   double dcmMeasureErrorStd = defaultDcmErrorStd,
+                   double zmpMeasureErrorStd = defaultZmpErrorStd,
                    const Vector2 & initZMP = Vector2::Zero(),
                    const Vector2 & initDcm = Vector2::Zero(),
                    const Vector2 & initBias = Vector2::Zero(),
-                   double dcmMeasureErrorStd = defaultDcmErrorStd,
-                   double zmpMeasureErrorStd = defaultZmpErrorStd,
                    const Vector2 & initDcmUncertainty = Vector2::Constant(defaultDCMUncertainty),
                    const Vector2 & initBiasUncertainty = Vector2::Constant(defaultBiasUncertainty));
 
@@ -81,28 +84,8 @@ public:
   /// @param measuredZMP            the the measured position of the ZMP in the world frame
   /// @param yaw                    the initial yaw angle in the form of a rotation matrix
   /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
-  /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
-  /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
-  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
-  /// @param initBias               the initial value of the drift
-  /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
-  void resetWithMeasurements(const Vector2 & measuredDcm,
-                             const Vector2 & measuredZMP,
-                             const Matrix2 & yaw,
-                             bool measurementIsWithBias,
-                             double biasDriftPerSecondStd,
-                             double dcmMeasureErrorStd,
-                             double zmpMeasureErrorStd,
-                             const Vector2 & initBias = Vector2::Constant(0),
-                             const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty));
-
-  /// @brief Resets the estimator with first measurements
-  /// @details Use this when initializing with an available DCM (biased / or not) measurement
-  ///
-  /// @param measuredDcm            the the measured position of the DCM in the world frame
-  /// @param measuredZMP            the the measured position of the ZMP in the world frame
-  /// @param yaw                    the initial yaw angle in the form of a rotation matrix
-  /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
+  /// @param biasLimit              the X and Y (expressed in local frame) largest accepted absolute values of the bias
+  ///                               (zero means no limit)
   /// @param initBias               the initial value of the drift
   /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
   void resetWithMeasurements(const Vector2 & measuredDcm,
@@ -119,51 +102,19 @@ public:
   /// @param measuredZMP            the the measured position of the ZMP in the world frame
   /// @param yaw                    the initial yaw angle
   /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
-  /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
-  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
-  /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
+  /// @param biasLimit              the X and Y (expressed in local frame) largest accepted absolute values of the bias
+  ///                               (zero means no limit)
   /// @param initBias               the initial value of the drift
   /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
-  inline void resetWithMeasurements(const Vector2 & measuredDcm,
-                                    const Vector2 & measuredZMP,
-                                    double yaw,
-                                    bool measurementIsWithBias = true,
-                                    double biasDriftPerSecondStd = defaultBiasDriftSecond,
-                                    double dcmMeasureErrorStd = defaultDcmErrorStd,
-                                    double zmpMeasureErrorStd = defaultZmpErrorStd,
-                                    const Vector2 & initBias = Vector2::Constant(0),
-                                    const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
+  void resetWithMeasurements(const Vector2 & measuredDcm,
+                             const Vector2 & measuredZMP,
+                             double yaw = 0,
+                             bool measurementIsWithBias = true,
+                             const Vector2 & initBias = Vector2::Constant(0),
+                             const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
   {
-    resetWithMeasurements(measuredDcm, measuredZMP, Rotation2D(yaw).toRotationMatrix(), measurementIsWithBias,
-                          biasDriftPerSecondStd, dcmMeasureErrorStd, zmpMeasureErrorStd, initBias, initBiasuncertainty);
-  }
-
-  /// @brief Resets the estimator with first measurements
-  /// @details Use this when initializing with an available DCM (biased / or not) measurement
-  ///
-  /// @param measuredDcm            the the measured position of the DCM in the world frame
-  /// @param measuredZMP            the the measured position of the ZMP in the world frame
-  /// @param rotation                the 3d orientation from which the initial yaw angle will be extracted using the
-  /// angle agnostic approach. This orientation is from local to global. i.e. bias_global == orientation * bias*local
-  /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
-  /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
-  /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
-  /// @param dcmMeasureErrorStd     the standard deviation of the dcm estimation error, NOT including the bias (m)
-  /// @param initBias               the initial value of the drift
-  /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
-  inline void resetWithMeasurements(const Vector2 & measuredDcm,
-                                    const Vector2 & measuredZMP,
-                                    const Matrix3 & rotation,
-                                    bool measurementIsWithBias = true,
-                                    double biasDriftPerSecondStd = defaultBiasDriftSecond,
-                                    double zmpMeasureErrorStd = defaultZmpErrorStd,
-                                    double dcmMeasureErrorStd = defaultDcmErrorStd,
-                                    const Vector2 & initBias = Vector2::Constant(0),
-                                    const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
-  {
-    resetWithMeasurements(measuredDcm, measuredZMP, kine::rotationMatrixToYawAxisAgnostic(rotation),
-                          measurementIsWithBias, biasDriftPerSecondStd, zmpMeasureErrorStd, dcmMeasureErrorStd,
-                          initBias, initBiasuncertainty);
+    resetWithMeasurements(measuredDcm, measuredZMP, Rotation2D(yaw).toRotationMatrix(), measurementIsWithBias, initBias,
+                          initBiasuncertainty);
   }
 
   ///@brief Destroy the Lipm Dcm Bias Estimator object
@@ -221,14 +172,6 @@ public:
   ///
   void setDcmMeasureErrorStd(double);
 
-  /// @brief Set the Inputs of the estimator
-  /// @details this version is with no orientation. The orientation will be assumed to be constant foir
-  /// this sample
-  ///
-  /// @param dcm measurement of the DCM in the world frame
-  /// @param zmp mesaurement of the ZMP in the world frame
-  void setInputs(const Vector2 & dcm, const Vector2 & zmp);
-
   /// @brief Set the Inputs of the estimator.
   /// @details The yaw will be extracted from the orientation using the axis agnostic
   /// approach.
@@ -259,7 +202,7 @@ public:
   /// @param dcm  measurement of the DCM in the world frame
   /// @param zmp  mesaurement of the ZMP in the world frame
   /// @param R    the 2x2 Matrix'representing the yaw angle i.e. bias_global == R * bias*local
-  void setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & R);
+  void setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & R = Matrix2::Identity());
 
   /// @brief Runs the estimation. Needs to be called every timestep
   ///
@@ -331,21 +274,18 @@ protected:
   Matrix2 previousOrientation_;
 
   /// @brief builds a diagonal out of the square valued of the Vec2
-  ///
   inline static Matrix2 Vec2ToSqDiag(const Vector2 & v)
   {
     return Vector2(v.array().square()).asDiagonal();
   }
 
   /// @brief builds a constant 2x2 diagonal from a double
-  ///
   inline static Matrix2 dblToDiag(const double & d)
   {
     return Vector2::Constant(d).asDiagonal();
   }
 
   /// @brief builds a constant 2x2 diagonal from a square of a double
-  ///
   inline static Matrix2 dblToSqDiag(const double & d)
   {
     return dblToDiag(d * d);
