@@ -110,15 +110,37 @@ public:
   ///                               (zero means no limit)
   /// @param initBias               the initial value of the drift
   /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
-  void resetWithMeasurements(const Vector2 & measuredDcm,
-                             const Vector2 & measuredZMP,
-                             double yaw = 0,
-                             bool measurementIsWithBias = true,
-                             const Vector2 & initBias = Vector2::Constant(0),
-                             const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
+  inline void resetWithMeasurements(const Vector2 & measuredDcm,
+                                    const Vector2 & measuredZMP,
+                                    double yaw = 0,
+                                    bool measurementIsWithBias = true,
+                                    const Vector2 & initBias = Vector2::Constant(0),
+                                    const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
   {
     resetWithMeasurements(measuredDcm, measuredZMP, Rotation2D(yaw).toRotationMatrix(), measurementIsWithBias, initBias,
                           initBiasuncertainty);
+  }
+  /// @brief Resets the estimator with first measurements
+  /// @details Use this when initializing with an available DCM (biased / or not) measurement
+  ///
+  /// @param measuredDcm            the the measured position of the DCM in the world frame
+  /// @param measuredZMP            the the measured position of the ZMP in the world frame
+  /// @param rotation                the 3d orientation from which the initial yaw angle will be extracted using the
+  /// angle agnostic approach. This orientation is from local to global. i.e. bias_global == orientation * bias*local
+  /// @param measurementIsWithBias  sets if yes or no the first measurement is biased
+  /// @param biasLimit              the X and Y (expressed in local frame) largest accepted absolute values of the bias
+  ///                               (zero means no limit)
+  /// @param initBias               the initial value of the drift
+  /// @param initBiasuncertainty    the uncertainty in the bias initial value in meters
+  inline void resetWithMeasurements(const Vector2 & measuredDcm,
+                                    const Vector2 & measuredZMP,
+                                    const Matrix3 & rotation = Matrix3::Identity(),
+                                    bool measurementIsWithBias = true,
+                                    const Vector2 & initBias = Vector2::Constant(0),
+                                    const Vector2 & initBiasuncertainty = Vector2::Constant(defaultBiasUncertainty))
+  {
+    resetWithMeasurements(measuredDcm, measuredZMP, kine::rotationMatrixToYawAxisAgnostic(rotation),
+                          measurementIsWithBias, initBias, initBiasuncertainty);
   }
 
   ///@brief Destroy the Lipm Dcm Bias Estimator object
