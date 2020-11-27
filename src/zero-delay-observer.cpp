@@ -33,6 +33,11 @@ void ZeroDelayObserver::clearStates()
   x_.reset();
 }
 
+bool ZeroDelayObserver::stateIsSet() const
+{
+  return x_.isSet();
+}
+
 void ZeroDelayObserver::setMeasurement(const ObserverBase::MeasureVector & y_k, TimeIndex k)
 {
 
@@ -130,7 +135,7 @@ TimeIndex ZeroDelayObserver::estimateState()
 
 ObserverBase::StateVector ZeroDelayObserver::getEstimatedState(TimeIndex k)
 {
-  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
+  BOOST_ASSERT(stateIsSet() && "The state vector has not been set");
 
   TimeIndex k0 = getCurrentTime();
 
@@ -150,13 +155,13 @@ ObserverBase::StateVector ZeroDelayObserver::getEstimatedState(TimeIndex k)
 
 ObserverBase::StateVector ZeroDelayObserver::getCurrentEstimatedState() const
 {
-  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
+  BOOST_ASSERT(stateIsSet() && "The state vector has not been set");
   return x_();
 }
 
 TimeIndex ZeroDelayObserver::getCurrentTime() const
 {
-  BOOST_ASSERT(x_.isSet() && "The state vector has not been set");
+  BOOST_ASSERT(stateIsSet() && "The state vector has not been set");
   return x_.getTime();
 }
 

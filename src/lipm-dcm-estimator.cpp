@@ -17,19 +17,22 @@ constexpr double LipmDcmEstimator::defaultBiasDriftSecond;
 constexpr double LipmDcmEstimator::defaultZmpErrorStd;
 constexpr double LipmDcmEstimator::defaultDcmErrorStd;
 
+constexpr double LipmDcmEstimator::defaultBiasLimit;
+
 using namespace tools;
 LipmDcmEstimator::LipmDcmEstimator(double dt,
                                    double omega_0,
                                    double biasDriftStd,
+                                   double dcmMeasureErrorStd,
+                                   double zmpMeasureErrorStd,
+                                   const Vector2 & biasLimit,
                                    const Vector2 & initZMP,
                                    const Vector2 & initDcm,
                                    const Vector2 & initBias,
-                                   double dcmMeasureErrorStd,
-                                   double zmpMeasureErrorStd,
                                    const Vector2 & initDcmUncertainty,
                                    const Vector2 & initBiasUncertainty)
 : omega0_(omega_0), dt_(dt), biasDriftStd_(biasDriftStd), zmpErrorStd_(zmpMeasureErrorStd), previousZmp_(initZMP),
-  filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
+  biasLimit_(biasLimit), filter_(4, 2, 2), A_(Matrix4::Identity()), previousOrientation_(Matrix2::Identity())
 {
   updateMatricesABQ_();
   C_ << Matrix2::Identity(), Matrix2::Identity();
@@ -45,29 +48,6 @@ LipmDcmEstimator::LipmDcmEstimator(double dt,
       Matrix2::Zero(),                   Vec2ToSqDiag(initBiasUncertainty);
   // clang-format on
   filter_.setStateCovariance(P);
-}
-
-void LipmDcmEstimator::resetWithMeasurements(const Vector2 & measuredDcm,
-                                             const Vector2 & measuredZMP,
-                                             const Matrix2 & yaw,
-                                             bool measurementIsWithBias,
-                                             double biasDriftPerSecondStd,
-                                             double dcmMeasureErrorStd,
-                                             double zmpMeasureErrorStd,
-                                             const Vector2 & initBias,
-                                             const Vector2 & initBiasuncertainty)
-
-{
-  biasDriftStd_ = biasDriftPerSecondStd;
-  zmpErrorStd_ = zmpMeasureErrorStd;
-  previousZmp_ = measuredZMP;
-  previousOrientation_ = yaw;
-  R_ = dblToSqDiag(dcmMeasureErrorStd);
-
-  resetWithMeasurements(measuredDcm, measuredZMP, yaw, measurementIsWithBias, initBias, initBiasuncertainty);
-
-  updateMatricesABQ_();
-  filter_.setMeasurementCovariance(R_);
 }
 
 void LipmDcmEstimator::resetWithMeasurements(const Vector2 & measuredDcm,
@@ -157,7 +137,12 @@ void LipmDcmEstimator::setBiasDriftPerSecond(double driftPerSecond)
   filter_.setProcessCovariance(Q_);
 }
 
-void LipmDcmEstimator::setDCM(const Vector2 & dcm)
+void LipmDcmEstimator::setBiasLimit(const Vector2 & biasLimit)
+{
+  biasLimit_ = biasLimit;
+}
+
+void LipmDcmEstimator::setUnbiasedDCM(const Vector2 & dcm)
 {
   Vector4 x = filter_.getCurrentEstimatedState();
   /// update the bias
@@ -165,9 +150,9 @@ void LipmDcmEstimator::setDCM(const Vector2 & dcm)
   filter_.setCurrentState(x);
 }
 
-void LipmDcmEstimator::setDCM(const Vector2 & dcm, const Vector2 & uncertainty)
+void LipmDcmEstimator::setUnbiasedDCM(const Vector2 & dcm, const Vector2 & uncertainty)
 {
-  setDCM(dcm);
+  setUnbiasedDCM(dcm);
   Matrix4 P = filter_.getStateCovariance();
   /// resetting the non diagonal parts
   P.topRightCorner<2, 2>().setZero();
@@ -188,32 +173,56 @@ void LipmDcmEstimator::setDcmMeasureErrorStd(double std)
   R = dblToSqDiag(std);
 }
 
-void LipmDcmEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp)
+void LipmDcmEstimator::update()
 {
-  if(filter_.getMeasurementsNumber() > 1)
+  filter_.estimateState();
+  if(biasLimit_.x() > 0 || biasLimit_.y() > 0)
   {
-    update(); /// update the estimation of the state to synchronize with the measurements
+    Vector2 localBias = getLocalBias();
+    Vector2 clampedLocalBias;
+    if(biasLimit_.x() > 0)
+    {
+      clampedLocalBias.x() = tools::clampScalar(localBias.x(), biasLimit_.x());
+    }
+    if(biasLimit_.y() > 0)
+    {
+      clampedLocalBias.y() = tools::clampScalar(localBias.y(), biasLimit_.y());
+    }
+
+    setBias(previousOrientation_ * clampedLocalBias);
+    setUnbiasedDCM(getUnbiasedDCM() + localBias - clampedLocalBias);
   }
-
-  Vector2 u;
-  Vector2 y;
-
-  y = dcm;
-
-  /// The prediction of the state depends on the previous value of the ZMP
-  u = previousZmp_;
-  previousZmp_ = zmp;
-
-  filter_.pushMeasurement(y);
-  filter_.pushInput(u);
 }
 
 void LipmDcmEstimator::setInputs(const Vector2 & dcm, const Vector2 & zmp, const Matrix2 & orientation)
 {
-  setInputs(dcm, zmp);
-  A_.bottomRightCorner<2, 2>() = orientation * previousOrientation_.transpose(); /// set the rotation differenc
-  previousOrientation_ = orientation;
-  filter_.setA(A_);
+  if(filter_.stateIsSet())
+  {
+    if(filter_.getMeasurementsNumber() > 1)
+    {
+      update(); /// update the estimation of the state to synchronize with the measurements
+    }
+
+    Vector2 u;
+    Vector2 y;
+
+    y = dcm;
+
+    /// The prediction of the state depends on the previous value of the ZMP
+    u = previousZmp_;
+    previousZmp_ = zmp;
+
+    filter_.pushMeasurement(y);
+    filter_.pushInput(u);
+
+    A_.bottomRightCorner<2, 2>() = orientation * previousOrientation_.transpose(); /// set the rotation differenc
+    previousOrientation_ = orientation;
+    filter_.setA(A_);
+  }
+  else
+  {
+    resetWithMeasurements(dcm, zmp, orientation, true);
+  }
 }
 
 Vector2 LipmDcmEstimator::getUnbiasedDCM() const

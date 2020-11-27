@@ -87,6 +87,45 @@ inline bool checkIfNormalized(const Vector3 & v, double & outputSquaredNorm)
   }
 }
 
+/// @brief returns the value clamped between min and max
+///
+/// @tparam T The type of the scalar
+/// @param x the input value
+/// @param max the max value
+/// @param min the min value
+/// @return T the calmped value
+template<typename T>
+inline T clampScalar(const T & x, const T & max, const T & min)
+{
+  if(x > max)
+  {
+    return max;
+  }
+  else
+  {
+    if(x < min)
+    {
+      return min;
+    }
+    else
+    {
+      return x;
+    }
+  }
+}
+
+/// @brief returns the value clamped between limit and -limit
+///
+/// @tparam T The type of the scalar
+/// @param x the input value
+/// @param limit is the maximum absolute value allowed, has to be positive
+/// @return T the clamped value
+template<typename T>
+inline T clampScalar(const T & x, const T & limit)
+{
+  return clampScalar(x, limit, -limit);
+}
+
 /// @brief normalize the vector only if it is not normalized already. Useful if the vector is likely to be normalized
 ///
 /// @param v the input vector
