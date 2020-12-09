@@ -18,7 +18,7 @@ namespace stateObservation
 {
 
 /**
- * \class  GaussienWhiteNoise
+ * \class  GaussianWhiteNoise
  * \brief The class derivates the NoiseBase class to implement a gaussian
  *          white noise with a given covariance matrix, and bias
  *

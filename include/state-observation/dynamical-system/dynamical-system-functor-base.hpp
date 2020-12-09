@@ -20,7 +20,7 @@ namespace stateObservation
 {
 
 /**
- * \class  DynamicsFunctorBase
+ * \class  DynamicalSystemFunctorBase
  * \brief
  *        This is the base class of any functor that describes the dynamics
  *        of the state and the measurement.

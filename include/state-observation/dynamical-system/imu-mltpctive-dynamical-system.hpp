@@ -24,7 +24,7 @@ namespace stateObservation
 {
 
 /**
- * \class  IMUDynamicalSystem
+ * \class  IMUMltpctiveDynamicalSystem
  * \brief  The class is an implementation of the dynamical system defined by
  *         an inertial measurement unit (IMU) fixed on a rigid body. The state
  *         is the position velocity and acceleration and the orientaion and rotation

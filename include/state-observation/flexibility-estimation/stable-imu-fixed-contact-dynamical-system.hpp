@@ -25,7 +25,7 @@ namespace stateObservation
 namespace flexibilityEstimation
 {
 /**
- * \class  IMUFixedContactDynamicalSystem
+ * \class  StableIMUFixedContactDynamicalSystem
  * \brief  This class describes the dynamics of a robot's flexibility
  *         this dynamics is the simplest possible system, the flexibility
  *         is expressed as a rotation against the contact positions with no

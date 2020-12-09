@@ -17,7 +17,7 @@ void STATE_OBSERVATION_DLLAPI defaultDifference(const Vector & stateVector1,
 } // namespace detail
 
 /**
- * \class  StateArithmetics
+ * \class  StateVectorArithmetics
  * \brief
  *        This class is used to customize the way the difference between measurements,
  *        the state update function and the differentiation are performed.

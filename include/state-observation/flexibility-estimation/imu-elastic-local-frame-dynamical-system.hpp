@@ -1,5 +1,5 @@
 /*
- * dynamical-system.hpp
+ * imu-elastic-local-frame-dynamical-system.hpp
  *
  *  Created on: 19 mai 2014
  *      Author: alexis
@@ -26,11 +26,9 @@ namespace flexibilityEstimation
 {
 
 /**
- * \class  DynamicalSystem
+ * \class  IMUElasticLocalFrameDynamicalSystem
  * \brief  This class describes the dynamics of a robot's flexibility
- *         this dynamics is the simplest possible system, the flexibility
- *         is expressed as a rotation against the contact positions with no
- *         other hypothesis than that the contact points are at constant position
+ *         this dynamics with elastic forces to bring the contacts at their position in the environment
  *
  */
 class STATE_OBSERVATION_DLLAPI IMUElasticLocalFrameDynamicalSystem : public stateObservation::DynamicalSystemFunctorBase

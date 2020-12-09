@@ -371,7 +371,7 @@ typedef IndexedMatrixT<Vector3> IndexedVector3;
 typedef IndexedMatrixT<Matrix3> IndexedMatrix3;
 
 /**
- * \class    IndexedMatrixArray
+ * \class    IndexedMatrixArrayT
  * \brief    This class describes a structure that enables to store array of matrices
  *           with time indexation.
  *
