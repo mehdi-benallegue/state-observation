@@ -11,7 +11,7 @@ macro(ADD_SO_TEST name)
   generate_msvc_dot_user_file(${name})
 endmacro()
 
-add_so_test(test-kalman-filter Boost::boost)
+add_so_test(test-kalman-filter)
 add_so_test(imu-test)
 add_so_test(imu-multiplicative-test)
 add_so_test(flex-estimation-test)

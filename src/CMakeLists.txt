@@ -110,8 +110,7 @@ target_include_directories(
   ${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
                          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>/$<CONFIG>/include $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::thread Boost::program_options Boost::timer
-                                             Boost::random Boost::disable_autolinking)
+target_link_libraries(${LIBRARY_NAME} PUBLIC Boost::timer Boost::disable_autolinking)
 if(TARGET Eigen3::Eigen)
   target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen)
 else()

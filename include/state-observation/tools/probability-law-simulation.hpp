@@ -11,7 +11,7 @@
 #ifndef SENSORSSIMULATIONPROBABILITYLAWSIMULATIONHPP
 #define SENSORSSIMULATIONPROBABILITYLAWSIMULATIONHPP
 
-#include <boost/random.hpp>
+#include <random>
 
 #include <state-observation/api.h>
 #include <state-observation/tools/definitions.hpp>
@@ -33,7 +33,8 @@ public:
   static Matrix getGaussianVector(const Matrix & std, const Matrix & bias, Index rows, Index cols = 1);
 
 protected:
-  static boost::lagged_fibonacci1279 gen_;
+  static std::random_device rd_;
+  static std::mt19937 gen_;
 };
 
 } // namespace tools

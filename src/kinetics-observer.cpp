@@ -7,6 +7,10 @@
 
 #include <state-observation/dynamics-estimators/kinetics-observer.hpp>
 
+#ifndef NDEBUG
+#  include <iostream>
+#endif
+
 namespace stateObservation
 {
 inline Matrix6 STATE_OBSERVATION_DLLAPI blockMat6(const Matrix3 & m1,
