@@ -418,8 +418,7 @@ namespace stateObservation
         return rotationMatrixToYaw(rotation);
       }
       else
-      { /// this is the case where there are non yae rotations
-
+      { /// this is the case where there are non-yaw rotations (roll & pitch)
         /// v is the vector that stays horizontal by rotation
         Vector2 v = getInvariantHorizontalVector(rotation).head<2>();
         Vector2 rotV = (rotation.topLeftCorner<2, 2>() * v);

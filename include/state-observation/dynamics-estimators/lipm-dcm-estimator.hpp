@@ -29,8 +29,44 @@ namespace stateObservation
 /// linearized to obtain a dynamics with a convergent and a divergent component of motion (DCN).
 /// The dynamics of the DCM depends on the Zero Moment Point.
 /// The DCM can be measured using the CoM and its velocity, but the CoM position can be biased.
+/// For instance if the measurement of the CoM is biased, or in presence of an external force
+/// the dynamics of the DCM is biased \f$\dot{\hat{\xi}} & =\omega_{0}(\hat{\xi}-z-b)\f$ where \f$\hat{\xi}$\f$ is the
+/// measured dcm and \f$b$\f$ is the bias. Also the measurement of the DCM can be noisy (since it uses CoM velocity
+/// estimation).
+///
 /// This estimator uses Kalman Filtering to estimate this bias and give a delay-free filtering of the DCM.
 /// The theorerical details are available at \ref lipm_dcm_details
+///
+/// Inputs and outputs:
+///  - Inputs are (every itneration)
+///     - measurements of ZMP
+///     - biased measurements DCM
+///     - The orientation of the robot
+///  - Outputs
+///      - Estimation of the bias (the bias is considered almost constant in the local frame of the robot)
+///      - Filtered DCM
+///
+/// Tuning:
+/// This estimator has a few parameters
+///  - Initial uncertainties
+///     @param initBiasUncertainty tunes how fast the bias converges initially. Too High values will make the bias
+///     overshoot.
+///     @param initDcmUncertainty tunes how good is the initial guess. Changing it will reduce the initial filtering
+///     on the DCM until the steady convergence
+///  - Measurement uncertainties
+///     @param dcmMeasureErrorStd tunes how filtered is the DCM signal. Lower values give less DCM filtering
+///     @param zmpMeasureErrorStd tunes how much the model can be trusted. If the measurements are noisy or if the
+///     LIPM model does not well represent the dynamics then higher values are recommended. Lower values increase DCM
+///     filtering
+///  - Other parameters
+///     @param biasDriftPerSecondStd tunes how fast the bias changes value during the motion. Higher values will make
+///     the bias move more during the mosion
+///     @param biaslLimit clamps the values of Drift between x and -x on X axis and between y and -y on Y axis.
+///
+///  Note that besides biaslLimit all the parameters don't change behavior with scaling : if we multiply all of
+///  them by the same positive factor the behavior would be the same. So the ratios between these parameters is the
+///  actual parameter
+
 class STATE_OBSERVATION_DLLAPI LipmDcmEstimator
 {
 private:
@@ -66,7 +102,7 @@ public:
   /// @param zmpMeasureErrorStd     the standard deviaiton of the zmp estimation error (m)
   /// @param biasLimit              the X and Y (expressed in local frame) largest accepted absolute values of the bias
   ///                               (zero means no limit)
-  /// @param tinitDcmUncertainty    the uncertainty in the DCM initial value in meters
+  /// @param initDcmUncertainty     the uncertainty in the DCM initial value in meters
   /// @param initBiasUncertainty    the uncertainty in the bias initial value in meters
   LipmDcmEstimator(double dt = defaultDt_,
                    double omega_0 = defaultOmega_,
