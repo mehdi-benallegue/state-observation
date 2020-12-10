@@ -1,1 +1,3 @@
-FILE_PATTERNS = *hpp
+FILE_PATTERNS          = *hpp
+INPUT                  = @PROJECT_SOURCE_DIR@/include @PROJECT_SOURCE_DIR@/plugins/ROS/include @PROJECT_SOURCE_DIR@/README.md @PROJECT_SOURCE_DIR@/doc/pages/pages.dox
+USE_MDFILE_AS_MAINPAGE = @PROJECT_SOURCE_DIR@/README.md

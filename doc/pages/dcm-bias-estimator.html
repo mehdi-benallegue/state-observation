@@ -1,0 +1,2113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2020-12-09"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>LIPM DCM Bias Estimator</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+LIPM DCM Bias Estimator
+</h1>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-1">1</a> One dimension: the basics
+</h1>
+<h2 class="Section">
+<a class="toc" name="toc-Section-1.1">1.1</a> Definitions
+</h2>
+<div class="Unindented">
+<div class="float">
+<a class="Label" name="tab:Variable-definition"> </a><div class="table">
+<table>
+<tr>
+<td align="center" valign="top">
+Symbol
+</td>
+<td align="center" valign="top">
+Meaning
+</td>
+<td align="center" valign="top">
+Expression
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i></span>
+</td>
+<td align="center" valign="top">
+divergent component of motion (DCM)
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>z</i></span>
+</td>
+<td align="center" valign="top">
+The zero moment point
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>b</i></span>
+</td>
+<td align="center" valign="top">
+the bias that we want to observe
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+biased DCM
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i> + <i>b</i></span>
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ẑ</i></span>
+</td>
+<td align="center" valign="top">
+Measured <span class="formula"><i>z</i></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>z</i> + <i>w</i><sup><i>z</i></sup></span>
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ̂</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+Measured <span class="formula"><i>ξ</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i><sup><i>b</i></sup> + <i>w</i><sup><i>ξ</i></sup></span>
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ω</i><sub>0</sub></span>
+</td>
+<td align="center" valign="top">
+Natural frequency of the DCM
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>T</i></span>
+</td>
+<td align="center" valign="top">
+sampling time
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>w</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+Brownian motion noise in the bias
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>w</i><sup><i>z</i></sup></span>
+</td>
+<td align="center" valign="top">
+<div class="PlainVisible">
+measurement noise in <span class="formula"><i>ẑ</i></span><span class="FootOuter"><span class="SupFootMarker"> [A] </span><span class="HoverFoot"><span class="SupFootMarker"> [A] </span><div class="PlainVisible">
+This covariance could be overestimated to take into account the modeling error due to centroidal angular momentum and variations of CoM height
+</div>
+</span></span>
+</div>
+
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>w</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+measurement noise in <span class="formula"><i>ξ̂</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+standard deviation of <span class="formula"><i>w</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>z</i></sup></span>
+</td>
+<td align="center" valign="top">
+standard deviation of <span class="formula"><i>w</i><sup><i>z</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+standard deviation of <span class="formula"><i>w</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+
+</table>
+<div class="caption">
+Table 1.1 Variable definition
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="Indented">
+<div class="float">
+<a class="Label" name="tab:State-Signals"> </a><div class="table">
+<table>
+<tr>
+<td align="center" valign="top">
+State Variables
+</td>
+<td align="center" valign="top">
+Inputs
+</td>
+<td align="center" valign="top">
+Measurements
+</td>
+<td align="center" valign="top">
+Standard deviations
+</td>
+<td align="center" valign="top">
+Parameters
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i></span>, <span class="formula"><i>b</i></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ẑ</i></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ξ̂</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>b</i></sup></span>, <span class="formula"><i>κ</i><sup><i>z</i></sup></span>, <span class="formula"><i>κ</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ω</i><sub>0</sub></span>, <span class="formula"><i>T</i></span>
+</td>
+
+</tr>
+
+</table>
+<div class="caption">
+Table 1.2 State definion and use of available signals in the Kalman filter 
+</div>
+
+</div>
+
+</div>
+
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-1.2">1.2</a> Dynamics
+</h2>
+<div class="Unindented">
+The dynamics of the DCM is <div class="formula">
+<a class="eqnumber" name="eq-1.1">(1.1) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ̇</i>
+</span>
+<span class="arraycell align-l">
+ = <i>ω</i><sub>0</sub>(<i>ξ</i> − <i>z</i>)
+</span>
+
+</span>
+</span>
+</div>
+This can be discetized to 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-1.2">(1.2) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ</i><sub><i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>ξ</i><sub><i>k</i></sub> + <i>ω</i><sub>0</sub><i>T</i>(<i>ξ</i><sub><i>k</i></sub> − <i>z</i><sub><i>k</i></sub>)
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = (1 + <i>ω</i><sub>0</sub><i>T</i>)<i>ξ</i><sub><i>k</i></sub> − <i>ω</i><sub>0</sub><i>Tz</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = (1 + <i>ω</i><sub>0</sub><i>T</i>)<i>ξ</i><sub><i>k</i></sub> − <i>ω</i><sub>0</sub><i>T</i><span class="symbol">(</span><i>ẑ</i><sub><i>k</i></sub> − <i>w</i><sup><i>z</i></sup><span class="symbol">)</span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = (1 + <i>ω</i><sub>0</sub><i>T</i>)<i>ξ</i><sub><i>k</i></sub> − <i>ω</i><sub>0</sub><i>T</i><i>ẑ</i><sub><i>k</i></sub> + <i>ω</i><sub>0</sub><i>Tw</i><sup><i>z</i></sup>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+And the dynamics of <span class="formula"><i>b</i></span> is 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-1.3">(1.3) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>b</i><sub><i>k</i></sub> + <i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Giving this dynamics<div class="formula">
+<a class="eqnumber" name="eq-1.4">(1.4) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i> + 1</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+1 + <i>ω</i><sub>0</sub><i>T</i>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>ω</i><sub>0</sub><i>T</i>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><i>ẑ</i><sub><i>k</i></sub> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ω</i><sub>0</sub><i>Tw</i><sup><i>z</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+This means that the process covariance matrix is of the form <div class="formula">
+<a class="eqnumber" name="eq-1.5">(1.5) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>Q</i>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><i>ω</i><sub>0</sub><i>T</i><i>κ</i><sup><i>z</i></sup><span class="symbol">)</span><sup>2</sup>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+<i>κ</i><span class="scripts"><sup class="script">2</sup><sub class="script"><i>v</i></sub></span>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+The measurement dynamics model is simply 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-1.6">(1.6) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ̂</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script"><i>k</i></sub></span>
+</span>
+<span class="arraycell align-l">
+ = <i>ξ</i><sub><i>k</i></sub> + <i>b</i><sub><i>k</i></sub> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = <span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+1
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+</span><span class="symbol">)</span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Giving this covariance matrix
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-1.7">(1.7) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>R</i> = 
+</span>
+<span class="arraycell align-l">
+<span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><i>κ</i><sup><i>ξ</i></sup><span class="symbol">)</span><sup>2</sup>
+</span>
+
+</span>
+</span><span class="symbol">)</span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-1.3">1.3</a> Observability
+</h2>
+<div class="Unindented">
+Let’s analyze the observability<div class="formula">
+<a class="eqnumber" name="eq-1.8">(1.8) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>O</i> = 
+</span>
+<span class="arraycell align-l">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+1
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+</span><span class="symbol">)</span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+1
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+</span><span class="symbol">)</span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+1 + <i>ω</i><sub>0</sub><i>T</i>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+⋮
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+1
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+1 + <i>ω</i><sub>0</sub><i>T</i>
+</span>
+<span class="arraycell align-c">
+1
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+⋮
+</span>
+<span class="arraycell align-c">
+⋮
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Which is full rank.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-1.4">1.4</a> Initializing <span class="formula"><i>ξ̂</i></span> with measurement
+</h2>
+<div class="Unindented">
+if we initialize <span class="formula"><i>ξ̂</i><sub>0</sub> = <i>ξ̂</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script"><i>k</i></sub></span> − <i>b̂</i><sub>0</sub></span> the we have the state <div class="formula">
+<a class="eqnumber" name="eq-1.9">(1.9) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ̂</i><sub>0</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b̂</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub>0</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub>0</sub> − <i>b̂</i><sub>0</sub> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>b</i><sub>0</sub> + <i>b̂</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub>0</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>e</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script">0</sub></span> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>e</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script">0</sub></span>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Giving the initial error covariance matrix
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.1">(2.1) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>P</i><sub>0</sub> = 
+</span>
+<span class="arraycell align-l">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><i>κ</i><sup><i>ξ</i></sup><span class="symbol">)</span><sup>2</sup> + <span class="symbol">(</span><i>κ</i><sup><i>b</i><sub>0</sub></sup><span class="symbol">)</span><sup>2</sup>
+</span>
+<span class="arraycell align-c">
+ − <span class="symbol">(</span><i>κ</i><sup><i>b</i><sub>0</sub></sup><span class="symbol">)</span><sup>2</sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ − <span class="symbol">(</span><i>κ</i><sup><i>b</i><sub>0</sub></sup><span class="symbol">)</span><sup>2</sup>
+</span>
+<span class="arraycell align-c">
+<span class="symbol">(</span><i>κ</i><sup><i>b</i><sub>0</sub></sup><span class="symbol">)</span><sup>2</sup>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-2">2</a> 2D case
+</h1>
+<div class="Unindented">
+This chapter is essentially a copy paste of the pervious one but 
+</div>
+<ul>
+<li>
+changing to 2D
+</li>
+<li>
+adding the support for rotations
+</li>
+
+</ul>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.1">2.1</a> Definitions
+</h2>
+<div class="Unindented">
+These are the same except that 2d vectors replace states, inputs and measurements and <span class="formula">2 × 2</span> matrices replace the standard deviations. parameters remain scalars
+</div>
+<div class="Indented">
+<div class="float">
+<a class="Label" name="tab:Variable-definition-2d"> </a><div class="table">
+<table>
+<tr>
+<td align="center" valign="top">
+Symbol
+</td>
+<td align="center" valign="top">
+Meaning
+</td>
+<td align="center" valign="top">
+Expression
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i></span>
+</td>
+<td align="center" valign="top">
+divergent component of motion (DCM)
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>z</i></span>
+</td>
+<td align="center" valign="top">
+The zero moment point
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>b</i></span>
+</td>
+<td align="center" valign="top">
+the bias that we want to observe
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+biased DCM
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i> + <i>b</i></span>
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ẑ</i></span>
+</td>
+<td align="center" valign="top">
+Measured <span class="formula"><i>z</i></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>z</i> + <i>w</i><sup><i>z</i></sup></span>
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ̂</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+Measured <span class="formula"><i>ξ</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i><sup><i>b</i></sup> + <i>w</i><sup><i>ξ</i></sup></span>
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ω</i><sub>0</sub></span>
+</td>
+<td align="center" valign="top">
+Natural frequency of the DCM
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>T</i></span>
+</td>
+<td align="center" valign="top">
+sampling time
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>w</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+Brownian motion noise in the bias
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>w</i><sup><i>z</i></sup></span>
+</td>
+<td align="center" valign="top">
+<div class="PlainVisible">
+measurement noise in <span class="formula"><i>ẑ</i></span><span class="FootOuter"><span class="SupFootMarker"> [B] </span><span class="HoverFoot"><span class="SupFootMarker"> [B] </span><div class="PlainVisible">
+This covariance could be overestimated to take into account the modeling error due to centroidal angular momentum and variations of CoM height
+</div>
+</span></span>
+</div>
+
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>w</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+measurement noise in <span class="formula"><i>ξ̂</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+standard deviation of <span class="formula"><i>w</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>z</i></sup></span>
+</td>
+<td align="center" valign="top">
+standard deviation of <span class="formula"><i>w</i><sup><i>z</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+standard deviation of <span class="formula"><i>w</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+
+</td>
+
+</tr>
+
+</table>
+<div class="caption">
+Table 2.1 Variable definition
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="Indented">
+<div class="float">
+<a class="Label" name="tab:State-Signals-2d"> </a><div class="table">
+<table>
+<tr>
+<td align="center" valign="top">
+State Variables
+</td>
+<td align="center" valign="top">
+Inputs
+</td>
+<td align="center" valign="top">
+Measurements
+</td>
+<td align="center" valign="top">
+Variances
+</td>
+<td align="center" valign="top">
+Parameters
+</td>
+
+</tr>
+<tr>
+<td align="center" valign="top">
+<span class="formula"><i>ξ</i></span>, <span class="formula"><i>b</i></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ẑ</i></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ξ̂</i><sup><i>b</i></sup></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>κ</i><sup><i>b</i></sup></span>, <span class="formula"><i>κ</i><sup><i>z</i></sup></span>, <span class="formula"><i>κ</i><sup><i>ξ</i></sup></span>
+</td>
+<td align="center" valign="top">
+<span class="formula"><i>ω</i><sub>0</sub></span>, <span class="formula"><i>T</i></span>
+</td>
+
+</tr>
+
+</table>
+<div class="caption">
+Table 2.2 State definion and use of available signals in the Kalman filter
+</div>
+
+</div>
+
+</div>
+
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.2">2.2</a> Dynamics
+</h2>
+<div class="Unindented">
+The dynamics of the DCM is <div class="formula">
+<a class="eqnumber" name="eq-2.2">(2.2) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ̇</i>
+</span>
+<span class="arraycell align-l">
+ = <i>ω</i><sub>0</sub>(<i>ξ</i> − <i>z</i>)
+</span>
+
+</span>
+</span>
+</div>
+This can be discetized to 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.3">(2.3) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ</i><sub><i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>ξ</i><sub><i>k</i></sub> + <i>ω</i><sub>0</sub><i>T</i>(<i>ξ</i><sub><i>k</i></sub> − <i>z</i><sub><i>k</i></sub>)
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = (1 + <i>ω</i><sub>0</sub><i>T</i>)<i>ξ</i><sub><i>k</i></sub> − <i>ω</i><sub>0</sub><i>Tz</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = (1 + <i>ω</i><sub>0</sub><i>T</i>)<i>ξ</i><sub><i>k</i></sub> − <i>ω</i><sub>0</sub><i>T</i><span class="symbol">(</span><i>z</i><sub><i>k</i></sub> − <i>w</i><sup><i>z</i></sup><span class="symbol">)</span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = (1 + <i>ω</i><sub>0</sub><i>T</i>)<i>ξ</i><sub><i>k</i></sub> − <i>ω</i><sub>0</sub><i>Tz</i><sub><i>k</i></sub> + <i>ω</i><sub>0</sub><i>Tw</i><sup><i>z</i></sup>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+And the dynamics of <span class="formula"><i>b</i></span> is 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.4">(2.4) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>b</i><sub><i>k</i></sub> + <i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Giving this dynamics<div class="formula">
+<a class="eqnumber" name="eq-2.5">(2.5) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i> + 1</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span>1 + <i>ω</i><sub>0</sub><i>T</i><span class="symbol">)</span><i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>ω</i><sub>0</sub><i>TI</i><sub>2 × 2</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><i>ẑ</i><sub><i>k</i></sub> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ω</i><sub>0</sub><i>Tw</i><sup><i>z</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+This means that the process covariance matrix is of the form <div class="formula">
+<a class="eqnumber" name="eq-2.6">(2.6) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>Q</i>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><i>ω</i><sub>0</sub><i>T</i><i>κ</i><sup><i>z</i></sup><span class="symbol">)</span><span class="symbol">(</span><i>ω</i><sub>0</sub><i>T</i><i>κ</i><sup><i>z</i></sup><span class="symbol">)</span><sup><i>T</i></sup>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+<i>κ</i><sub><i>v</i></sub><i>κ</i><span class="scripts"><sup class="script"><sup><i>T</i></sup></sup><sub class="script"><i>v</i></sub></span>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+The measurement dynamics model is simply 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.7">(2.7) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ̂</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script"><i>k</i></sub></span>
+</span>
+<span class="arraycell align-l">
+ = <i>ξ</i><sub><i>k</i></sub> + <i>b</i><sub><i>k</i></sub> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = <span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+</span><span class="symbol">)</span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Giving this covariance matrix
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.8">(2.8) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>R</i> = 
+</span>
+<span class="arraycell align-l">
+<span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>κ</i><sup><i>ξ</i></sup><i>κ</i><sup><i>ξ</i></sup><sup><i>T</i></sup>
+</span>
+
+</span>
+</span><span class="symbol">)</span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.3">2.3</a> Observability
+</h2>
+<div class="Unindented">
+Let’s analyze the observability<div class="formula">
+<a class="eqnumber" name="eq-2.9">(2.9) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>O</i> = 
+</span>
+<span class="arraycell align-l">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+</span><span class="symbol">)</span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+</span><span class="symbol">)</span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span>1 + <i>ω</i><sub>0</sub><i>T</i><span class="symbol">)</span><i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+⋮
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span>1 + <i>ω</i><sub>0</sub><i>T</i><span class="symbol">)</span><i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+<i>I</i><sub>2 × 2</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+⋮
+</span>
+<span class="arraycell align-c">
+⋮
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Which is full rank.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.4">2.4</a> Initializing <span class="formula"><i>ξ̂</i></span> with measurement
+</h2>
+<div class="Unindented">
+if we initialize <span class="formula"><i>ξ̂</i><sub>0</sub> = <i>ξ̂</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script"><i>k</i></sub></span> − <i>b̂</i><sub>0</sub></span> the we have the state <div class="formula">
+<a class="eqnumber" name="eq-2.10">(2.10) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ̂</i><sub>0</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b̂</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub>0</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub>0</sub> − <i>b̂</i><sub>0</sub> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>b</i><sub>0</sub> + <i>b̂</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub>0</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub>0</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>e</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script">0</sub></span> + <i>w</i><sup><i>ξ</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>e</i><span class="scripts"><sup class="script"><i>b</i></sup><sub class="script">0</sub></span>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Giving the initial error covariance matrix
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.11">(2.11) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>P</i><sub>0</sub> = 
+</span>
+<span class="arraycell align-l">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>κ</i><sup><i>ξ</i></sup><i>κ</i><sup><i>ξ</i><i>T</i></sup> + <i>κ</i><sup><i>b</i><sub>0</sub></sup><i>κ</i><sup><i>b</i><sub>0</sub><i>T</i></sup>
+</span>
+<span class="arraycell align-c">
+ − <i>κ</i><sup><i>b</i><sub>0</sub></sup><i>κ</i><sup><i>b</i><sub>0</sub><i>T</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>κ</i><sup><i>b</i><sub>0</sub></sup><i>κ</i><sup><i>b</i><sub>0</sub><i>T</i></sup>
+</span>
+<span class="arraycell align-c">
+<i>κ</i><sup><i>b</i><sub>0</sub></sup><i>κ</i><sup><i>b</i><sub>0</sub><i>T</i></sup>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.5">2.5</a> Include rotations
+</h2>
+<div class="Unindented">
+What if the bias is actually linked to the orientation of the base? In other words, <div class="formula">
+<a class="eqnumber" name="eq-2.12">(2.12) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>b</i><sub><i>k</i></sub>
+</span>
+<span class="arraycell align-l">
+ = <i>R</i><sub><i>k</i></sub><i>b</i><sub><i>l</i>, <i>k</i></sub>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+where <span class="formula"><i>R</i></span> is the orientation of the robot in 2D amd <span class="formula"><i>b</i><sub><i>l</i></sub></span> is the local drift. We model the local drift to be constant, i.e. <div class="formula">
+<span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>b</i><sub><i>l</i>, <i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>b</i><sub><i>l</i>, <i>k</i></sub> + <i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+In this case the update is then 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.13">(2.13) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>R</i><sub><i>k</i> + 1</sub><i>R</i><span class="scripts"><sup class="script"><i>T</i></sup><sub class="script"><i>k</i></sub></span><i>b</i><sub><i>k</i></sub> + <i>R</i><sub><i>k</i> + 1</sub><i>R</i><span class="scripts"><sup class="script"><i>T</i></sup><sub class="script"><i>k</i></sub></span><i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+By assuming that <span class="formula"><i>v</i><sub><i>k</i></sub></span> is an isotropic noise we end up with this model<div class="formula">
+<span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+<span class="arraycell align-l">
+ = <i>R</i><sub><i>k</i></sub><i>R</i><span class="scripts"><sup class="script"><i>T</i></sup><sub class="script"><i>k</i> − 1</sub></span><i>b</i><sub><i>k</i></sub> + <i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Which gives
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-2.14">(2.14) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i> + 1</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i> + 1</sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<span class="symbol">(</span>1 + <i>ω</i><sub>0</sub><i>T</i><span class="symbol">)</span><i>I</i><sub>2 × 2</sub>
+</span>
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+<span class="arraycell align-c">
+<i>R</i><sub><i>k</i> + 1</sub><i>R</i><span class="scripts"><sup class="script"><i>T</i></sup><sub class="script"><i>k</i></sub></span>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ξ</i><sub><i>k</i></sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>b</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+ − <i>ω</i><sub>0</sub><i>TI</i><sub>2 × 2</sub>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+0
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><i>ẑ</i><sub><i>k</i></sub> + <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎜</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="array"><span class="arrayrow">
+<span class="arraycell align-c">
+<i>ω</i><sub>0</sub><i>Tw</i><sup><i>z</i></sup>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-c">
+<i>v</i><sub><i>k</i></sub>
+</span>
+
+</span>
+</span><span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎟</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+<div class="Indented">
+Note that in this case we consider that the rotation signal <span class="formula"><i>R</i></span> is noiseless.
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Appendix-A">A</a> Unit-testing code
+</h1>
+<div class="Unindented">
+We wish to generate a random trajectory for the dcm but with bounded values. Lets compute a stable desired derivative for the dcm and the corresponding desired zmp 
+</div>
+<div class="Indented">
+<div class="formula">
+<a class="eqnumber" name="eq-A.1">(A.1) </a><span class="environment"><span class="arrayrow">
+<span class="arraycell align-r">
+<i>ξ̇</i><sup><i>d</i></sup>
+</span>
+<span class="arraycell align-l">
+ =  − <i>λ</i><i>ξ</i>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+<i>ω</i><sub>0</sub><span class="symbol">(</span><i>ξ</i> − <i>z</i><sup><i>d</i></sup><span class="symbol">)</span>
+</span>
+<span class="arraycell align-l">
+ =  − <i>λ</i><i>ξ</i>
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+ 
+</span>
+<span class="arraycell align-l">
+ 
+</span>
+
+</span>
+<span class="arrayrow">
+<span class="arraycell align-r">
+<i>z</i><sup><i>d</i></sup>
+</span>
+<span class="arraycell align-l">
+ = <span class="array"><span class="arrayrow"><span class="bracket align-left">⎛</span></span><span class="arrayrow"><span class="bracket align-left">⎝</span></span></span><span class="fraction"><span class="ignored">(</span><span class="numerator"><i>λ</i></span><span class="ignored">)/(</span><span class="denominator"><i>ω</i><sub>0</sub></span><span class="ignored">)</span></span> + 1<span class="array"><span class="arrayrow"><span class="bracket align-right">⎞</span></span><span class="arrayrow"><span class="bracket align-right">⎠</span></span></span><i>ξ</i>
+</span>
+
+</span>
+</span>
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

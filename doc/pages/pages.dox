@@ -1,0 +1,17 @@
+/** \page toc Table of contents
+
+@par toc Table of Contents
+
+- @ref theory
+  - @ref lipm_dcm_details
+
+*/
+
+/** \page theory Theoretical details
+
+\subpage lipm_dcm_details
+
+\page lipm_dcm_details LIPM estimator
+\htmlinclude pages/dcm-bias-estimator.html
+
+*/

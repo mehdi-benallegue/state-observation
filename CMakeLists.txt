@@ -42,6 +42,9 @@ project(
   LANGUAGES CXX
   VERSION ${PROJECT_VERSION})
 
+set(DOXYGEN_USE_MATHJAX "YES")
+set(DOXYGEN_EXAMPLE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+
 # For MSVC, set local environment variable to enable finding the built dll
 # of the main library when launching ctest with RUN_TESTS
 if(MSVC)

@@ -30,9 +30,7 @@ namespace stateObservation
 /// The dynamics of the DCM depends on the Zero Moment Point.
 /// The DCM can be measured using the CoM and its velocity, but the CoM position can be biased.
 /// This estimator uses Kalman Filtering to estimate this bias and give a delay-free filtering of the DCM.
-/// Here are the theorerical details
-/// \latexinclude  ../../../doc/latex/dcm-bias-estimator.tex
-
+/// The theorerical details are available at \ref lipm_dcm_details
 class STATE_OBSERVATION_DLLAPI LipmDcmEstimator
 {
 private:
@@ -60,7 +58,7 @@ public:
   ///
   /// @param dt                     the sampling time in seconds
   /// @param omega_0                the natural frequency of the DCM (rad/s)
-  /// @param biasDriftPerSecondStd  the standard deviation of the drift (m/s)
+  /// @param biasDriftPerSecondStd  the standard deviation of the bias drift (m/s)
   /// @param initZMP                the initial value of the DCM
   /// @param initDCM                the initial value of the DCM
   /// @param initBias               the initial value of the bias

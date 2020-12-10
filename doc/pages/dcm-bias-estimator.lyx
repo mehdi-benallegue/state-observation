@@ -1,0 +1,2145 @@
+#LyX 2.4 created this file. For more info see https://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass extbook
+\begin_preamble
+\usepackage{hyperref}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language american
+\language_package default
+\inputencoding utf8
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #b5bd68
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+LIPM DCM Bias Estimator
+\end_layout
+
+\begin_layout Chapter
+One dimension: the basics
+\end_layout
+
+\begin_layout Section
+Definitions
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="15" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Symbol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Meaning
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Expression
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+divergent component of motion (DCM)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $z$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The zero moment point
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the bias that we want to observe
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biased DCM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi+b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Measured 
+\begin_inset Formula $z$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $z+w^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\xi}^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Measured 
+\begin_inset Formula $\xi^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi^{b}+w^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\omega_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Natural frequency of the DCM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $T$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sampling time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $w^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Brownian motion noise in the bias
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $w^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+measurement noise in 
+\begin_inset Formula $\hat{z}$
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This covariance could be overestimated to take into account the modeling
+ error due to centroidal angular momentum and variations of CoM height
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $w^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+measurement noise in 
+\begin_inset Formula $\hat{\xi}^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard deviation of 
+\begin_inset Formula $w^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard deviation of 
+\begin_inset Formula $w^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard deviation of 
+\begin_inset Formula $w^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Variable-definition"
+
+\end_inset
+
+Variable definition
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+State Variables
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Inputs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Measurements
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Standard deviations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameters
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\xi}^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{b}$
+\end_inset
+
+, 
+\begin_inset Formula $\kappa^{z}$
+\end_inset
+
+, 
+\begin_inset Formula $\kappa^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\omega_{0}$
+\end_inset
+
+, 
+\begin_inset Formula $T$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:State-Signals"
+
+\end_inset
+
+State definion and use of available signals in the Kalman filter 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Dynamics
+\end_layout
+
+\begin_layout Standard
+The dynamics of the DCM is 
+\begin_inset Formula 
+\begin{align}
+\dot{\xi} & =\omega_{0}(\xi-z)
+\end{align}
+
+\end_inset
+
+This can be discetized to 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\xi_{k+1} & =\xi_{k}+\omega_{0}T(\xi_{k}-z_{k})\\
+ & =(1+\omega_{0}T)\xi_{k}-\omega_{0}Tz_{k}\\
+ & =(1+\omega_{0}T)\xi_{k}-\omega_{0}T\left(\hat{z}_{k}-w^{z}\right)\\
+ & =(1+\omega_{0}T)\xi_{k}-\omega_{0}T\hat{z}_{k}+\omega_{0}Tw^{z}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the dynamics of 
+\begin_inset Formula $b$
+\end_inset
+
+ is 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+b_{k+1} & =b_{k}+v_{k}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Giving this dynamics
+\begin_inset Formula 
+\begin{align}
+\left(\begin{array}{c}
+\xi_{k+1}\\
+b_{k+1}
+\end{array}\right) & =\left(\begin{matrix}1+\omega_{0}T & 0\\
+0 & 1
+\end{matrix}\right)\left(\begin{array}{c}
+\xi_{k}\\
+b_{k}
+\end{array}\right)+\left(\begin{matrix}-\omega_{0}T\\
+0
+\end{matrix}\right)\hat{z}_{k}+\left(\begin{matrix}\omega_{0}Tw^{z}\\
+v_{k}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This means that the process covariance matrix is of the form 
+\begin_inset Formula 
+\begin{align}
+Q & =\left(\begin{matrix}\left(\omega_{0}T\kappa^{z}\right)^{2} & 0\\
+0 & \kappa_{v}^{2}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The measurement dynamics model is simply 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\hat{\xi}_{k}^{b} & =\xi_{k}+b_{k}+w^{\xi}\\
+ & =\left(\begin{matrix}1 & 1\end{matrix}\right)\left(\begin{array}{c}
+\xi_{k}\\
+b_{k}
+\end{array}\right)+w^{\xi}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Giving this covariance matrix
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+R= & \left(\begin{matrix}\left(\kappa^{\xi}\right)^{2}\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Observability
+\end_layout
+
+\begin_layout Standard
+Let's analyze the observability
+\begin_inset Formula 
+\begin{align}
+O= & \left(\begin{matrix}\left(\begin{matrix}1 & 1\end{matrix}\right)\\
+\left(\begin{matrix}1 & 1\end{matrix}\right)\left(\begin{matrix}1+\omega_{0}T & 0\\
+0 & 1
+\end{matrix}\right)\\
+\vdots
+\end{matrix}\right)=\left(\begin{matrix}1 & 1\\
+1+\omega_{0}T & 1\\
+\vdots & \vdots
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which is full rank.
+\end_layout
+
+\begin_layout Section
+Initializing 
+\begin_inset Formula $\hat{\xi}$
+\end_inset
+
+ with measurement
+\end_layout
+
+\begin_layout Standard
+if we initialize 
+\begin_inset Formula $\hat{\xi}_{0}=\hat{\xi}_{k}^{b}-\hat{b}_{0}$
+\end_inset
+
+ the we have the state 
+\begin_inset Formula 
+\begin{align}
+\left(\begin{array}{c}
+\hat{\xi}_{0}\\
+\hat{b}_{0}
+\end{array}\right) & =\left(\begin{array}{c}
+\xi_{0}\\
+b_{0}
+\end{array}\right)+\left(\begin{array}{c}
+b_{0}-\hat{b}_{0}+w^{\xi}\\
+-b_{0}+\hat{b}_{0}
+\end{array}\right)\\
+ & =\left(\begin{array}{c}
+\xi_{0}\\
+b_{0}
+\end{array}\right)+\left(\begin{array}{c}
+e_{0}^{b}+w^{\xi}\\
+-e_{0}^{b}
+\end{array}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Giving the initial error covariance matrix
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+P_{0}= & \left(\begin{matrix}\left(\kappa^{\xi}\right)^{2}+\left(\kappa^{b_{0}}\right)^{2} & -\left(\kappa^{b_{0}}\right)^{2}\\
+-\left(\kappa^{b_{0}}\right)^{2} & \left(\kappa^{b_{0}}\right)^{2}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+2D case
+\end_layout
+
+\begin_layout Standard
+This chapter is essentially a copy paste of the pervious one but 
+\end_layout
+
+\begin_layout Itemize
+changing to 2D
+\end_layout
+
+\begin_layout Itemize
+adding the support for rotations
+\end_layout
+
+\begin_layout Section
+Definitions
+\end_layout
+
+\begin_layout Standard
+These are the same except that 2d vectors replace states, inputs and measurement
+s and 
+\begin_inset Formula $2\times2$
+\end_inset
+
+ matrices replace the standard deviations.
+ parameters remain scalars
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="15" columns="3">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Symbol
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Meaning
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Expression
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+divergent component of motion (DCM)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $z$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+The zero moment point
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the bias that we want to observe
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+biased DCM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi+b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Measured 
+\begin_inset Formula $z$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $z+w^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\xi}^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Measured 
+\begin_inset Formula $\xi^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi^{b}+w^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\omega_{0}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Natural frequency of the DCM
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $T$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sampling time
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $w^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Brownian motion noise in the bias
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $w^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+measurement noise in 
+\begin_inset Formula $\hat{z}$
+\end_inset
+
+
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+This covariance could be overestimated to take into account the modeling
+ error due to centroidal angular momentum and variations of CoM height
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $w^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+measurement noise in 
+\begin_inset Formula $\hat{\xi}^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard deviation of 
+\begin_inset Formula $w^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard deviation of 
+\begin_inset Formula $w^{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+standard deviation of 
+\begin_inset Formula $w^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Variable-definition-2d"
+
+\end_inset
+
+Variable definition
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="2" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+State Variables
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Inputs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Measurements
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Variances
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Parameters
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\xi$
+\end_inset
+
+, 
+\begin_inset Formula $b$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{z}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\hat{\xi}^{b}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\kappa^{b}$
+\end_inset
+
+, 
+\begin_inset Formula $\kappa^{z}$
+\end_inset
+
+, 
+\begin_inset Formula $\kappa^{\xi}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\omega_{0}$
+\end_inset
+
+, 
+\begin_inset Formula $T$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:State-Signals-2d"
+
+\end_inset
+
+State definion and use of available signals in the Kalman filter
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Dynamics
+\end_layout
+
+\begin_layout Standard
+The dynamics of the DCM is 
+\begin_inset Formula 
+\begin{align}
+\dot{\xi} & =\omega_{0}(\xi-z)
+\end{align}
+
+\end_inset
+
+This can be discetized to 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\xi_{k+1} & =\xi_{k}+\omega_{0}T(\xi_{k}-z_{k})\\
+ & =(1+\omega_{0}T)\xi_{k}-\omega_{0}Tz_{k}\\
+ & =(1+\omega_{0}T)\xi_{k}-\omega_{0}T\left(z_{k}-w^{z}\right)\\
+ & =(1+\omega_{0}T)\xi_{k}-\omega_{0}Tz_{k}+\omega_{0}Tw^{z}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And the dynamics of 
+\begin_inset Formula $b$
+\end_inset
+
+ is 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+b_{k+1} & =b_{k}+v_{k}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Giving this dynamics
+\begin_inset Formula 
+\begin{align}
+\left(\begin{array}{c}
+\xi_{k+1}\\
+b_{k+1}
+\end{array}\right) & =\left(\begin{matrix}\left(1+\omega_{0}T\right)I_{2\times2} & 0\\
+0 & I_{2\times2}
+\end{matrix}\right)\left(\begin{array}{c}
+\xi_{k}\\
+b_{k}
+\end{array}\right)+\left(\begin{matrix}-\omega_{0}TI_{2\times2}\\
+0
+\end{matrix}\right)\hat{z}_{k}+\left(\begin{matrix}\omega_{0}Tw^{z}\\
+v_{k}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This means that the process covariance matrix is of the form 
+\begin_inset Formula 
+\begin{align}
+Q & =\left(\begin{matrix}\left(\omega_{0}T\kappa^{z}\right)\left(\omega_{0}T\kappa^{z}\right)^{T} & 0\\
+0 & \kappa_{v}\kappa_{v}^{^{T}}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The measurement dynamics model is simply 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\hat{\xi}_{k}^{b} & =\xi_{k}+b_{k}+w^{\xi}\\
+ & =\left(\begin{matrix}I_{2\times2} & I_{2\times2}\end{matrix}\right)\left(\begin{array}{c}
+\xi_{k}\\
+b_{k}
+\end{array}\right)+w^{\xi}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Giving this covariance matrix
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+R= & \left(\begin{matrix}\kappa^{\xi}\kappa^{\xi}{}^{T}\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Observability
+\end_layout
+
+\begin_layout Standard
+Let's analyze the observability
+\begin_inset Formula 
+\begin{align}
+O= & \left(\begin{matrix}\left(\begin{matrix}I_{2\times2} & I_{2\times2}\end{matrix}\right)\\
+\left(\begin{matrix}I_{2\times2} & I_{2\times2}\end{matrix}\right)\left(\begin{matrix}\left(1+\omega_{0}T\right)I_{2\times2} & 0\\
+0 & I_{2\times2}
+\end{matrix}\right)\\
+\vdots
+\end{matrix}\right)=\left(\begin{matrix}I_{2\times2} & I_{2\times2}\\
+\left(1+\omega_{0}T\right)I_{2\times2} & I_{2\times2}\\
+\vdots & \vdots
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which is full rank.
+\end_layout
+
+\begin_layout Section
+Initializing 
+\begin_inset Formula $\hat{\xi}$
+\end_inset
+
+ with measurement
+\end_layout
+
+\begin_layout Standard
+if we initialize 
+\begin_inset Formula $\hat{\xi}_{0}=\hat{\xi}_{k}^{b}-\hat{b}_{0}$
+\end_inset
+
+ the we have the state 
+\begin_inset Formula 
+\begin{align}
+\left(\begin{array}{c}
+\hat{\xi}_{0}\\
+\hat{b}_{0}
+\end{array}\right) & =\left(\begin{array}{c}
+\xi_{0}\\
+b_{0}
+\end{array}\right)+\left(\begin{array}{c}
+b_{0}-\hat{b}_{0}+w^{\xi}\\
+-b_{0}+\hat{b}_{0}
+\end{array}\right)\\
+ & =\left(\begin{array}{c}
+\xi_{0}\\
+b_{0}
+\end{array}\right)+\left(\begin{array}{c}
+e_{0}^{b}+w^{\xi}\\
+-e_{0}^{b}
+\end{array}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Giving the initial error covariance matrix
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+P_{0}= & \left(\begin{matrix}\kappa^{\xi}\kappa^{\xi T}+\kappa^{b_{0}}\kappa^{b_{0}T} & -\kappa^{b_{0}}\kappa^{b_{0}T}\\
+-\kappa^{b_{0}}\kappa^{b_{0}T} & \kappa^{b_{0}}\kappa^{b_{0}T}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Include rotations
+\end_layout
+
+\begin_layout Standard
+What if the bias is actually linked to the orientation of the base? In other
+ words, 
+\begin_inset Formula 
+\begin{align}
+b_{k} & =R_{k}b_{l,k}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $R$
+\end_inset
+
+ is the orientation of the robot in 2D amd 
+\begin_inset Formula $b_{l}$
+\end_inset
+
+ is the local drift.
+ We model the local drift to be constant, i.e.
+ 
+\begin_inset Formula 
+\begin{align*}
+b_{l,k+1} & =b_{l,k}+v_{k}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case the update is then 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+b_{k+1} & =R_{k+1}R_{k}^{T}b_{k}+R_{k+1}R_{k}^{T}v_{k}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By assuming that 
+\begin_inset Formula $v_{k}$
+\end_inset
+
+ is an isotropic noise we end up with this model
+\begin_inset Formula 
+\begin{align*}
+b_{k+1} & =R_{k}R_{k-1}^{T}b_{k}+v_{k}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Which gives
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\left(\begin{array}{c}
+\xi_{k+1}\\
+b_{k+1}
+\end{array}\right) & =\left(\begin{matrix}\left(1+\omega_{0}T\right)I_{2\times2} & 0\\
+0 & R_{k+1}R_{k}^{T}
+\end{matrix}\right)\left(\begin{array}{c}
+\xi_{k}\\
+b_{k}
+\end{array}\right)+\left(\begin{matrix}-\omega_{0}TI_{2\times2}\\
+0
+\end{matrix}\right)\hat{z}_{k}+\left(\begin{matrix}\omega_{0}Tw^{z}\\
+v_{k}
+\end{matrix}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that in this case we consider that the rotation signal 
+\begin_inset Formula $R$
+\end_inset
+
+ is noiseless.
+\end_layout
+
+\begin_layout Chapter
+\start_of_appendix
+Unit-testing code
+\end_layout
+
+\begin_layout Standard
+We wish to generate a random trajectory for the dcm but with bounded values.
+ Lets compute a stable desired derivative for the dcm and the corresponding
+ desired zmp 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\dot{\xi}^{d} & =-\lambda\xi\\
+\omega_{0}\left(\xi-z^{d}\right) & =-\lambda\xi\\
+z^{d} & =\left(\frac{\lambda}{\omega_{0}}+1\right)\xi
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
