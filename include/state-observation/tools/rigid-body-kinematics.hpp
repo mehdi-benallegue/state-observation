@@ -182,8 +182,6 @@ inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2, 
 
 /// @brief Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation matrix (minimizes the deviation
 /// of the v vector)
-/// @details throws exception when the orientation is singlular (likely gimbal lock)
-/// to avoid these issues, we recommend to use mergeTiltWithYawAxisAgnostic()
 /// @param Rtez the tilt \f$R_1^T e_z\f$ (the local image of \f$e_z\f$ unit vector)
 /// @param R2 is the second rotation matrix from which the "yaw" needs to be extracted
 /// @param v is the vector to use as reference (for a traditional yaw v is initialized to \f$e_x\f$)
