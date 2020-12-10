@@ -111,7 +111,7 @@ target_include_directories(
                          $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>/$<CONFIG>/include $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(${LIBRARY_NAME} PUBLIC Boost::filesystem Boost::thread Boost::program_options Boost::timer
-                                             Boost::random Boost::disable_autolinking)
+                                             Boost::disable_autolinking)
 if(TARGET Eigen3::Eigen)
   target_link_libraries(${LIBRARY_NAME} PUBLIC Eigen3::Eigen)
 else()

@@ -56,8 +56,7 @@ add_project_dependency(
   system
   thread
   program_options
-  timer
-  random)
+  timer)
 include_directories(${Boost_INCLUDE_DIRS})
 add_project_dependency(Eigen3 QUIET NO_CMAKE_PACKAGE_REGISTRY)
 if(Eigen3_FOUND)
