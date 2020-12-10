@@ -108,7 +108,7 @@ int testUnidimDcmBiasEstimator(int errorCode)
 
   std::cout << "Sum of error on the 10 last samples = " << error << std::endl;
 
-  if(error > 0.05)
+  if(error > 0.06)
   {
     return errorCode;
   }
@@ -232,7 +232,7 @@ int testDcmBiasEstimator(int errorCode)
 
   std::cout << "Sum of error on the 10 last samples = " << error << std::endl;
 
-  if(error > 0.05)
+  if(error > 0.06)
   {
     return errorCode;
   }
