@@ -10,10 +10,8 @@ Build-Depends: debhelper (>= 9),
  pkg-config,
  cmake,
  doxygen,
- libboost-test-dev,
- libboost-filesystem-dev,
- libboost-thread-dev,
- libboost-program-options-dev,
+ libboost-chrono-dev,
+ libboost-system-dev,
  libboost-timer-dev,
  libeigen3-dev (>= 3.2)
 
@@ -22,6 +20,11 @@ Section: libdevel
 Architecture: any
 Suggests: libstate-observation-doc
 Depends: pkg-config,
+         cmake,
+         libboost-chrono-dev,
+         libboost-system-dev,
+         libboost-timer-dev,
+         libeigen3-dev (>= 3.2),
          libstate-observation (= ${binary:Version}),
          ${misc:Depends}
 Description: Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters)
