@@ -8,17 +8,26 @@ void ZeroDelayObserver::setState(const ObserverBase::StateVector & x_k, TimeInde
   BOOST_ASSERT(checkStateVector(x_k) && "The size of the state vector is incorrect");
 
   x_.set(x_k, k);
-  while(y_.size() > 0 && y_.getFirstIndex() <= k)
-  {
-    y_.popFront();
-  }
 
-  if(p_ > 0)
-    while(u_.size() > 0 && u_.getFirstIndex() < k)
+  if(k < getCurrentTime())
+  {
+    y_.clear();
+    u_.clear();
+  }
+  else
+  {
+    while(y_.size() > 0 && y_.getFirstIndex() <= k)
     {
-      u_.popFront();
+      y_.popFront();
     }
-}
+
+    if(p_ > 0)
+      while(u_.size() > 0 && u_.getFirstIndex() < k)
+      {
+        u_.popFront();
+      }
+  }
+} // namespace stateObservation
 
 void ZeroDelayObserver::setCurrentState(const ObserverBase::StateVector & x_k)
 {
