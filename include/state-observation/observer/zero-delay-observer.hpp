@@ -55,9 +55,13 @@ public:
   /// Destructor
   virtual ~ZeroDelayObserver(){};
 
-  /// Set the value of the state vector at time index k. Only the value
-  /// with the highest time-index is kept and others are deleted, the
-  /// highest index is called the current time k_0
+  /// @brief Set the value of the state vector at time index k.
+  ///
+  /// @details This replaces the current state estimate. If k < current time then the measurements and the inputs
+  /// are also cleared. Otherwise only past measurements and inputs are removed.
+  ///
+  /// @param x_k
+  /// @param k
   virtual void setState(const ObserverBase::StateVector & x_k, TimeIndex k);
 
   /// @brief Modify the value of the state vector at the current time.
