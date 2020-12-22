@@ -29,154 +29,118 @@
 namespace stateObservation
 {
 
-/**
- * \class  KineticsObserver
- * \brief
- *
- */
-
+/// @brief This observer estimated the kinematics and the external forces.
+/// @details This estimation is based on the assumption of viscoelastic contacts and using three kinds of measurements:
+/// IMUs, Force/Torque measurements (contact and other ones) and any absolute position measurements.
+///
 class STATE_OBSERVATION_DLLAPI KineticsObserver : protected DynamicalSystemFunctorBase, protected StateVectorArithmetics
 {
 public:
   typedef kine::Kinematics Kinematics;
   typedef kine::Orientation Orientation;
 
-  /// The constructor.
-  ///  \li maxContacts : maximum number of contacts,
-  ///  \li maxNumberOfIMU : the maximumnumber of IMUs
+  // ////////////////////////////////////////////////////////////
+  /// @name Constructors and destructors
+  // ///////////////////////////////////////////////////////////
+  /// @{
+
+  /// @brief Construct a new Kinetics Observer
+  ///
+  /// @param maxContacts maximum number of contacts between the robot and the environment. These do not include the
+  /// additional forces nor the estimated unmodeled forces
+  /// @param maxNumberOfIMU the maximum number of IMUs. They don't have to give measurements at each iterations and they
+  /// don't have to be synchronized
   KineticsObserver(unsigned maxContacts = 4, unsigned maxNumberOfIMU = 1);
 
-  /// virtual destructor
+  /// @brief Destroy the Kinetics Observer
+  ///
   virtual ~KineticsObserver();
 
-  /// Gets the state size
-  Index getStateSize() const;
+  /// @}
 
-  /// Gets the measurement size
-  Index getMeasurementSize() const;
+  // ////////////////////////////////////////////////////////////
+  /// @name Setting and getting parameters
+  /// For initialization and update of parameters that should not evolve over
+  /// time on a sample basis.
+  // ///////////////////////////////////////////////////////////
 
-  /// ///////////////////////////////////////////////////////////
-  /// Getting, setting the current time and running the estimation
-  /// //////////////////////////////////////////////////////////
+  /// @{
 
-  /// gets the sampling time
+  /// @brief Get the Sampling Time
+  ///
+  /// @return const double &
   double getSamplingTime() const;
 
-  /// sets the sampling time
+  /// @brief Set the Sampling Time
+  ///
   void setSamplingTime(double);
 
-  /// this function triggers the estimation itself
-  Vector update();
-
-  /// ////////////////////////////////
-  /// Getting and setting the state
-  /// ////////////////////////////////
-
-  /// Gets an estimation of the state in the form of a state vector $\hat{x_{k+1}}$
-  Vector getStateVector() const;
-
-  /// Gets the internal sample time of the state vector
-  stateObservation::TimeIndex getStateVectorSampleTime() const;
-
-  /// Get the Kinematics of the observed frams
-  Kinematics getKinematics() const;
-
-  /// Get the kinematics of a given frame
-  Kinematics getKinematicsOf(const Kinematics & localKinematics) const;
-  Kinematics getKinematicsOf(const Kinematics & localKinematics);
-  Kinematics getKinematicsOf(Kinematics & localKinematics) const;
-  Kinematics getKinematicsOf(Kinematics & localKinematics);
-
-  /// get the contact force provided by the estimator
-  /// which is different from a contact sensor measurement
-  Vector6 getContactWrench(int contactNbr) const;
-  Kinematics getContactPosition(int contactNbr) const;
-
-  /// gets the external unmodeled forces
-  Vector6 getUnmodeledWrench() const;
-
-  /// This function allows to estimate the acceleration
-  /// it returns a Kinemactis
-  Kinematics estimateAccelerations();
-
-  /// Sets a value for the kinematics part of the state
-  /// if resetForces is set to true the forces are set to zero
+  /// @brief Set if the unmodeled and unmeasured external wrench should be
+  ///         estimated.
+  /// @details Activating this estimation will assume that the contact exists
+  ///          therefore, it is likely to modify the value of the estimated state.
+  ///          The estimation will also be slower.
   ///
-  void setStateKinematics(const Kinematics &, bool resetContactWrenches = true, bool resetCovariance = true);
-
-  /// Allows to initializa the value of the gyro bias of the IMU
-  /// corresponding to the numberOfIMU
-  /// reset Covariance allows to reinitialize the gyro bias
-  void setGyroBias(const Vector3 &, unsigned numberOfIMU = 1, bool resetCovariance = true);
-
-  /// if only force or torque is available, set the unavailable value to zero
-  void setStateUnmodeledWrench(const Vector6 &, bool resetCovariance = true);
-
-  /// Sets a value of the state x_k provided from another source
-  /// can be used for initialization of the estimator
-  void setStateVector(const Vector &, bool resetCovariance = true);
-
-  /// Getters for the indexes of the state Vector
-  inline unsigned kineIndex() const;
-  inline unsigned posIndex() const;
-  inline unsigned oriIndex() const;
-  inline unsigned linVelIndex() const;
-  inline unsigned angVelIndex() const;
-  inline unsigned gyroBiasIndex(unsigned IMUNumber) const;
-  inline unsigned unmodeledWrenchIndex() const;
-  inline unsigned unmodeledForceIndex() const;
-  inline unsigned unmodeledTorqueIndex() const;
-  inline unsigned contactsIndex() const;
-  inline unsigned contactIndex(unsigned contactNbr) const;
-  inline unsigned contactKineIndex(unsigned contactNbr) const;
-  inline unsigned contactPosIndex(unsigned contactNbr) const;
-  inline unsigned contactOriIndex(unsigned contactNbr) const;
-  inline unsigned contactForceIndex(unsigned contactNbr) const;
-  inline unsigned contactTorqueIndex(unsigned contactNbr) const;
-  inline unsigned contactWrenchIndex(unsigned contactNbr) const;
-
-  /// Getters for the indexes of the state Vector
-  inline unsigned kineIndexTangent() const;
-  inline unsigned posIndexTangent() const;
-  inline unsigned oriIndexTangent() const;
-  inline unsigned linVelIndexTangent() const;
-  inline unsigned angVelIndexTangent() const;
-  inline unsigned gyroBiasIndexTangent(unsigned IMUNumber) const;
-  inline unsigned unmodeledWrenchIndexTangent() const;
-  inline unsigned unmodeledForceIndexTangent() const;
-  inline unsigned unmodeledTorqueIndexTangent() const;
-  inline unsigned contactsIndexTangent() const;
-  inline unsigned contactIndexTangent(unsigned contactNbr) const;
-  inline unsigned contactKineIndexTangent(unsigned contactNbr) const;
-  inline unsigned contactPosIndexTangent(unsigned contactNbr) const;
-  inline unsigned contactOriIndexTangent(unsigned contactNbr) const;
-  inline unsigned contactForceIndexTangent(unsigned contactNbr) const;
-  inline unsigned contactTorqueIndexTangent(unsigned contactNbr) const;
-  inline unsigned contactWrenchIndexTangent(unsigned contactNbr) const;
-
-  /// /////////////////////////////////////////////////////
-  /// Setting and getting the state of the estimation
-  /// ////////////////////////////////////////////////////
+  /// @param b
   void setWithUnmodeledWrench(bool b = true);
 
-  /// Sets if the update() function estimates also the accelerations
+  /// @brief Sets if the estimation computes also the accelerations
+  /// @details This will not modify the estimated value, but just compute 
+  ///          the modeled acceleration, which gives a model-based filtered 
+  ///           acceleration
+  ///
+  /// @param b
   void setWithAccelerationEstimation(bool b = true);
 
+  /// @brief Set if the gyrometer bias is computed or not.
+  ///        This parameter is global for all the IMUs.
+  /// 
+  /// @param b 
   void setWithGyroBias(bool b = true);
 
-  /// ///////////////////////////////////////////////
-  /// Getting and setting input data and measurements
-  /// /////////////////////////////////////////////
+  /// @brief Set the total mass of the robot. This can be changed online
+  /// 
+  /// @return sets 
+  void setMass(double);
 
-  /// sets the measurement of the IMU (gyrometer, accelerometer, kinematics and number of the IMU)
-  /// accelero and gyrometer are the measurement
-  /// localKine gets the kinematics of the IMU expressed in the observed frame
-  /// the best is to provide the position, the orientation,
+  /// @}
+
+  // ///////////////////////////////////////////////////////////
+  /// @name Setting kinematic sensors
+  /// These are the methods to be called at each iteration to give the control 
+  /// inputs and the sensor measurement for IMUs and absolute pose sensors.
+  // //////////////////////////////////////////////////////////
+  
+  /// @{
+
+  /// @brief Set the measurements of an IMU and give the Kinematic of the IMU
+  /// 
+  /// @details The overload that does not have the covariance matrices as an 
+  /// inputs uses default ones.
+  ///
+  /// The IMU is located in a sensor frame. We suppose we know the kinematics of
+  /// this sensor frame in the local frame (for example the base frame or the 
+  /// control frame). 
+  ///
+  /// @return the number of the IMU (useful in case there are several ones)
+  /// @param accelero measured value
+  /// @param gyrometer measured gyro value
+  /// @param localKine sets the kinematics of the IMU expressed in the local
+  /// frame. The best is to provide the position, the orientation,
   /// the angular and linear velocities and the linear acceleration
   /// Nevertheless if velocities or accelerations are not available they will be
   /// automatically computed through finite differences
-  /// the acceleroCov and the gyroCov are the covariance matrices of the sensors
+  /// @param num the number of the IMU (useful in case there are several ones).
+  ///           If not set it will be generated automatically.
   int setIMU(const Vector3 & accelero, const Vector3 & gyrometer, const Kinematics & localKine, int num = -1);
+
+  /// @brief @copybrief setIMU(const Vector3&,const Vector3&,const Kinematics &,int)
+  /// Provides also the associated covariance matrices
+  /// @details
+  /// This version specifies the covariance matrices of these measurements. 
+  /// @copydetails setIMU(const Vector3&,const Vector3&,const Kinematics &,int)
+  /// @param acceleroCov
+  /// @param gyroCov
   int setIMU(const Vector3 & accelero,
              const Vector3 & gyrometer,
              const Matrix3 & acceleroCov,
@@ -184,7 +148,41 @@ public:
              const Kinematics & localKine,
              int num = -1);
 
+  /// @brief set the default covariance matrix for IMU.
+  /// @details this is used to set the covariances wgen not given explicitely
+  /// (see setIMU(const Vector3&,const Vector3&,const Kinematics &,int)).
+  /// @param acceleroCov
+  /// @param gyroCov
   void setIMUDefaultCovarianceMatrix(const Matrix3 & acceleroCov, const Matrix3 & gyroCov);
+
+ 
+
+
+  /// @brief Set an Absolute Pose Sensor measurement
+  /// The measurement is the kinematics namely position and orientation.
+  /// @details The overload with the measurement only uses default covariance 
+  /// matrix.
+  /// @param measurement
+  void setAbsolutePoseSensor(const Kinematics & measurement);
+
+  /// @brief @copybrief setAbsolutePoseSensor(const Kinematics &)
+  ///
+  /// @details This version sets the Covariance matrix explicitely.
+  /// @copybrief setAbsolutePoseSensor(const Kinematics &)
+  /// @param CovarianceMatrix the covariance matrix
+  void setAbsolutePoseSensor(const Kinematics & measurement, const Matrix6 & CovarianceMatrix);
+
+  void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix6 &);
+
+  /// @}
+
+  // ///////////////////////////////////////////////////////////
+  /// @name Setting input data and measurements
+  /// These are the methods to be called at each iteration to give the control
+  /// inputs and the sensor measurement
+  // //////////////////////////////////////////////////////////
+
+  /// @{
 
   ////////// Contact stters, these are MANDATORY for every contact at every iteration ///
   /// if the contact is equipped with wrench sensor call setContactWrenchSensor
@@ -209,15 +207,9 @@ public:
   /// otherwise they will be automatically computed
   void setContactWithNoSensor(const Kinematics & localKine, unsigned contactNumber);
 
-  /// Set a measurement of the pose. The input is the Measured kinematics
-  /// namely position and orientation.
-  void setAbsolutePoseSensor(const Kinematics &);
-  void setAbsolutePoseSensor(const Kinematics &, const Matrix6 & CovarianceMatrix);
-
-  /// TODO
+  /// @}
+  // TODO
   // void setVelocityGuess(const Kinematics)
-
-  void setAbsolutePoseSensorDefaultCovarianceMatrix(const Matrix6 &);
 
   ///////////////////////////////////////////////
   /// Setting inputs to the dynamical system
@@ -225,9 +217,6 @@ public:
   /// Add known external forces and moments which are not due to contact
   /// they must be expressed in the same frame as the kinematic root
   void setAdditionalWrench(const Vector3 & force, const Vector3 & torque);
-
-  /// sets the mass of the robot
-  void setMass(double);
 
   /// Sets the 3x3 inertia matrix expressed in the local frame and  optionally
   ///  its time derivative (computed with finite differences otherwise)
@@ -300,6 +289,140 @@ public:
   Index getNumberOfContacts() const;
 
   std::vector<int> getListOfContacts() const;
+
+  /// ///////////////////////////////////////////////////////////
+  /// @subsection Running the estimation
+  /// //////////////////////////////////////////////////////////
+
+  /// @brief Runs the estimation. Returns the state vector
+  ///
+  /// @return const Vector&
+  const Vector & update();
+
+  /// ///////////////////////////////////////////////////////////
+  /// @subsection Getting estimations the estimation
+  /// //////////////////////////////////////////////////////////
+
+  /// Get the Kinematics of the observed frame
+  Kinematics getKinematics() const;
+
+  /// Get the kinematics of a given frame
+  Kinematics getKinematicsOf(const Kinematics & localKinematics) const;
+  Kinematics getKinematicsOf(const Kinematics & localKinematics);
+  Kinematics getKinematicsOf(Kinematics & localKinematics) const;
+  Kinematics getKinematicsOf(Kinematics & localKinematics);
+
+  /// get the contact force provided by the estimator
+  /// which is different from a contact sensor measurement
+  Vector6 getContactWrench(int contactNbr) const;
+  Kinematics getContactPosition(int contactNbr) const;
+
+  /// gets the external unmodeled forces
+  Vector6 getUnmodeledWrench() const;
+
+  /// This function allows to estimate the acceleration
+  /// it returns a Kinemactis
+  Kinematics estimateAccelerations();
+
+  /// ///////////////////////////////////////////////////////////
+  /// @section Set state components
+  /// //////////////////////////////////////////////////////////
+
+  /// Sets a value for the kinematics part of the state
+  /// if resetForces is set to true the forces are set to zero
+  ///
+  void setStateKinematics(const Kinematics &, bool resetContactWrenches = true, bool resetCovariance = true);
+
+  /// Allows to initializa the value of the gyro bias of the IMU
+  /// corresponding to the numberOfIMU
+  /// reset Covariance allows to reinitialize the gyro bias
+  void setGyroBias(const Vector3 &, unsigned numberOfIMU = 1, bool resetCovariance = true);
+
+  /// if only force or torque is available, set the unavailable value to zero
+  void setStateUnmodeledWrench(const Vector6 &, bool resetCovariance = true);
+
+  ///////////////////////////////////////////////////////////////
+  /// @section State representation - State Vectors (advanced use)
+  ///////////////////////////////////////////////////////////////
+
+  /// ///////////////////////////////////////////////////////////
+  /// @subsection State representation sizes
+  /// //////////////////////////////////////////////////////////
+
+  /// @brief Get the State Vector Size.
+  ///
+  /// @return Index
+  Index getStateSize() const;
+
+  /// @brief Get the Measurement vector Size.
+  ///
+  /// @return Index
+  Index getMeasurementSize() const;
+
+  /// ///////////////////////////////////////////////////////////
+  /// @subsection Getters for the indexes of the state Vector
+  /// //////////////////////////////////////////////////////////
+
+  inline unsigned kineIndex() const;
+  inline unsigned posIndex() const;
+  inline unsigned oriIndex() const;
+  inline unsigned linVelIndex() const;
+  inline unsigned angVelIndex() const;
+  inline unsigned gyroBiasIndex(unsigned IMUNumber) const;
+  inline unsigned unmodeledWrenchIndex() const;
+  inline unsigned unmodeledForceIndex() const;
+  inline unsigned unmodeledTorqueIndex() const;
+  inline unsigned contactsIndex() const;
+  inline unsigned contactIndex(unsigned contactNbr) const;
+  inline unsigned contactKineIndex(unsigned contactNbr) const;
+  inline unsigned contactPosIndex(unsigned contactNbr) const;
+  inline unsigned contactOriIndex(unsigned contactNbr) const;
+  inline unsigned contactForceIndex(unsigned contactNbr) const;
+  inline unsigned contactTorqueIndex(unsigned contactNbr) const;
+  inline unsigned contactWrenchIndex(unsigned contactNbr) const;
+
+  /// ///////////////////////////////////////////////////////////
+  /// @subsection Getters for the indexes of the tangent state Vector
+  /// //////////////////////////////////////////////////////////
+
+  inline unsigned kineIndexTangent() const;
+  inline unsigned posIndexTangent() const;
+  inline unsigned oriIndexTangent() const;
+  inline unsigned linVelIndexTangent() const;
+  inline unsigned angVelIndexTangent() const;
+  inline unsigned gyroBiasIndexTangent(unsigned IMUNumber) const;
+  inline unsigned unmodeledWrenchIndexTangent() const;
+  inline unsigned unmodeledForceIndexTangent() const;
+  inline unsigned unmodeledTorqueIndexTangent() const;
+  inline unsigned contactsIndexTangent() const;
+  inline unsigned contactIndexTangent(unsigned contactNbr) const;
+  inline unsigned contactKineIndexTangent(unsigned contactNbr) const;
+  inline unsigned contactPosIndexTangent(unsigned contactNbr) const;
+  inline unsigned contactOriIndexTangent(unsigned contactNbr) const;
+  inline unsigned contactForceIndexTangent(unsigned contactNbr) const;
+  inline unsigned contactTorqueIndexTangent(unsigned contactNbr) const;
+  inline unsigned contactWrenchIndexTangent(unsigned contactNbr) const;
+
+  /// ////////////////////////////////
+  /// @section Getting and setting the state
+  /// ////////////////////////////////
+
+  /// @brief Gets the current value of the state estimation in the form of a state vector \f$\hat{x_{k}}\f$
+  ///
+  /// @return const Vector&
+  const Vector & getCurrentStateVector() const;
+
+  /// @brief Get the State Vector Internal Time Index
+  /// This is for advanced use but may be used to check how many states have been estimated up to now
+  ///
+  /// @return TimeIndex
+  TimeIndex getStateVectorTimeIndex() const;
+
+  /// Sets a value of the state x_k provided from another source
+  /// can be used for initialization of the estimator
+  void setStateVector(const Vector &, bool resetCovariance = true);
+
+  //################################################################
 
   /// Sets the covariance matrix of the flexibility Guess
   void setStateCovariance(const Matrix & P);
