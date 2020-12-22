@@ -971,7 +971,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
 
   if(error > 1e-8)
   {
-    //    return errorcode;
+    return errorcode;
   }
 
   o.clearContacts();
