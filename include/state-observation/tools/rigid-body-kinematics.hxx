@@ -670,25 +670,7 @@ namespace stateObservation
     inline Orientation::Orientation(const Orientation & operand1, const Orientation & operand2):
     q_(false),m_(false)
     {
-      templateSetToProductNoAlias_(operand1,operand2);
-    }
-
-    inline Orientation::Orientation(Orientation & operand1, const Orientation & operand2 ):
-    q_(false),m_(false)
-    {
-      templateSetToProductNoAlias_(operand1,operand2);
-    }
-
-    inline Orientation::Orientation(const Orientation & operand1, Orientation & operand2 ):
-    q_(false),m_(false)
-    {
-      templateSetToProductNoAlias_(operand1,operand2);
-    }
-
-    inline Orientation::Orientation(Orientation & operand1, Orientation & operand2):
-    q_(false),m_(false)
-    {
-      templateSetToProductNoAlias_(operand1,operand2);
+      setToProductNoAlias(operand1, operand2);
     }
 
     inline Orientation & Orientation::operator=(const Vector3& v)
@@ -757,49 +739,7 @@ namespace stateObservation
 
     inline Vector4 Orientation::toVector4() const
     {
-      return quaternion().coeffs();
-    }
-
-    inline Vector4 Orientation::toVector4()
-    {
-      return quaternion().coeffs();
-    }
-
-    inline Orientation::operator Matrix3()
-    {
-      return matrix3();
-    }
-
-    inline Orientation::operator Quaternion()
-    {
-      return quaternion();
-    }
-
-    inline Orientation::operator Matrix3() const
-    {
-      check_();
-      if (!isMatrixSet())
-      {
-        return q_().toRotationMatrix();
-      }
-      else
-      {
-        return m_();
-      }
-
-    }
-
-    inline Orientation::operator Quaternion() const
-    {
-      check_();
-      if (isQuaternionSet() )
-      {
-        return q_();
-      }
-      else
-      {
-        return Quaternion(m_());
-      }
+      return toQuaternion().coeffs();
     }
 
     inline Vector3 Orientation::toRotationVector() const
@@ -816,19 +756,6 @@ namespace stateObservation
     }
 
     inline Vector3 Orientation::toRollPitchYaw() const
-    {
-      check_();
-      if (isMatrixSet())
-      {
-        return kine::rotationMatrixToRollPitchYaw(m_());
-      }
-      else
-      {
-        return kine::rotationMatrixToRollPitchYaw(q_().toRotationMatrix());
-      }
-    }
-
-    inline Vector3 Orientation::toRollPitchYaw()
     {
       check_();
       if (!isMatrixSet())
@@ -852,7 +779,7 @@ namespace stateObservation
       }
     }
 
-    inline const Matrix3& Orientation::matrix3()
+    inline const Matrix3 & Orientation::toMatrix3() const
     {
       check_();
       if (!isMatrixSet())
@@ -862,7 +789,7 @@ namespace stateObservation
       return m_;
     }
 
-    inline const Quaternion& Orientation::quaternion()
+    inline const Quaternion & Orientation::toQuaternion() const
     {
       check_();
       if (!isQuaternionSet() )
@@ -872,51 +799,51 @@ namespace stateObservation
       return q_;
     }
 
-    inline const Matrix3& Orientation::matrix3() const
+    inline Orientation::operator const Matrix3 &() const
     {
-      BOOST_ASSERT (isMatrixSet() && "The matrix is not set");
-      return m_;
+      return toMatrix3();
     }
 
-    inline const Quaternion& Orientation::quaternion() const
+    inline Orientation::operator const Quaternion &() const
     {
-      BOOST_ASSERT (isQuaternionSet() && "The quaternion is not set");
-      return q_;
+      return toQuaternion();
     }
 
-    inline Orientation Orientation::setToProductNoAlias( Orientation& R1, Orientation& R2)
+    inline const Orientation & Orientation::setToProductNoAlias(const Orientation & R1, const Orientation & R2)
     {
-      return templateSetToProductNoAlias_(R1,R2);
-    }
+      R1.check_();
+      R2.check_();
+      if(R1.isQuaternionSet() && R2.isQuaternionSet())
+      {
+        if(R1.isMatrixSet() && R2.isMatrixSet())
+        {
+          m_.set().noalias() = R1.m_() * R2.m_();
+        }
+        else
+        {
+          m_.reset();
+        }
+        q_ = R1.q_() * R2.q_();
+      }
+      else
+      {
+        m_.set(true); /// we set the matrix as initialized before giving the value
+        if(!R1.isMatrixSet())
+        {
+          m_().noalias() = R1.quaternionToMatrix_() * R2.m_();
+        }
+        else if(!R2.isMatrixSet())
+        {
+          m_().noalias() = R1.m_() * R2.quaternionToMatrix_();
+        }
+        else
+        {
+          m_().noalias() = R1.m_() * R2.m_();
+        }
+        q_.reset();
+      }
 
-    inline Orientation Orientation::setToProductNoAlias( Orientation& R1, const Orientation& R2)
-    {
-      return templateSetToProductNoAlias_(R1,R2);
-    }
-
-    inline Orientation Orientation::setToProductNoAlias(  const Orientation& R1, Orientation& R2)
-    {
-      return templateSetToProductNoAlias_(R1,R2);
-    }
-
-    inline Orientation Orientation::setToProductNoAlias( const Orientation& R1, const Orientation& R2)
-    {
-      return templateSetToProductNoAlias_(R1,R2);
-    }
-
-    inline Orientation Orientation::operator*( Orientation& R2)
-    {
-      return Orientation(*this,R2);
-    }
-
-    inline Orientation Orientation::operator*(const Orientation& R2)
-    {
-      return Orientation(*this,R2);
-    }
-
-    inline Orientation Orientation::operator*( Orientation& R2) const
-    {
-      return Orientation(*this,R2);
+      return *this;
     }
 
     inline Orientation Orientation::operator*(const Orientation& R2) const
@@ -931,11 +858,11 @@ namespace stateObservation
       {
         if (isMatrixSet())
         {
-          return Orientation(q_().conjugate(), m_().transpose());
+          return Orientation(q_().inverse(), m_().transpose());
         }
         else
         {
-          return Orientation(q_().conjugate());
+          return Orientation(q_().inverse());
         }
       }
       else
@@ -1024,34 +951,14 @@ namespace stateObservation
       q_.set(b);
     }
 
-
-    inline Vector3 Orientation::operator*( const Vector3& v)
+    inline Vector3 Orientation::operator*(const Vector3 & v) const
     {
       check_();
       if (!isMatrixSet())
       {
         quaternionToMatrix_();
-        return m_()*v;
-
       }
-      else
-      {
-        return m_()*v;
-      }
-
-    }
-
-    inline Vector3 Orientation::operator*( const Vector3& v) const
-    {
-      check_();
-      if (m_.isSet())
-      {
-        return m_()*v;
-      }
-      else
-      {
-        return q_()*v;
-      }
+      return m_()*v;
     }
 
     inline CheckedMatrix3 & Orientation::getMatrixRefUnsafe()
@@ -1069,62 +976,14 @@ namespace stateObservation
       BOOST_ASSERT((isQuaternionSet()  || isMatrixSet()) && "The orientation is not initialized");
     }
 
-    inline Matrix3 & Orientation::quaternionToMatrix_()
+    inline const Matrix3 & Orientation::quaternionToMatrix_() const
     {
       return m_=q_().toRotationMatrix();
     }
 
-    inline Quaternion & Orientation::matrixToQuaternion_()
+    inline const Quaternion & Orientation::matrixToQuaternion_() const
     {
       return q_=Quaternion(m_());
-    }
-
-    inline Matrix3  Orientation::quaternionToMatrix_() const
-    {
-      return q_().toRotationMatrix();
-    }
-
-    inline Quaternion  Orientation::matrixToQuaternion_() const
-    {
-      return Quaternion(m_());
-    }
-
-    template<typename Ori1, typename Ori2>
-    inline Orientation Orientation::templateSetToProductNoAlias_(Ori1& R1, Ori2& R2)
-    {
-      R1.check_();
-      R2.check_();
-      if (R1.isQuaternionSet()  && R2.isQuaternionSet() )
-      {
-        if (R1.isMatrixSet() && R2.isMatrixSet())
-        {
-          m_.set().noalias() = R1.m_()*R2.m_();
-        }
-        else
-        {
-          m_.reset();
-        }
-        q_ = R1.q_()*R2.q_();
-      }
-      else
-      {
-        m_.set(true); /// we set the matrix as initialized before giving the value
-        if (!R1.isMatrixSet() )
-        {
-          m_().noalias() = R1.quaternionToMatrix_()*R2.m_();
-        }
-        else if (!R2.isMatrixSet() )
-        {
-          m_().noalias() = R1.m_()*R2.quaternionToMatrix_();
-        }
-        else
-        {
-          m_().noalias() = R1.m_()*R2.m_();
-        }
-        q_.reset();
-      }
-
-      return *this;
     }
 
     inline Orientation Orientation::zeroRotation()
@@ -1933,7 +1792,7 @@ namespace stateObservation
       }
       if (orientation.isSet())
       {
-        output.segment<4>(curIndex)=Quaternion(orientation).coeffs();
+        output.segment<4>(curIndex) = orientation.toQuaternion().coeffs();
         curIndex+=4;
       }
       if (linVel.isSet())

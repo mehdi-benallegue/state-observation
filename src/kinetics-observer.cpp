@@ -228,7 +228,7 @@ void KineticsObserver::setMass(double m)
   mass_ = m;
 }
 
-Vector KineticsObserver::update()
+const Vector & KineticsObserver::update()
 {
   if(k_est_ != k_data_)
   {
@@ -347,12 +347,12 @@ Vector KineticsObserver::update()
   return stateVector_;
 }
 
-Vector KineticsObserver::getStateVector() const
+const Vector & KineticsObserver::getCurrentStateVector() const
 {
   return stateVector_;
 }
 
-stateObservation::TimeIndex KineticsObserver::getStateVectorSampleTime() const
+stateObservation::TimeIndex KineticsObserver::getStateVectorTimeIndex() const
 {
   return ekf_.getCurrentTime();
 }
@@ -1368,7 +1368,7 @@ void KineticsObserver::computeAccelerations_(Kinematics & stateKine,
                                              Vector3 & linAcc,
                                              Vector3 & angAcc)
 {
-  Matrix3 Rt = stateKine.orientation.matrix3().inverse();
+  Matrix3 Rt = stateKine.orientation.toMatrix3().transpose();
   Vector3 Rtw = Rt * stateKine.angVel();
   Vector3 corioCentri = 2 * Rtw.cross(comd_() + Rtw.cross(com_()));
 
@@ -1393,14 +1393,14 @@ void KineticsObserver::computeContactForces_(VectorContactIterator i,
 
   Kinematics globalKine(stateKine, localKine); /// product of kinematics
 
-  Matrix3 globKineOriInverse = globalKine.orientation.inverse();
+  Matrix3 globKineOriInverse = globalKine.orientation.toMatrix3().transpose();
 
   force = globKineOriInverse
           * (contact.linearStiffness * (contactPose.position() - globalKine.position())
              - contact.linearDamping * globalKine.linVel());
   torque = globKineOriInverse
            * (-0.5 * contact.angularStiffness
-                  * (Quaternion(globalKine.orientation) * Quaternion(contactPose.orientation).inverse()).vec()
+                  * (globalKine.orientation.toQuaternion() * contactPose.orientation.toQuaternion().inverse()).vec()
               - contact.angularDamping * globalKine.angVel());
 }
 
@@ -1562,8 +1562,8 @@ Vector KineticsObserver::stateDynamics(const Vector & xInput, const Vector & /*u
 
       x.segment<sizeForce>(contactForceIndex(i)) = -(Rcit * (Kpt * errorKine.position() + Kdt * errorKine.linVel()));
 
-      x.segment<sizeTorque>(contactTorqueIndex(i)) =
-          -(Rcit * (Kpr * kine::vectorComponent(Quaternion(errorKine.orientation)) * 0.5 + Kdr * errorKine.angVel()));
+      x.segment<sizeTorque>(contactTorqueIndex(i)) = -(
+          Rcit * (Kpr * kine::vectorComponent(errorKine.orientation.toQuaternion()) * 0.5 + Kdr * errorKine.angVel()));
     }
   }
 
@@ -1595,22 +1595,22 @@ Vector KineticsObserver::measureDynamics(const Vector & x, const Vector & /*unus
 
   computeAccelerations_(stateKine, forceLocal, torqueLocal, linacc, angacc);
 
-  Kinematics & localKine = opt_.kine;
+  Kinematics & globalKine = opt_.kine;
 
   for(VectorIMUConstIterator i = imuSensors_.begin(); i != imuSensors_.end(); ++i)
   {
     if(i->time == k_data_)
     {
       const IMU & imu = *i;
-      localKine = stateKine * imu.kinematics;
-      localKine.orientation.matrix3();
+      globalKine.setToProductNoAlias(stateKine, imu.kinematics);
+      const Matrix3 & globalOri = globalKine.orientation.toMatrix3();
 
       /// accelerometer
-      y.segment<sizeAcceleroSignal>(imu.measIndex) =
-          localKine.orientation.getMatrixRefUnsafe()().transpose() * (localKine.linAcc() + cst::gravity);
+      y.segment<sizeAcceleroSignal>(imu.measIndex).noalias() =
+          globalOri.transpose() * (globalKine.linAcc() + cst::gravity);
       /// gyrometer
-      y.segment<sizeGyroSignal>(imu.measIndex + sizeAcceleroSignal) =
-          localKine.orientation.getMatrixRefUnsafe()().transpose() * localKine.angVel();
+      y.segment<sizeGyroSignal>(imu.measIndex + sizeAcceleroSignal).noalias() =
+          globalOri.transpose() * globalKine.angVel();
     }
   }
 

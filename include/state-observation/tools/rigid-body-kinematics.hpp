@@ -337,9 +337,6 @@ public:
   Orientation(const double & roll, const double & pitch, const double & yaw);
 
   Orientation(const Orientation & multiplier1, const Orientation & multiplier2);
-  Orientation(Orientation & multiplier1, const Orientation & multiplier2);
-  Orientation(const Orientation & multiplier1, Orientation & multiplier2);
-  Orientation(Orientation & multiplier1, Orientation & multiplier2);
 
   inline Orientation & operator=(const Vector3 & v);
 
@@ -361,48 +358,25 @@ public:
   inline Orientation & setZeroRotation();
 
   /// get a const reference on the matrix or the quaternion
-  inline const Matrix3 & matrix3();
-  inline const Quaternion & quaternion();
+  inline const Matrix3 & toMatrix3() const;
+  inline const Quaternion & toQuaternion() const;
 
-  inline const Matrix3 & matrix3() const;
-  inline const Quaternion & quaternion() const;
+  inline operator const Matrix3 &() const;
+  inline operator const Quaternion &() const;
 
   inline Vector4 toVector4() const;
-  inline Vector4 toVector4();
-
-  inline operator Matrix3();
-
-  inline operator Quaternion();
-
-  inline operator Matrix3() const;
-
-  inline operator Quaternion() const;
 
   inline Vector3 toRotationVector() const;
   inline Vector3 toRollPitchYaw() const;
-  inline Vector3 toRollPitchYaw();
   inline AngleAxis toAngleAxis() const;
 
   /// Multiply the rotation (orientation) by another rotation R2
   /// the non const versions allow to use more optimized methods
 
-  inline Orientation operator*(Orientation & R2);
-
-  inline Orientation operator*(const Orientation & R2);
-
-  inline Orientation operator*(Orientation & R2) const;
-
   inline Orientation operator*(const Orientation & R2) const;
 
   /// Noalias versions of the operator*
-
-  inline Orientation setToProductNoAlias(Orientation & R1, Orientation & R2);
-
-  inline Orientation setToProductNoAlias(Orientation & R1, const Orientation & R2);
-
-  inline Orientation setToProductNoAlias(const Orientation & R1, Orientation & R2);
-
-  inline Orientation setToProductNoAlias(const Orientation & R1, const Orientation & R2);
+  inline const Orientation & setToProductNoAlias(const Orientation & R1, const Orientation & R2);
 
   inline Orientation inverse() const;
 
@@ -417,8 +391,6 @@ public:
   /// Rotate a vector
   inline Vector3 operator*(const Vector3 & v) const;
 
-  inline Vector3 operator*(const Vector3 & v);
-
   inline bool isSet() const;
   inline void reset();
 
@@ -430,7 +402,7 @@ public:
   inline void setMatrix(bool b = true);
   inline void setQuaternion(bool b = true);
 
-  /// no checks are performed for these functionsm use with caution
+  /// no checks are performed for these functions, use with caution
 
   inline CheckedMatrix3 & getMatrixRefUnsafe();
   inline CheckedQuaternion & getQuaternionRefUnsafe();
@@ -449,17 +421,11 @@ public:
 private:
   void check_() const;
 
-  inline Matrix3 & quaternionToMatrix_();
-  inline Quaternion & matrixToQuaternion_();
-  inline Matrix3 quaternionToMatrix_() const;
-  inline Quaternion matrixToQuaternion_() const;
+  inline const Matrix3 & quaternionToMatrix_() const;
+  inline const Quaternion & matrixToQuaternion_() const;
 
-  /// this is a helper function to avoid code duplication
-  template<typename Ori1, typename Ori2>
-  inline Orientation templateSetToProductNoAlias_(Ori1 & multiplier1, Ori2 & multiplier2);
-
-  CheckedQuaternion q_;
-  CheckedMatrix3 m_;
+  mutable CheckedQuaternion q_;
+  mutable CheckedMatrix3 m_;
 };
 
 struct Kinematics
