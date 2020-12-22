@@ -405,7 +405,7 @@ Matrix KalmanFilterBase::getLastGain() const
 
 Vector KalmanFilterBase::predictSensor_(TimeIndex k)
 {
-  return ybar_.set(simulateSensor_(xbar_(), k), k);
+  return ybar_.set(simulateSensor_(xbar_(), k), k)();
 }
 
 void KalmanFilterBase::setStateArithmetics(StateVectorArithmetics * a)

@@ -332,7 +332,7 @@ public:
   IndexedMatrixT(const MatrixType & v, TimeIndex k);
 
   /// Set the value of the matrix and the time sample
-  inline MatrixType set(const MatrixType & v, TimeIndex k);
+  inline IndexedMatrixT & set(const MatrixType & v, TimeIndex k);
 
   /// Switch the vector to "initialized" state
   inline void set(bool value = true);
