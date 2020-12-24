@@ -454,9 +454,6 @@ struct Kinematics
   Kinematics(const Vector & v, Flags::Byte = Flags::all);
 
   Kinematics(const Kinematics & multiplier1, const Kinematics & multiplier2);
-  Kinematics(Kinematics & multiplier1, const Kinematics & multiplier2);
-  Kinematics(const Kinematics & multiplier1, Kinematics & multiplier2);
-  Kinematics(Kinematics & multiplier1, Kinematics & multiplier2);
 
   /// Fills from vector
   /// the flags show which parts of the kinematics to be loaded from the vector
@@ -487,15 +484,9 @@ struct Kinematics
   inline Vector toVector() const;
 
   /// composition of transformation
-  inline Kinematics operator*(const Kinematics &)const;
-  inline Kinematics operator*(const Kinematics &);
-  inline Kinematics operator*(Kinematics &)const;
-  inline Kinematics operator*(Kinematics &);
+  inline Kinematics operator*(const Kinematics &) const;
 
   inline Kinematics setToProductNoAlias(const Kinematics & operand1, const Kinematics & operand2);
-  inline Kinematics setToProductNoAlias(const Kinematics & operand1, Kinematics & operand2);
-  inline Kinematics setToProductNoAlias(Kinematics & operand1, const Kinematics & operand2);
-  inline Kinematics setToProductNoAlias(Kinematics & operand1, Kinematics & operand2);
 
   inline void reset();
 
@@ -512,9 +503,6 @@ struct Kinematics
 
 protected:
   inline const Kinematics & update_deprecated(const Kinematics & newValue, double dt, Flags::Byte = Flags::all);
-  /// this is a helper function to avoid code duplication
-  template<typename operand1, typename operand2>
-  inline Kinematics templateSetToProductNoAlias_(operand1 & multilplier1, operand2 & multiplier2);
 
   Vector3 tempVec_;
 };

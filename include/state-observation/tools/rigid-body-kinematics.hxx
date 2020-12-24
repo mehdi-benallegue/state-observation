@@ -1007,35 +1007,10 @@ namespace stateObservation
       fromVector (v,flags);
     }
 
-
-    inline Kinematics::Kinematics(const Kinematics & multiplier1,const Kinematics & multiplier2):
-      position(false), orientation(false), linVel(false), angVel(false),
-      linAcc(false), angAcc(false)
+    inline Kinematics::Kinematics(const Kinematics & multiplier1, const Kinematics & multiplier2)
     {
-      templateSetToProductNoAlias_(multiplier1,multiplier2);
+      setToProductNoAlias(multiplier1, multiplier2);
     }
-
-    inline Kinematics::Kinematics(Kinematics & multiplier1,const Kinematics & multiplier2):
-      position(false), orientation(false), linVel(false), angVel(false),
-      linAcc(false), angAcc(false)
-    {
-      templateSetToProductNoAlias_(multiplier1,multiplier2);
-    }
-
-    inline Kinematics::Kinematics(const Kinematics & multiplier1,Kinematics & multiplier2):
-      position(false), orientation(false), linVel(false), angVel(false),
-      linAcc(false), angAcc(false)
-    {
-      templateSetToProductNoAlias_(multiplier1,multiplier2);
-    }
-
-    inline Kinematics::Kinematics(Kinematics & multiplier1, Kinematics & multiplier2):
-      position(false), orientation(false), linVel(false), angVel(false),
-      linAcc(false), angAcc(false)
-    {
-      templateSetToProductNoAlias_(multiplier1,multiplier2);
-    }
-
 
     inline Kinematics & Kinematics::fromVector(const Vector & v, Kinematics::Flags::Byte flags)
     {
@@ -1656,37 +1631,100 @@ namespace stateObservation
       return Kinematics(*this,multiplier);
     }
 
-    inline Kinematics Kinematics::operator*(const Kinematics & multiplier)
+    inline Kinematics Kinematics::setToProductNoAlias(const Kinematics & multiplier1, const Kinematics & multiplier2)
     {
-      return Kinematics(*this,multiplier);
-    }
+      BOOST_ASSERT(multiplier1.orientation.isSet()
+                   && "The multiplier 1 orientation is not initialized, the multiplication is not possible.");
 
-    inline Kinematics Kinematics::operator*( Kinematics & multiplier) const
-    {
-      return Kinematics(*this,multiplier);
-    }
+      BOOST_ASSERT((multiplier2.position.isSet() || multiplier2.orientation.isSet())
+                   && "The multiplier 2 kinematics is not initialized, the multiplication is not possible.");
 
-    inline Kinematics Kinematics::operator*(Kinematics & multiplier)
-    {
-      return Kinematics(*this,multiplier);
-    }
+      if(multiplier2.position.isSet() && multiplier1.position.isSet())
+      {
+        position.set(true);
+        Vector3 & R1p2 = position(); /// reference ( Vector3&  )
+        R1p2.noalias() = multiplier1.orientation * multiplier2.position();
 
+        if(multiplier2.linVel.isSet() && multiplier1.linVel.isSet() && multiplier1.angVel.isSet())
+        {
+          Vector3 & R1p2d = tempVec_; /// reference
+          R1p2d.noalias() = multiplier1.orientation * multiplier2.linVel();
 
-    inline Kinematics Kinematics::setToProductNoAlias(const Kinematics & operand1,const Kinematics & operand2)
-    {
-      return templateSetToProductNoAlias_(operand1, operand2);
-    }
-    inline Kinematics Kinematics::setToProductNoAlias(const Kinematics & operand1, Kinematics & operand2)
-    {
-      return templateSetToProductNoAlias_(operand1, operand2);
-    }
-    inline Kinematics Kinematics::setToProductNoAlias( Kinematics & operand1,const Kinematics & operand2)
-    {
-      return templateSetToProductNoAlias_(operand1, operand2);
-    }
-    inline Kinematics Kinematics::setToProductNoAlias( Kinematics & operand1, Kinematics & operand2)
-    {
-      return templateSetToProductNoAlias_(operand1, operand2);
+          linVel.set(true);
+          Vector3 & w1xR1p2 = linVel(); /// reference
+          w1xR1p2.noalias() = multiplier1.angVel().cross(R1p2);
+
+          Vector3 & w1xR1p2_R1p2d = w1xR1p2; ///  reference ( =linVel() )
+          w1xR1p2_R1p2d += R1p2d;
+
+          if(multiplier2.linAcc.isSet() && multiplier1.linAcc.isSet() && multiplier1.angAcc.isSet())
+          {
+            linAcc.set(true);
+            linAcc().noalias() = multiplier1.orientation * multiplier2.linAcc();
+            linAcc().noalias() += multiplier1.angAcc().cross(R1p2);
+            linAcc().noalias() += multiplier1.angVel().cross(w1xR1p2_R1p2d + R1p2d);
+            linAcc() += multiplier1.linAcc();
+          }
+          else
+          {
+            linAcc.reset();
+          }
+
+          linVel() += multiplier1.linVel();
+        }
+        else
+        {
+          linVel.reset();
+          linAcc.reset();
+        }
+
+        position() += multiplier1.position();
+      }
+      else
+      {
+        position.reset();
+        linVel.reset();
+        linAcc.reset();
+      }
+
+      if(multiplier2.orientation.isSet())
+      {
+        orientation.setToProductNoAlias(multiplier1.orientation, multiplier2.orientation);
+
+        if(multiplier2.angVel.isSet() && multiplier1.angVel.isSet())
+        {
+          angVel.set(true);
+          Vector3 & R1w2 = angVel(); /// reference
+          R1w2.noalias() = multiplier1.orientation * multiplier2.angVel();
+
+          if(multiplier2.angAcc.isSet() && multiplier1.angAcc.isSet())
+          {
+            angAcc.set(true);
+            angAcc().noalias() = multiplier1.orientation * multiplier2.angAcc();
+            angAcc().noalias() += multiplier1.angVel().cross(R1w2);
+            angAcc() += multiplier1.angAcc();
+          }
+          else
+          {
+            angAcc.reset();
+          }
+
+          angVel() += multiplier1.angVel();
+        }
+        else
+        {
+          angVel.reset();
+          angAcc.reset();
+        }
+      }
+      else
+      {
+        orientation.reset();
+        angVel.reset();
+        angAcc.reset();
+      }
+
+      return *this;
     }
 
     inline Vector Kinematics::toVector(Flags::Byte flags) const
@@ -1826,107 +1864,6 @@ namespace stateObservation
       angVel.reset();
       linAcc.reset();
       angAcc.reset();
-    }
-
-    template<typename operand1,typename operand2>
-    inline Kinematics Kinematics::templateSetToProductNoAlias_(operand1& multiplier1, operand2& multiplier2)
-    {
-      BOOST_ASSERT(multiplier1.orientation.isSet()
-       && "The multiplier 1 orientation is not initialized, the multiplication is not possible.");
-
-      BOOST_ASSERT((multiplier2.position.isSet() || multiplier2.orientation.isSet())
-        &&"The multiplier 2 kinematics is not initialized, the multiplication is not possible.");
-
-
-      if (multiplier2.position.isSet() && multiplier1.position.isSet())
-      {
-        position.set(true);
-        Vector3& R1p2 = position(); /// reference ( Vector3&  )
-        R1p2.noalias() = multiplier1.orientation*multiplier2.position();
-
-        if (multiplier2.linVel.isSet() && multiplier1.linVel.isSet() && multiplier1.angVel.isSet())
-        {
-          Vector3& R1p2d = tempVec_; /// reference
-          R1p2d.noalias() = multiplier1.orientation*multiplier2.linVel();
-
-          linVel.set(true);
-          Vector3& w1xR1p2 = linVel(); /// reference
-          w1xR1p2.noalias() = multiplier1.angVel().cross(R1p2);
-
-          Vector3& w1xR1p2_R1p2d = w1xR1p2; ///  reference ( =linVel() )
-          w1xR1p2_R1p2d += R1p2d;
-
-          if (multiplier2.linAcc.isSet() && multiplier1.linAcc.isSet() && multiplier1.angAcc.isSet())
-          {
-            linAcc.set(true);
-            linAcc().noalias()  = multiplier1.orientation*multiplier2.linAcc();
-            linAcc().noalias() += multiplier1.angAcc().cross(R1p2);
-            linAcc().noalias() += multiplier1.angVel().cross(w1xR1p2_R1p2d+R1p2d);
-            linAcc()           += multiplier1.linAcc();
-          }
-          else
-          {
-            linAcc.reset();
-          }
-
-
-
-          linVel() += multiplier1.linVel();
-        }
-        else
-        {
-          linVel.reset();
-          linAcc.reset();
-        }
-
-        position() += multiplier1.position();
-      }
-      else
-      {
-        position.reset();
-        linVel.reset();
-        linAcc.reset();
-      }
-
-
-      if (multiplier2.orientation.isSet())
-      {
-        orientation.setToProductNoAlias(multiplier1.orientation, multiplier2.orientation);
-
-        if (multiplier2.angVel.isSet() && multiplier1.angVel.isSet())
-        {
-          angVel.set(true);
-          Vector3& R1w2 = angVel(); ///reference
-          R1w2.noalias() = multiplier1.orientation * multiplier2.angVel();
-
-          if (multiplier2.angAcc.isSet() && multiplier1.angAcc.isSet())
-          {
-            angAcc.set(true);
-            angAcc().noalias()  = multiplier1.orientation * multiplier2.angAcc();
-            angAcc().noalias() += multiplier1.angVel().cross(R1w2);
-            angAcc()           += multiplier1.angAcc();
-          }
-          else
-          {
-            angAcc.reset();
-          }
-
-          angVel() +=  multiplier1.angVel();
-        }
-        else
-        {
-          angVel.reset();
-          angAcc.reset();
-        }
-      }
-      else
-      {
-        orientation.reset();
-        angVel.reset();
-        angAcc.reset();
-      }
-
-      return *this;
     }
 
      inline const Kinematics & Kinematics::update_deprecated(const Kinematics & newValue, double dt, Flags::Byte flags)
