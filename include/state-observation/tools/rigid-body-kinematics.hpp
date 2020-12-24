@@ -484,7 +484,7 @@ struct Kinematics
   inline Vector toVector() const;
 
   /// composition of transformation
-  inline Kinematics operator*(const Kinematics &) const;
+  inline Kinematics operator*(const Kinematics &)const;
 
   inline Kinematics setToProductNoAlias(const Kinematics & operand1, const Kinematics & operand2);
 

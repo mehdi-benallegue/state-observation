@@ -85,8 +85,8 @@ public:
   void setWithUnmodeledWrench(bool b = true);
 
   /// @brief Sets if the estimation computes also the accelerations
-  /// @details This will not modify the estimated value, but just compute 
-  ///          the modeled acceleration, which gives a model-based filtered 
+  /// @details This will not modify the estimated value, but just compute
+  ///          the modeled acceleration, which gives a model-based filtered
   ///           acceleration
   ///
   /// @param b
@@ -94,33 +94,33 @@ public:
 
   /// @brief Set if the gyrometer bias is computed or not.
   ///        This parameter is global for all the IMUs.
-  /// 
-  /// @param b 
+  ///
+  /// @param b
   void setWithGyroBias(bool b = true);
 
   /// @brief Set the total mass of the robot. This can be changed online
-  /// 
-  /// @return sets 
+  ///
+  /// @return sets
   void setMass(double);
 
   /// @}
 
   // ///////////////////////////////////////////////////////////
   /// @name Setting kinematic sensors
-  /// These are the methods to be called at each iteration to give the control 
+  /// These are the methods to be called at each iteration to give the control
   /// inputs and the sensor measurement for IMUs and absolute pose sensors.
   // //////////////////////////////////////////////////////////
-  
+
   /// @{
 
   /// @brief Set the measurements of an IMU and give the Kinematic of the IMU
-  /// 
-  /// @details The overload that does not have the covariance matrices as an 
+  ///
+  /// @details The overload that does not have the covariance matrices as an
   /// inputs uses default ones.
   ///
   /// The IMU is located in a sensor frame. We suppose we know the kinematics of
-  /// this sensor frame in the local frame (for example the base frame or the 
-  /// control frame). 
+  /// this sensor frame in the local frame (for example the base frame or the
+  /// control frame).
   ///
   /// @return the number of the IMU (useful in case there are several ones)
   /// @param accelero measured value
@@ -137,7 +137,7 @@ public:
   /// @brief @copybrief setIMU(const Vector3&,const Vector3&,const Kinematics &,int)
   /// Provides also the associated covariance matrices
   /// @details
-  /// This version specifies the covariance matrices of these measurements. 
+  /// This version specifies the covariance matrices of these measurements.
   /// @copydetails setIMU(const Vector3&,const Vector3&,const Kinematics &,int)
   /// @param acceleroCov
   /// @param gyroCov
@@ -155,12 +155,9 @@ public:
   /// @param gyroCov
   void setIMUDefaultCovarianceMatrix(const Matrix3 & acceleroCov, const Matrix3 & gyroCov);
 
- 
-
-
   /// @brief Set an Absolute Pose Sensor measurement
   /// The measurement is the kinematics namely position and orientation.
-  /// @details The overload with the measurement only uses default covariance 
+  /// @details The overload with the measurement only uses default covariance
   /// matrix.
   /// @param measurement
   void setAbsolutePoseSensor(const Kinematics & measurement);
