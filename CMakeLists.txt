@@ -67,5 +67,7 @@ install(FILES "${CMAKE_BINARY_DIR}/$<CONFIG>/include/state-observation/config.h"
         DESTINATION ${INCLUDE_INSTALL_DESTINATION})
 
 add_subdirectory(src)
-add_subdirectory(unit-testings)
+if(BUILD_TESTING)
+  add_subdirectory(unit-testings)
+endif()
 add_subdirectory(misc-tools)
