@@ -843,7 +843,7 @@ int testKineticsObserverCodeAccessor(int errorcode)
   angDamping.diagonal().setConstant(20);
 
   contactKine.position.set() << 0, -0.1, 0;
-  o.addContact(contactKine, linStiffness, linDamping, angStiffness, angDamping, 3);
+  o.addContact(contactKine, 3, linStiffness, linDamping, angStiffness, angDamping);
 
   Matrix12 initialCov, processCov;
 
@@ -853,13 +853,13 @@ int testKineticsObserverCodeAccessor(int errorcode)
   processCov.diagonal().setConstant(0.0001);
 
   contactKine.position.set() << 1, 0.1, 0;
-  int i = o.addContact(contactKine, initialCov, processCov, -1);
+  int i = o.addContact(contactKine, initialCov, processCov);
 
   (void)i; /// avoid warning in release mode
   assert(i == 1);
 
   contactKine.position.set() << 1, -0.1, 0;
-  o.addContact(contactKine, initialCov, processCov, linDamping, linStiffness, angStiffness, angDamping, 2);
+  o.addContact(contactKine, initialCov, processCov, 2, linDamping, linStiffness, angStiffness, angDamping);
 
   std::cout << index << " " << x.transpose() << std::endl;
 

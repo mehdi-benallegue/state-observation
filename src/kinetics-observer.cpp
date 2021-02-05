@@ -155,11 +155,13 @@ KineticsObserver::KineticsObserver(unsigned maxContacts, unsigned maxNumberOfIMU
   stateKinematicsProcessCovMat_.block<sizeAngVel, sizeAngVel>(angVelIndexTangent(), angVelIndexTangent()) =
       stateAngVelProcessCovMat_;
 
-  contactProcessCovMat_.setZero();
-  contactProcessCovMat_.block<sizePos, sizePos>(0, 0) = contactPositionProcessCovMat_;
-  contactProcessCovMat_.block<sizeOriTangent, sizeOriTangent>(3, 3) = contactOrientationProcessCovMat_;
-  contactProcessCovMat_.block<sizeForce, sizeForce>(6, 6) = contactForceProcessCovMat_;
-  contactProcessCovMat_.block<sizeTorque, sizeTorque>(9, 9) = contactTorqueProcessCovMat_;
+  contactProcessCovMatDefault_.setZero();
+  contactProcessCovMatDefault_.block<sizePos, sizePos>(0, 0) = contactPositionProcessCovMat_;
+  contactProcessCovMatDefault_.block<sizeOriTangent, sizeOriTangent>(3, 3) = contactOrientationProcessCovMat_;
+  contactProcessCovMatDefault_.block<sizeForce, sizeForce>(6, 6) = contactForceProcessCovMat_;
+  contactProcessCovMatDefault_.block<sizeTorque, sizeTorque>(9, 9) = contactTorqueProcessCovMat_;
+
+  contactInitCovMatDefault_ = contactProcessCovMatDefault_;
 
   I_.set(Matrix3::Identity(), k_data_);
   Id_.set(Matrix3::Zero(), k_data_);
@@ -238,7 +240,7 @@ const Vector & KineticsObserver::update()
       {
         BOOST_ASSERT((i->time == k_data_) && "The contacts have not all been updated. \
               Either remove lost contacts using removeContact \
-              or Run setContactFTSensor or setContactWithNoSensor on every existing contact");
+              or Run updateContactWithWrenchSensor or updateContactWithNoSensor on every existing contact");
 
         /// the following code is only an attempt to maintain a coherent state of the state observer
         /// therefore we unset the observer
@@ -367,21 +369,6 @@ kine::Kinematics KineticsObserver::getKinematicsOf(const Kinematics & local) con
   return Kinematics(stateKinematics_, local); /// product of the kinematics
 }
 
-kine::Kinematics KineticsObserver::getKinematicsOf(const Kinematics & local)
-{
-  return Kinematics(stateKinematics_, local); /// product of the kinematics
-}
-
-kine::Kinematics KineticsObserver::getKinematicsOf(Kinematics & local) const
-{
-  return Kinematics(stateKinematics_, local); /// product of the kinematics
-}
-
-kine::Kinematics KineticsObserver::getKinematicsOf(Kinematics & local)
-{
-  return Kinematics(stateKinematics_, local); /// product of the kinematics
-}
-
 Vector6 KineticsObserver::getContactWrench(int contactNbr) const
 {
   return stateVector_.segment<sizeWrench>(contactWrenchIndex(contactNbr));
@@ -417,7 +404,8 @@ kine::Kinematics KineticsObserver::estimateAccelerations()
 void KineticsObserver::setStateKinematics(const Kinematics & kine, bool resetForces, bool resetCovariance)
 {
   BOOST_ASSERT(kine.position.isSet() && kine.orientation.isSet() && kine.linVel.isSet() && kine.angVel.isSet()
-               && "The Kinematics is not correctly initialized");
+               && "The Kinematics is not correctly initialized, should be the position, orientation, and linear and "
+                  "angular verlocities");
   stateKinematics_ = kine;
   stateVector_.segment<sizeStateKine>(kineIndex()) = stateKinematics_.toVector(flagsStateKine);
 
@@ -445,7 +433,7 @@ void KineticsObserver::setStateKinematics(const Kinematics & kine, bool resetFor
       {
         if(i->isSet)
         {
-          setBlockStateCovariance<sizeContact>(stateCovariance, contactInitCovMat_, contactIndex(i));
+          setBlockStateCovariance<sizeContact>(stateCovariance, contactInitCovMatDefault_, contactIndex(i));
         }
       }
     }
@@ -634,9 +622,9 @@ void KineticsObserver::setIMUDefaultCovarianceMatrix(const Matrix3 & acceleroCov
   gyroCovMatDefault_ = gyroCov;
 }
 
-void KineticsObserver::setContactWrenchSensor(const Vector6 & wrench,
-                                              const Kinematics & localKine,
-                                              unsigned contactNumber)
+void KineticsObserver::updateContactWithWrenchSensor(const Vector6 & wrench,
+                                                     const Kinematics & localKine,
+                                                     unsigned contactNumber)
 {
   /// ensure the measuements are labeled with the good time stamp
   startNewIteration_();
@@ -669,10 +657,10 @@ void KineticsObserver::setContactWrenchSensor(const Vector6 & wrench,
   }
 }
 
-void KineticsObserver::setContactWrenchSensor(const Vector6 & wrench,
-                                              const Matrix6 & wrenchCovMatrix,
-                                              const Kinematics & localKine,
-                                              unsigned contactNumber)
+void KineticsObserver::updateContactWithWrenchSensor(const Vector6 & wrench,
+                                                     const Matrix6 & wrenchCovMatrix,
+                                                     const Kinematics & localKine,
+                                                     unsigned contactNumber)
 {
   /// ensure the measuements are labeled with the good time stamp
   startNewIteration_();
@@ -706,7 +694,7 @@ void KineticsObserver::setContactWrenchSensorDefaultCovarianceMatrix(const Matri
   contactWrenchSensorCovMatDefault_ = wrenchSensorCovMat;
 }
 
-void KineticsObserver::setContactWithNoSensor(const Kinematics & localKine, unsigned contactNumber)
+void KineticsObserver::updateContactWithNoSensor(const Kinematics & localKine, unsigned contactNumber)
 {
   /// ensure the measuements are labeled with the good time stamp
   startNewIteration_();
@@ -872,11 +860,11 @@ void KineticsObserver::setAngularMomentum(const Vector3 & sigma)
 int KineticsObserver::addContact(const Kinematics & pose,
                                  const Matrix12 & initialCovarianceMatrix,
                                  const Matrix12 & processCovarianceMatrix,
+                                 int contactNumber,
                                  const Matrix3 & linearStiffness,
                                  const Matrix3 & linearDamping,
                                  const Matrix3 & angularStiffness,
-                                 const Matrix3 & angularDamping,
-                                 int contactNumber)
+                                 const Matrix3 & angularDamping)
 {
 
   BOOST_ASSERT(pose.position.isSet() && pose.orientation.isSet()
@@ -913,10 +901,41 @@ int KineticsObserver::addContact(const Kinematics & pose,
 
   contact.absPose = pose;
 
-  contact.linearStiffness = linearStiffness;
-  contact.linearDamping = linearDamping;
-  contact.angularStiffness = angularStiffness;
-  contact.angularDamping = angularDamping;
+  if(linearDamping != Matrix3::Zero())
+  {
+    contact.linearStiffness = linearStiffness;
+  }
+  else
+  {
+    contact.linearStiffness = linearStiffnessMatDefault_;
+  }
+
+  if(linearDamping != Matrix3::Zero())
+  {
+    contact.linearDamping = linearDamping;
+  }
+  else
+  {
+    contact.linearDamping = linearDampingMatDefault_;
+  }
+
+  if(angularStiffness != Matrix3::Zero())
+  {
+    contact.angularStiffness = angularStiffness;
+  }
+  else
+  {
+    contact.angularStiffness = angularStiffnessMatDefault_;
+  }
+
+  if(angularDamping != Matrix3::Zero())
+  {
+    contact.angularDamping = angularDamping;
+  }
+  else
+  {
+    contact.angularDamping = angularDampingMatDefault_;
+  }
 
   /// update the state vector
   stateVector_.segment<sizeContact>(contact.stateIndex) << pose.toVector(flagsContactKine), Vector6::Zero();
@@ -934,34 +953,16 @@ int KineticsObserver::addContact(const Kinematics & pose,
   return contactNumber;
 }
 
-/// version with default stiffness and damping
-/// use when the contact parameters are known
-int KineticsObserver::addContact(const Kinematics & pose,
-                                 const Matrix12 & initialCovarianceMatrix,
-                                 const Matrix12 & processCovarianceMatrix,
-                                 int contactNumber)
-{
-  return addContact(pose, initialCovarianceMatrix, processCovarianceMatrix, linearStiffnessMatDefault_,
-                    linearDampingMatDefault_, angularDampingMatDefault_, angularDampingMatDefault_, contactNumber);
-}
-
 /// version when the contact position is perfectly known
 int KineticsObserver::addContact(const Kinematics & pose,
+                                 int contactNumber,
                                  const Matrix3 & linearStiffness,
                                  const Matrix3 & linearDamping,
                                  const Matrix3 & angularStiffness,
-                                 const Matrix3 & angularDamping,
-                                 int contactNumber)
+                                 const Matrix3 & angularDamping)
 {
-  return addContact(pose, contactInitCovMat_, contactProcessCovMat_, linearStiffness, linearDamping, angularStiffness,
-                    angularDamping, contactNumber);
-}
-
-/// version when the position is perfectly known but not the stiffness and damping
-int KineticsObserver::addContact(const Kinematics & pose, int contactNumber)
-{
-  return addContact(pose, contactInitCovMat_, contactProcessCovMat_, linearStiffnessMatDefault_,
-                    linearDampingMatDefault_, angularDampingMatDefault_, angularDampingMatDefault_, contactNumber);
+  return addContact(pose, contactInitCovMatDefault_, contactProcessCovMatDefault_, contactNumber, linearStiffness,
+                    linearDamping, angularStiffness, angularDamping);
 }
 
 void KineticsObserver::removeContact(int contactNbr)
@@ -1003,7 +1004,7 @@ std::vector<int> KineticsObserver::getListOfContacts() const
   return v;
 }
 
-void KineticsObserver::setStateCovariance(const Matrix & P)
+void KineticsObserver::setStateCovarianceMat(const Matrix & P)
 {
   ekf_.setStateCovariance(P);
 }
@@ -1046,7 +1047,7 @@ void KineticsObserver::setUnmodeledWrenchStateCovMat(const Matrix6 & currentCovM
   ekf_.setStateCovariance(P);
 }
 
-void KineticsObserver::setUnmodeledWrenchIniCovMatDefault(const Matrix6 & initCovMat)
+void KineticsObserver::setUnmodeledWrenchInitCovMatDefault(const Matrix6 & initCovMat)
 {
   unmodeledWrenchInitCovMat_ = initCovMat;
 }
@@ -1067,7 +1068,7 @@ void KineticsObserver::setContactStateCovMat(int contactNbr, const Matrix12 & co
 
 void KineticsObserver::setContactInitCovMatDefault(const Matrix12 & contactCovMat)
 {
-  contactInitCovMat_ = contactCovMat;
+  contactInitCovMatDefault_ = contactCovMat;
 }
 
 void KineticsObserver::setContactProcessCovMat(int contactNbr, const Matrix12 & contactCovMat)
@@ -1077,12 +1078,12 @@ void KineticsObserver::setContactProcessCovMat(int contactNbr, const Matrix12 & 
   ekf_.setProcessCovariance(P);
 }
 
-Matrix KineticsObserver::getStateCovariance() const
+Matrix KineticsObserver::getStateCovarianceMat() const
 {
   return ekf_.getStateCovariance();
 }
 
-void KineticsObserver::setProcessNoiseCovariance(const Matrix & Q)
+void KineticsObserver::setProcessNoiseCovarianceMat(const Matrix & Q)
 {
   ekf_.setProcessCovariance(Q);
 }
@@ -1185,7 +1186,7 @@ void KineticsObserver::resetStateContactCovMat(unsigned contactNbr)
                && "Tried to set the covariance of a non existant contact");
 
   Matrix P = ekf_.getStateCovariance();
-  setBlockStateCovariance<sizeContactTangent>(P, contactInitCovMat_, contacts_[contactNbr].stateIndexTangent);
+  setBlockStateCovariance<sizeContactTangent>(P, contactInitCovMatDefault_, contacts_[contactNbr].stateIndexTangent);
   ekf_.setStateCovariance(P);
 }
 
@@ -1243,7 +1244,7 @@ void KineticsObserver::resetProcessContactCovMat(unsigned contactNbr)
                && "Tried to set the covariance of a non existant contact");
 
   Matrix P = ekf_.getProcessCovariance();
-  setBlockStateCovariance<sizeContactTangent>(P, contactProcessCovMat_, contacts_[contactNbr].stateIndexTangent);
+  setBlockStateCovariance<sizeContactTangent>(P, contactProcessCovMatDefault_, contacts_[contactNbr].stateIndexTangent);
   ekf_.setProcessCovariance(P);
 }
 
