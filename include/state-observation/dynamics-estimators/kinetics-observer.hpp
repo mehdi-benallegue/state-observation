@@ -863,8 +863,6 @@ protected:
     Matrix3 covMatrixAccelero;
     Matrix3 covMatrixGyro;
 
-    static int currentNumber;
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
@@ -895,8 +893,6 @@ protected:
     static const Kinematics::Flags::Byte localKineFlags = /// flags for the components of the kinematics
         Kinematics::Flags::position | Kinematics::Flags::orientation | Kinematics::Flags::linVel
         | Kinematics::Flags::angVel;
-
-    static int numberOfRealSensors;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
@@ -1055,6 +1051,9 @@ protected:
 
   NoiseBase * processNoise_;
   NoiseBase * measurementNoise_;
+
+  int numberOfContactRealSensors_;
+  int currentIMUSensorNumber_;
 
   /// function to call before adding any measurement
   /// detects if there is a new estimation beginning and then

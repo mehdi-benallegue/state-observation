@@ -86,9 +86,6 @@ const double KineticsObserver::defaultdx = 1e-6;
 const int measurementSizeBase = 0;
 const int inputSize = 0;
 
-int KineticsObserver::Contact::numberOfRealSensors = 0;
-int KineticsObserver::IMU::currentNumber = 0;
-
 KineticsObserver::KineticsObserver(unsigned maxContacts, unsigned maxNumberOfIMU)
 : maxContacts_(maxContacts), maxImuNumber_(maxNumberOfIMU), contacts_(maxContacts_), imuSensors_(maxImuNumber_),
   stateSize_(sizeStateBase + maxImuNumber_ * sizeGyroBias + maxContacts * sizeContact),
@@ -98,7 +95,8 @@ KineticsObserver::KineticsObserver(unsigned maxContacts, unsigned maxNumberOfIMU
   ekf_(stateSize_, stateTangentSize_, measurementSizeBase, measurementSizeBase, inputSize, false, false),
   finiteDifferencesJacobians_(true), withGyroBias_(true), withUnmodeledWrench_(false),
   withAccelerationEstimation_(false), k_est_(0), k_data_(0), mass_(defaultMass), dt_(defaultdx), processNoise_(0x0),
-  measurementNoise_(0x0), linearStiffnessMatDefault_(Matrix3::Identity() * linearStiffnessDefault),
+  measurementNoise_(0x0), numberOfContactRealSensors_(0), currentIMUSensorNumber_(0),
+  linearStiffnessMatDefault_(Matrix3::Identity() * linearStiffnessDefault),
   angularStiffnessMatDefault_(Matrix3::Identity() * angularStiffnessDefault),
   linearDampingMatDefault_(Matrix3::Identity() * linearDampingDefault),
   angularDampingMatDefault_(Matrix3::Identity() * angularDampingDefault),
@@ -179,8 +177,6 @@ KineticsObserver::KineticsObserver(unsigned maxContacts, unsigned maxNumberOfIMU
 
   updateKine_();
 
-  Contact::numberOfRealSensors = 0;
-
   stateVectorDx_.setConstant(1e-6);
 }
 
@@ -204,7 +200,7 @@ Index KineticsObserver::getMeasurementSize() const
       }
     }
 
-    size += Contact::numberOfRealSensors * sizeWrench;
+    size += numberOfContactRealSensors_ * sizeWrench;
 
     if(absPoseSensor_.time == k_data_)
     {
@@ -242,13 +238,14 @@ const Vector & KineticsObserver::update()
               Either remove lost contacts using removeContact \
               or Run updateContactWithWrenchSensor or updateContactWithNoSensor on every existing contact");
 
-        /// the following code is only an attempt to maintain a coherent state of the state observer
-        /// therefore we unset the observer
+        /// the following code is only an attempt to maintain a consistent state of the state observer
+        /// therefore we unset the state
         if(i->time != k_data_)
         {
           if(i->withRealSensor)
           {
-            Contact::numberOfRealSensors--;
+            i->withRealSensor = false;
+            numberOfContactRealSensors_--;
           }
           i->isSet = false;
         }
@@ -257,7 +254,7 @@ const Vector & KineticsObserver::update()
 
     ///////////// initialize the measurement Vector and matrix //////////////
 
-    measurementSize_ = sizeIMUSignal * IMU::currentNumber + sizeWrench * Contact::numberOfRealSensors;
+    measurementSize_ = sizeIMUSignal * currentIMUSensorNumber_ + sizeWrench * numberOfContactRealSensors_;
     measurementTangentSize_ = measurementSize_;
     if(absPoseSensor_.time == k_data_)
     {
@@ -551,7 +548,7 @@ int KineticsObserver::setIMU(const Vector3 & accelero, const Vector3 & gyrometer
   }
 
   imu.time = k_data_;
-  ++IMU::currentNumber;
+  ++currentIMUSensorNumber_;
 
   return num;
 }
@@ -611,7 +608,7 @@ int KineticsObserver::setIMU(const Vector3 & accelero,
 
   imu.time = k_data_;
 
-  ++IMU::currentNumber;
+  ++currentIMUSensorNumber_;
 
   return num;
 }
@@ -653,7 +650,7 @@ void KineticsObserver::updateContactWithWrenchSensor(const Vector6 & wrench,
   if(!(contacts_[contactNumber].withRealSensor))
   {
     contacts_[contactNumber].withRealSensor = true;
-    Contact::numberOfRealSensors++;
+    numberOfContactRealSensors_++;
   }
 }
 
@@ -685,7 +682,7 @@ void KineticsObserver::updateContactWithWrenchSensor(const Vector6 & wrench,
   if(!(contacts_[contactNumber].withRealSensor))
   {
     contacts_[contactNumber].withRealSensor = true;
-    Contact::numberOfRealSensors++;
+    numberOfContactRealSensors_++;
   }
 }
 
@@ -718,7 +715,7 @@ void KineticsObserver::updateContactWithNoSensor(const Kinematics & localKine, u
   if(contacts_[contactNumber].withRealSensor)
   {
     contacts_[contactNumber].withRealSensor = false;
-    Contact::numberOfRealSensors--;
+    numberOfContactRealSensors_--;
   }
 }
 
@@ -968,21 +965,18 @@ int KineticsObserver::addContact(const Kinematics & pose,
 void KineticsObserver::removeContact(int contactNbr)
 {
   BOOST_ASSERT(!contacts_[contactNbr].isSet && "Tried to remove a non-existing contact.");
-  if(contacts_[contactNbr].isSet)
+  contacts_[contactNbr].isSet = false;
+  if(contacts_[contactNbr].withRealSensor)
   {
-    contacts_[contactNbr].isSet = false;
-    if(contacts_[contactNbr].withRealSensor)
-    {
-      contacts_[contactNbr].withRealSensor = false;
-      --Contact::numberOfRealSensors;
-    }
+    contacts_[contactNbr].withRealSensor = false;
+    --numberOfContactRealSensors_;
   }
 }
 
 void KineticsObserver::clearContacts()
 {
   contacts_.clear();
-  Contact::numberOfRealSensors = 0;
+  numberOfContactRealSensors_ = 0;
 }
 
 Index KineticsObserver::getNumberOfContacts() const
@@ -1295,8 +1289,8 @@ void KineticsObserver::startNewIteration_()
   if(k_est_ == k_data_)
   {
     ++k_data_;
-    Contact::numberOfRealSensors = 0;
-    IMU::currentNumber = 0;
+    numberOfContactRealSensors_ = 0;
+    currentIMUSensorNumber_ = 0;
   }
 }
 
@@ -1494,7 +1488,7 @@ void KineticsObserver::measurementDifference(const Vector & measureVector1,
   Orientation & o2 = opt_.ori2;
   difference.resize(measurementTangentSize_);
 
-  int currentMeasurementSize = sizeIMUSignal * IMU::currentNumber + sizeWrench * Contact::numberOfRealSensors;
+  int currentMeasurementSize = sizeIMUSignal * currentIMUSensorNumber_ + sizeWrench * numberOfContactRealSensors_;
 
   difference.segment(0, currentMeasurementSize).noalias() =
       measureVector1.segment(0, currentMeasurementSize) - measureVector2.segment(0, currentMeasurementSize);
