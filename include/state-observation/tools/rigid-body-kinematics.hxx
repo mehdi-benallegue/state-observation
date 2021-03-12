@@ -314,6 +314,31 @@ inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v)
   return M;
 }
 
+inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1)
+{
+
+  BOOST_ASSERT(v1.isUnitary() && Rv1.isUnitary() && "The vectors v1 and Rv1 need to be normalized");
+
+  double v1dotRv1 = v1.dot(Rv1);
+  if(1 - v1dotRv1 < cst::epsilon1)
+  {
+    /// the angle is zero;
+    return Matrix3::Identity();
+  }
+  else if(1 + v1dotRv1 < cst::epsilon1)
+  {
+    ///it is a singularity
+    throw std::invalid_argument("twoVectorsToRotationMatrix Vectors are opposite: there is an infinity of rotation "
+                                "matrices with minimal angle between them");
+  }
+  else
+  {
+    Vector3 v1xRv1 = v1.cross(Rv1);
+    return Matrix3::Identity() + skewSymmetric(v1xRv1)
+           + ((1 - v1.dot(Rv1)) / v1xRv1.squaredNorm()) * skewSymmetric2(v1xRv1);
+  }
+}
+
 inline bool isPureYaw(const Matrix3 & R)
 {
   return (fabs(R(2, 0)) < cst::epsilon1 && fabs(R(2, 1)) < cst::epsilon1);
@@ -347,10 +372,6 @@ inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2, const 
   Vector3 mlxv1 = (R2.transpose() * m).cross(v1);
 
   double n2 = mlxv1.squaredNorm();
-
-  BOOST_ASSERT((n2 > cst::epsilonAngle * cst::epsilonAngle)
-               && "Tilt is singular with regard to the provided axis (likely gimbal lock). Please use the "
-                  "angle-agnostic version");
 
   if(n2 > cst::epsilonAngle * cst::epsilonAngle)
   {
