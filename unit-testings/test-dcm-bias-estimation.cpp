@@ -242,94 +242,11 @@ int testDcmBiasEstimator(int errorCode)
   }
 }
 
-/// @brief test rotationMatrix2Angle
-///
-/// @param errorCode
-/// @return int
-int testrotationMatrix2Angle(int errorCode)
-{
-
-  {
-    Vector3 axis = Vector3::Random().normalized();
-    Vector3 v = Vector3::Random().cross(axis).normalized();
-    double angle = -1.9745; /// random value
-    Matrix3 m = (AngleAxis(angle, axis)).matrix() * AngleAxis(-0.546, v).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToAngle(m, axis, v));
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
-    {
-      return errorCode;
-    }
-  }
-  {
-    double angle = 2.6845; /// random value
-
-    Vector2 v = Vector2::Random().normalized();
-    Vector3 v3;
-    v3 << v, 0;
-    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(-1.245, v3).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToYaw(m, v));
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
-    {
-      return errorCode;
-    }
-  }
-  {
-    double angle = 2.6845; /// random value
-
-    Vector2 v = Vector2::UnitX();
-    Vector3 v3;
-    v3 << v, 0;
-    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(-0.689, Vector3::UnitY()).matrix()
-                * AngleAxis(-1.245, v3).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToYaw(m));
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
-    {
-      return errorCode;
-    }
-  }
-  {
-    double angle = 1.4587; /// random value
-
-    Vector2 v = Vector2::Random().normalized();
-    Vector3 v3;
-    v3 << v, 0;
-
-    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(3.54, v3).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToYawAxisAgnostic(m));
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
-    {
-      return errorCode;
-    }
-  }
-  return 0;
-}
 
 int main()
 {
   int exitCode;
 
-  exitCode = testrotationMatrix2Angle(1);
-
-  if(exitCode != 0)
-  {
-    std::cout << "Failed, testrotationMatrix2Angle error code: " << exitCode << std::endl;
-    return exitCode;
-  }
 
   exitCode = testUnidimDcmBiasEstimator(2);
 
