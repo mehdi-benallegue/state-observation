@@ -145,6 +145,14 @@ inline Vector6 homogeneousMatrixToVector6(const Matrix4 & M);
 /// transforms a 6d vector (position theta mu) into a homogeneous matrix
 inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 
+/// @brief Builds the smallest angle matrix allowing to get from a NORMALIZED vector v1 to its imahe Rv1
+/// This is based on Rodrigues formula
+///
+/// @param v1 the NORMALIZED vector 
+/// @param Rv1 the NORMALIZED image of this vector by the rotation matrix R
+/// @return Matrix3 the rotation matrix R
+inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1);
+
 /// @brief checks if this matrix is a pure yaw matrix or not
 ///
 /// @param R the rotation matrix
