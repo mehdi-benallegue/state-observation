@@ -214,9 +214,7 @@ inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & ax
 inline double rotationMatrixToYaw(const Matrix3 & rotation, const Vector2 & v);
 
 /// @brief take 3x3 matrix represeting a rotation and gives the yaw angle from roll pitch yaw representation
-/// @details this is a generalization of yaw extraction (yaw is equivalent to v = Matrix3::UnitX())
 /// @param rotation The 3x3 rotation matrix
-/// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
 /// @return double the angle
 inline double rotationMatrixToYaw(const Matrix3 & rotation);
 
