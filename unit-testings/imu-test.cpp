@@ -121,7 +121,7 @@ int test()
   std::ofstream f;
   f.open("trajectory.dat");
 
-  double dx;
+  double dx=0;
 
   for(TimeIndex i = y.getFirstIndex(); i < y.getNextIndex(); ++i)
   {
