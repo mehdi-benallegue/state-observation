@@ -434,7 +434,7 @@ inline double rotationMatrixToYaw(const Matrix3 & rotation)
 inline double rotationMatrixToYawAxisAgnostic(const Matrix3 & rotation)
 {
 
-  if(rotation(2, 0) < cst::epsilon1 && rotation(2, 1) < cst::epsilon1)
+  if(fabs(rotation(2, 0)) < cst::epsilon1 && fabs(rotation(2, 1)) < cst::epsilon1)
   { /// this is the case of pure yaw rotationm, so simply extract yaw
     return rotationMatrixToYaw(rotation);
   }
