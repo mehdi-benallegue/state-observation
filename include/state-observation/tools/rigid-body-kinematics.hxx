@@ -406,7 +406,7 @@ inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2, 
 
 inline Matrix3 mergeTiltWithYawAxisAgnostic(const Vector3 & Rtez, const Matrix3 & R2)
 {
-  return mergeTiltWithYaw(Rtez, R2, getInvariantHorizontalVector(R2).normalized());
+  return mergeTiltWithYaw(Rtez, R2, getInvariantHorizontalVector(R2.transpose()).normalized());
 }
 
 inline Matrix3 mergeRoll1Pitch1WithYaw2AxisAgnostic(const Matrix3 & R1, const Matrix3 & R2)
