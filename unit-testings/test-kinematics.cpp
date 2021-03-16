@@ -83,7 +83,6 @@ int testRotationOperations(int errorCode)
     }
   }
   {
-
     Vector3 horizAxis1;
     horizAxis1(2) = 0;
     horizAxis1.head<2>() = Vector2::Random().normalized();
@@ -100,7 +99,7 @@ int testRotationOperations(int errorCode)
     double tiltAngle2 = 1.1259; /// random value
     horizAxis2(2) = 0;
     horizAxis2.head<2>() = Vector2::Random().normalized();
-
+    
     Matrix3 m2 = yaw * AngleAxis(tiltAngle2, horizAxis2).matrix();
 
     Matrix3 estimatedMatrix = kine::mergeTiltWithYawAxisAgnostic(tilt, m2);
@@ -924,7 +923,7 @@ int main()
   int returnVal;
   int errorcode=0;
 
-  if(returnVal = testRotationOperations(++errorcode))
+  if((returnVal = testRotationOperations(++errorcode)))
   {
     std::cout << "testRotationOperations Failed, error code: " << returnVal << std::endl;
     return returnVal;
