@@ -26,13 +26,15 @@ public:
   /// gets a scalar Gaussian random variable
   /// having a given bias and standard deviation(std)
   /// default is the cetered unit Gaussian
-  double getGaussianScalar(double std = 1, double bias = 0);
+  static double getGaussianScalar(double std = 1, double bias = 0);
 
   /// gets vector Gaussian random variable
   /// having a given bias and standard deviation(std)
   static Matrix getGaussianVector(const Matrix & std, const Matrix & bias, Index rows, Index cols = 1);
 
 protected:
+  /// @brief Private constructor for preventing instanciation of Probability Law Simulation 
+  ProbabilityLawSimulation(){}
   static std::random_device rd_;
   static std::mt19937 gen_;
 };

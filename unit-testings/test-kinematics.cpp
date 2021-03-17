@@ -141,10 +141,10 @@ int testOrientation(int errcode)
 
   Vector4 q_i;
 
-  tools::ProbabilityLawSimulation s;
+  typedef tools::ProbabilityLawSimulation ran;
 
   /// random orientation
-  q_i = s.getGaussianVector(Matrix4::Identity(), Vector4::Zero(), 4);
+  q_i = ran::getGaussianVector(Matrix4::Identity(), Vector4::Zero(), 4);
   q_i.normalize();
 
   /// several representations of the orientation

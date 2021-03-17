@@ -16,7 +16,7 @@ double ProbabilityLawSimulation::getGaussianScalar(double std, double bias)
 
 Matrix ProbabilityLawSimulation::getGaussianVector(const Matrix & std, const Matrix & bias, Index rows, Index cols)
 {
-  std::normal_distribution<> g(0, 1);
+  std::normal_distribution<double> g(0, 1);
   Matrix ret = Matrix::Zero(rows, cols);
   for(Index i = 0; i < rows; ++i)
   {

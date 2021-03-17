@@ -23,18 +23,18 @@ int testUnidimDcmBiasEstimator(int errorCode)
   ///////////////////////////////////////
   /// Build the ground truth signals
   ///////////////////////////////////////
-  tools::ProbabilityLawSimulation ran;
+  typedef tools::ProbabilityLawSimulation ran;
   std::vector<double> dcm(signallength), bias(signallength), zmp(signallength);
 
   /// set the desired exponential convergence of the DCM
   double lambda = 2;
 
   /// initialize the dcm and bias to a random value
-  dcm[0] = ran.getGaussianScalar(2, 0);
+  dcm[0] = ran::getGaussianScalar(2, 0);
   double initBiasstd = 0.01;
 
-  bias[0] = ran.getGaussianScalar(0.01, 0);
-  double deviation = ran.getGaussianScalar(0.05, 0);
+  bias[0] = ran::getGaussianScalar(0.01, 0);
+  double deviation = ran::getGaussianScalar(0.05, 0);
   zmp[0] = (lambda / w0 + 1) * dcm[0] + deviation;
 
   for(int i = 0; i < signallength - 1; ++i)
@@ -42,10 +42,10 @@ int testUnidimDcmBiasEstimator(int errorCode)
     /// dcm dynamics
     dcm[i + 1] = dcm[i] + dt * w0 * (dcm[i] - zmp[i]);
     /// drift
-    bias[i + 1] = bias[i] + ran.getGaussianScalar(biasDriftPerSecondStd * dt);
+    bias[i + 1] = bias[i] + ran::getGaussianScalar(biasDriftPerSecondStd * dt);
     /// set a noisy zmp to create  bounded drift of the DCM
-    deviation += ran.getGaussianScalar(0.05, 0);
-    zmp[i + 1] = (lambda / w0 + 1) * dcm[i] + ran.getGaussianScalar(0.05, 0) + deviation;
+    deviation += ran::getGaussianScalar(0.05, 0);
+    zmp[i + 1] = (lambda / w0 + 1) * dcm[i] + ran::getGaussianScalar(0.05, 0) + deviation;
   }
 
   /////////////////////////////////
@@ -55,9 +55,9 @@ int testUnidimDcmBiasEstimator(int errorCode)
 
   for(int i = 0; i < signallength; ++i)
   {
-    dcm_m_unbiased[i] = dcm[i] + ran.getGaussianScalar(dcmMeasurementErrorStd);
+    dcm_m_unbiased[i] = dcm[i] + ran::getGaussianScalar(dcmMeasurementErrorStd);
     dcm_m[i] = dcm_m_unbiased[i] + bias[i];
-    zmp_m[i] = zmp[i] + ran.getGaussianScalar(zmpMeasurementErrorStd);
+    zmp_m[i] = zmp[i] + ran::getGaussianScalar(zmpMeasurementErrorStd);
   }
 
   /////////////////////////////////
@@ -135,7 +135,7 @@ int testDcmBiasEstimator(int errorCode)
   ///////////////////////////////////////
   /// Build the ground truth signals
   ///////////////////////////////////////
-  tools::ProbabilityLawSimulation ran;
+  typedef tools::ProbabilityLawSimulation ran;
   IndexedVectorArray dcm(signallength), localBias(signallength), bias(signallength), zmp(signallength);
   std::vector<double> yaw(signallength);
 
@@ -143,11 +143,11 @@ int testDcmBiasEstimator(int errorCode)
   double lambda = 2;
 
   /// initialize the dcm and localBias to a random value
-  dcm[0] = ran.getGaussianVector(Matrix2::Identity() * 2, Vector2::Zero(), 2);
+  dcm[0] = ran::getGaussianVector(Matrix2::Identity() * 2, Vector2::Zero(), 2);
   double initBiasstd = 0.01;
 
-  localBias[0] = ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.01;
-  Vector2 deviation = ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
+  localBias[0] = ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.01;
+  Vector2 deviation = ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
   zmp[0] = (lambda / w0 + 1) * dcm[0] + deviation;
 
   for(int i = 0; i < signallength - 1; ++i)
@@ -156,17 +156,17 @@ int testDcmBiasEstimator(int errorCode)
     dcm[i + 1] = dcm[i] + dt * w0 * (dcm[i] - zmp[i]);
     /// local bias drift
     localBias[i + 1] =
-        localBias[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * biasDriftPerSecondStd * dt;
+        localBias[i] + ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * biasDriftPerSecondStd * dt;
     /// set a noisy zmp to create  bounded drift of the DCM
-    deviation += ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
+    deviation += ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05;
     zmp[i + 1] =
-        (lambda / w0 + 1) * dcm[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05 + deviation;
+        (lambda / w0 + 1) * dcm[i] + ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * 0.05 + deviation;
   }
 
   for(int i = 0; i < signallength; ++i)
   {
     /// global-frame bias computation
-    yaw[i] = ran.getGaussianScalar(2 * M_PI);
+    yaw[i] = ran::getGaussianScalar(2 * M_PI);
     bias[i] = Rotation2D(yaw[i]) * localBias[i];
   }
 
@@ -179,9 +179,9 @@ int testDcmBiasEstimator(int errorCode)
   {
 
     dcm_m_unbiased[i] =
-        dcm[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * dcmMeasurementErrorStd;
+        dcm[i] + ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * dcmMeasurementErrorStd;
     dcm_m[i] = dcm_m_unbiased[i] + bias[i];
-    zmp_m[i] = zmp[i] + ran.getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * zmpMeasurementErrorStd;
+    zmp_m[i] = zmp[i] + ran::getGaussianVector(Matrix2::Identity(), Vector2::Zero(), 2) * zmpMeasurementErrorStd;
   }
 
   /////////////////////////////////
