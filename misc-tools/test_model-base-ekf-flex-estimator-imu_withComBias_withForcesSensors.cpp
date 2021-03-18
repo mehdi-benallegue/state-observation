@@ -254,7 +254,7 @@ int test()
   x.resize(stateSize);
   Vector xPredicted;
   xPredicted.resize(stateSize);
-  unsigned contactNbr;
+  unsigned contactNbr = 0;
   Index inputSize, measurementSize;
 
   stateObservation::IndexedMatrixArray measurementForces, filteredForces, inputFeetPositions;
