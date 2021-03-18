@@ -12,139 +12,177 @@ using namespace kine;
 /// @return int
 int testRotationOperations(int errorCode)
 {
+  unsigned numberOfTests = 1000;
+  for(unsigned currentTest = 0; currentTest < numberOfTests; ++currentTest)
   {
-    ///test pure yaw
-    if(!isPureYaw(AngleAxis(-1.02, Vector3::UnitZ()).matrix())
-       || isPureYaw(AngleAxis(0.5, Vector3::UnitZ() + 0.01 * Vector3::UnitX()).matrix()))
-    {
-      std::cout << "Pure yaw detection failed " << std::endl;
-      return errorCode;
+    { /// test isRotation
+
+      Matrix3 R = Matrix3::Random();
+      //(M.isUnitary() && isApprox(M.topLeftCorner<2, 2>().determinant(), M(2, 2))
+      //&& isApprox(M.bottomLeftCorner<2, 2>().determinant(), M(0, 2)));
+      if(isRotationMatrix(R, cst::epsilon1 * 10))
+      {
+        std::cout << "Test number " << currentTest << "isRotationTest failed: false positive" << std::endl;
+        return errorCode;
+      }
+      R = randomRotationQuaternion().toRotationMatrix();
+      if(!isRotationMatrix(R, cst::epsilon1 * 10))
+      {
+        std::cout << R.isUnitary() << " " << R.topLeftCorner<2, 2>().determinant() << " " << R(2, 2) << " "
+                  << R.bottomLeftCorner<2, 2>().determinant() << " " << R(0, 2) << " "
+                  << R.topLeftCorner<2, 2>().determinant() - R(2, 2) << " "
+                  << R.bottomLeftCorner<2, 2>().determinant() - R(0, 2) << std::endl;
+        std::cout << "Test number " << currentTest << "isRotationTest failed: false negative" << std::endl;
+        return errorCode;
+      }
+      Matrix3 R2;
+      R2 << R.col(1), R.col(0), R.col(2); /// Non right handed orthogonal matrix
+      if(isRotationMatrix(R2, cst::epsilon1 * 10))
+      {
+        std::cout << "isRotationTest failed: false positive (right-handedness)" << std::endl;
+        return errorCode;
+      }
     }
-    else
     {
-      std::cout << "Pure yaw detection succeeded" << std::endl;
+      /// test pure yaw
+      if(!isPureYaw(AngleAxis(randomAngle(), Vector3::UnitZ()).matrix())
+         || isPureYaw(randomRotationQuaternion().toRotationMatrix()))
+      {
+        std::cout << "Test number " << currentTest << "Pure yaw detection failed " << std::endl;
+        return errorCode;
+      }
     }
-  }
-  {
-    Vector3 axis = Vector3::Random().normalized();
-    Vector3 v = Vector3::Random().cross(axis).normalized();
-    double angle = -1.9745; /// random value
-    Matrix3 m = (AngleAxis(angle, axis)).matrix() * AngleAxis(-0.546, v).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToAngle(m, axis, v));
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
     {
-      return errorCode;
+      /// Test the angle made by one vector by a rotation
+      Vector3 axis = Vector3::Random().normalized();
+      Vector3 v = Vector3::Random().cross(axis).normalized();
+      double angle = randomAngle();
+      Matrix3 m = (AngleAxis(angle, axis)).matrix() * AngleAxis(randomAngle(), v).matrix();
+
+      double error = fabs(angle - kine::rotationMatrixToAngle(m, axis, v));
+
+      if(error > cst::epsilon1 * 2 * M_PI)
+      {
+        std::cout << "Test number " << currentTest << "Test vector angle failed. Angle error " << error << std::endl;
+        return errorCode;
+      }
     }
-  }
-  {
-    double angle = 2.6845; /// random value
-
-    Vector2 v = Vector2::Random().normalized();
-    Vector3 v3;
-    v3 << v, 0;
-    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(-1.245, v3).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToYaw(m, v));
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
     {
-      return errorCode;
+      /// Test yaw extraction with custom vector
+      double angle = randomAngle();
+
+      Vector2 v = Vector2::Random().normalized();
+      Vector3 v3;
+      v3 << v, 0;
+      Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(randomAngle(), v3).matrix();
+
+      double error = fabs(angle - kine::rotationMatrixToYaw(m, v));
+
+      if(error > cst::epsilon1 * 2 * M_PI)
+      {
+        std::cout << "Test number " << currentTest << "Test Yaw extraction with custom vector failed. Angle error "
+                  << error << std::endl;
+        return errorCode;
+      }
     }
-  }
-  {
-    double angle = 2.6845; /// random value
-
-    Vector2 v = Vector2::UnitX();
-    Vector3 v3;
-    v3 << v, 0;
-    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(-0.689, Vector3::UnitY()).matrix()
-                * AngleAxis(-1.245, v3).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToYaw(m));
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
     {
-      return errorCode;
+      /// Test yaw extraction from roll pitch yaw using the x axis alignment
+      double rollangle = randomAngle();
+      double pitchangle = randomAngle() / 2; /// constrain the pitch to be smaller than pi/2
+      double yawangle = randomAngle();
+
+      Matrix3 m = rollPitchYawToRotationMatrix(rollangle, pitchangle, yawangle);
+
+      double error = fabs(yawangle - kine::rotationMatrixToYaw(m));
+
+      if(error > cst::epsilon1 * 1000 * M_PI) /// this function is really not precise
+      {
+        std::cout << "Test number " << currentTest << " axis-based failed. Angle" << yawangle << " Angle error " << error
+                  << std::endl;
+        return errorCode;
+      }
+
+      /// Test yaw extraction from roll pitch yaw using the traditional conversion
+      Vector3 rpy = kine::rotationMatrixToRollPitchYaw(m);
+      error = fabs(yawangle - rpy(2));
+
+      if(error > cst::epsilon1 * 1000 * M_PI)
+      {
+        std::cout << "Test number " << currentTest << "eigen-based failed. Angle" << yawangle << " Angle error "
+                  << error << std::endl;
+        return errorCode;
+      }
     }
-  }
-  {
-    double angle = 1.7587; /// random value
 
-    Vector2 v = Vector2::Random().normalized();
-    Vector3 v3;
-    v3 << v, 0;
-
-    std::cout << "yaw_zero " << kine::rotationMatrixToYawAxisAgnostic(AngleAxis(3.54, v3).matrix()) << std::endl;
-
-    Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(3.54, v3).matrix();
-
-    double error = fabs(angle - kine::rotationMatrixToYawAxisAgnostic(m));
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
     {
-      return errorCode;
+      /// Test the automatic detection of the vector to use to extract yaw from a rotation matrix
+      double angle = randomAngle(); /// random value
+      Vector2 v = Vector2::Random().normalized();
+      Vector3 v3;
+      v3 << v, 0;
+
+      Matrix3 m = AngleAxis(angle, Vector3::UnitZ()).matrix() * AngleAxis(randomAngle(), v3).matrix();
+
+      double error = fabs(angle - kine::rotationMatrixToYawAxisAgnostic(m));
+
+      if(error > cst::epsilon1 * 2 * M_PI)
+      {
+        std::cout << " Test rotationMatrixToYawAxisAgnostic failed. Angle error " << error << std::endl;
+
+        return errorCode;
+      }
     }
-  }
-  {
-    Vector3 horizAxis1;
-    horizAxis1(2) = 0;
-    horizAxis1.head<2>() = Vector2::Random().normalized();
-    double tiltAngle1 = 1.3457; /// random value
-    double yawAngle = -1.7596; /// random value
-    Matrix3 yaw = AngleAxis(yawAngle, Vector3::UnitZ()).matrix();
-
-    /// we should get back this matrix
-    Matrix3 initialMatrix = yaw * AngleAxis(tiltAngle1, horizAxis1).matrix();
-
-    Vector3 tilt = initialMatrix.transpose() * Vector3::UnitZ();
-
-    Vector3 horizAxis2;
-    double tiltAngle2 = 1.1259; /// random value
-    horizAxis2(2) = 0;
-    horizAxis2.head<2>() = Vector2::Random().normalized();
-    
-    Matrix3 m2 = yaw * AngleAxis(tiltAngle2, horizAxis2).matrix();
-
-    Matrix3 estimatedMatrix = kine::mergeTiltWithYawAxisAgnostic(tilt, m2);
-
-    double tiltError = (tilt - estimatedMatrix.transpose() * Vector3::UnitZ()).squaredNorm();
-
-    std::cout << "horizAxis1 " << horizAxis1.transpose() << std::endl;
-    std::cout << "yaw " << std::endl << yaw << std::endl;
-    Vector2 v = Vector2::Random().normalized();
-    Vector3 v3;
-    v3 << v, 0;
-    // horizAxis1 = v3;
-    std::cout << "horizAxis1 norm " << horizAxis1.norm() << std::endl;
-
-    std::cout << "yaw_zero " << kine::rotationMatrixToYawAxisAgnostic(AngleAxis(tiltAngle1, v3).matrix()) << std::endl;
-
-    std::cout << "yaw_zero " << kine::rotationMatrixToYawAxisAgnostic(AngleAxis(tiltAngle1, horizAxis1).matrix())
-              << std::endl;
-    std::cout << "yaw0 " << kine::rotationMatrixToYawAxisAgnostic(yaw) << std::endl;
-    std::cout << "yaw1 " << kine::rotationMatrixToYawAxisAgnostic(initialMatrix) << std::endl;
-    std::cout << "yaw2 " << kine::rotationMatrixToYawAxisAgnostic(m2) << std::endl;
-
-    std::cout << "Tilt error " << tiltError << std::endl;
-
-    double error = AngleAxis(initialMatrix * estimatedMatrix.transpose()).angle();
-
-    std::cout << "Angle error " << error << std::endl;
-
-    if(error > cst::epsilon1)
     {
-      //return errorCode;
+      Vector3 horizAxis1;
+      horizAxis1(2) = 0;
+      horizAxis1.head<2>() = Vector2::Random().normalized();
+      double tiltAngle1 = randomAngle();
+      double yawAngle = randomAngle();
+
+      Matrix3 yaw = AngleAxis(yawAngle, Vector3::UnitZ()).matrix();
+
+      /// we should get back this matrix
+      Matrix3 initialMatrix = yaw * AngleAxis(tiltAngle1, horizAxis1).matrix();
+
+      Vector3 tilt = initialMatrix.transpose() * Vector3::UnitZ();
+
+      Vector3 horizAxis2;
+      horizAxis2(2) = 0;
+      horizAxis2.head<2>() = Vector2::Random().normalized();
+
+      Vector3 ml = initialMatrix.transpose() * horizAxis2;
+
+      Vector3 newTilt = Vector3::Random();
+      Matrix3 mTemp1, mTemp2;
+
+      mTemp1 << horizAxis2, horizAxis2.cross(Vector3::UnitZ().cross(horizAxis2)).normalized(),
+          horizAxis2.cross(Vector3::UnitZ()).normalized();
+
+      mTemp2 << ml, ml.cross(newTilt.cross(ml)).normalized(), ml.cross(newTilt).normalized();
+
+      Matrix3 M2 = mTemp1 * mTemp2.transpose();
+
+      Matrix3 estimatedMatrix = kine::mergeTiltWithYawAxisAgnostic(tilt, M2);
+      std::cout << " " << isRotationMatrix(M2, 0.001) << " " << isRotationMatrix(mTemp1, 0.0001) << " "
+                << isRotationMatrix(mTemp2, 0.0001) << std::endl;
+
+      if(!isRotationMatrix(estimatedMatrix, cst::epsilon1 * 10))
+      {
+        std::cout << "Test mergeTiltWithYawAxisAgnostic failed. Reconstructed matrix is not a Rotation Matrix"
+                  << std::endl;
+        return errorCode;
+      }
+
+      double error = AngleAxis(initialMatrix * estimatedMatrix.transpose()).angle();
+
+      if(error > cst::epsilon1 * 1000 * M_PI) 
+      {
+        std::cout << "Test mergeTiltWithYawAxisAgnostic failed. Reconstructed matrix is wrong"
+                  << std::endl;
+        return errorCode;
+      }
     }
-  }
+  } /// end of for
   return 0;
 }
 
@@ -933,7 +971,7 @@ int testKinematics(int errcode)
 int main()
 {
   int returnVal;
-  int errorcode=0;
+  int errorcode = 0;
 
   if((returnVal = testRotationOperations(++errorcode)))
   {
