@@ -342,7 +342,7 @@ inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1)
 
 inline bool isPureYaw(const Matrix3 & R)
 {
-  return (fabs(R(2, 0)) < cst::epsilon1 && fabs(R(2, 1)) < cst::epsilon1);
+  return R.block<1, 2>(2, 0).isZero(cst::epsilon1);
 }
 
 inline Vector3 getInvariantHorizontalVector(const Matrix3 & R)
