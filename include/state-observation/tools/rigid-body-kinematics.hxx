@@ -317,7 +317,8 @@ inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v)
 inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1)
 {
 
-  BOOST_ASSERT(v1.isUnitary() && Rv1.isUnitary() && "The vectors v1 and Rv1 need to be normalized");
+  BOOST_ASSERT(v1.isUnitary(cst::epsilon1) && Rv1.isUnitary(cst::epsilon1)
+               && "The vectors v1 and Rv1 need to be normalized");
 
   double v1dotRv1 = v1.dot(Rv1);
   if(1 - v1dotRv1 < cst::epsilon1)
