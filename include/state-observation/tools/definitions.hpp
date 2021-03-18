@@ -41,6 +41,37 @@
 
 namespace stateObservation
 {
+/// @brief Checks if it is derived from EigenBase (the base class of all dense functions)
+///
+/// @tparam T The class that you want to check
+template<typename T>
+struct isEigen
+{
+  static constexpr bool value = std::is_base_of<Eigen::EigenBase<T>, T>::value;
+};
+
+/// @brief Checks if a class is a specialization of Eigen::Matrix
+/// @tparam T The class that you want to check
+template<typename T>
+struct isMatrix : std::false_type
+{
+};
+
+template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+struct isMatrix<Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols>> : std::true_type
+{
+};
+
+template<typename T>
+struct EigenType : std::enable_if<isEigen<T>::value, T>
+{
+};
+
+template<typename T>
+struct MatrixType :std::enable_if<isMatrix<T>::value, T>
+{
+};
+
 /// Dynamic sized scalar vector
 typedef Eigen::VectorXd Vector;
 

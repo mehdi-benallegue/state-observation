@@ -14,17 +14,10 @@ double ProbabilityLawSimulation::getGaussianScalar(double std, double bias)
   return g(gen_);
 }
 
-Matrix ProbabilityLawSimulation::getGaussianVector(const Matrix & std, const Matrix & bias, Index rows, Index cols)
+double ProbabilityLawSimulation::getUniformScalar(double min, double max)
 {
-  std::normal_distribution<double> g(0, 1);
-  Matrix ret = Matrix::Zero(rows, cols);
-  for(Index i = 0; i < rows; ++i)
-  {
-    for(Index j = 0; j < cols; ++j) ret(i, j) = g(gen_);
-  }
-  ret = std * ret + bias;
-
-  return ret;
+  std::uniform_real_distribution<double> g(min, max);
+  return g(gen_);
 }
 } // namespace tools
 
