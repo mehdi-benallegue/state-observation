@@ -453,6 +453,16 @@ inline Quaternion zeroRotationQuaternion()
   return Quaternion(1, 0, 0, 0);
 }
 
+inline Quaternion randomRotationQuaternion()
+{
+  return Quaternion(tools::ProbabilityLawSimulation::getGaussianVector<Vector4>(Matrix4::Identity(), Vector4::Zero(), 4).normalized());
+}
+
+inline double randomAngle()
+{
+  return tools::ProbabilityLawSimulation::getUniformScalar(-M_PI, M_PI);
+}
+
 /// transforms a rotation into translation given a constraint of a fixed point
 /// which means the global position of the fixed point is constantly at its
 /// constrained position
