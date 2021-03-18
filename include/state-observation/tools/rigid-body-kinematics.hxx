@@ -189,11 +189,13 @@ inline Vector3 rotationMatrixToRollPitchYaw(const Matrix3 & R, Vector3 & v)
 
 inline Vector3 rotationMatrixToRollPitchYaw(const Matrix3 & R)
 {
-  //      v<<atan2(R(2,1),R(2,2)),
-  //      atan2(-R(2,0),sqrt(tools::square(R(2,1))+tools::square(R(2,2)))),
-  //      atan2(R(1,0),R(0,0));
-  //      return v;
-  return R.eulerAngles(2, 1, 0).reverse();
+  Vector3 v;
+  v << atan2(R(2, 1), R(2, 2)), atan2(-R(2, 0), sqrt(tools::square(R(2, 1)) + tools::square(R(2, 2)))),
+      atan2(R(1, 0), R(0, 0));
+  return v;
+  /// previous implementation using Eigen, does not respect the constraint that
+  /// abs(roll)<pi ; abs(pitch)<pi/2 ; abs(yaw)<pi
+  // return R.eulerAngles(2, 1, 0).reverse();
 }
 
 /// Transform the roll pitch yaw into rotation matrix
@@ -212,16 +214,8 @@ inline Matrix3 rollPitchYawToRotationMatrix(const Vector3 & rpy)
 ///( R = Ry*Rp*Rr)
 inline Quaternion rollPitchYawToQuaternion(double roll, double pitch, double yaw)
 {
-  AngleAxis rollAngle(roll, Eigen::Vector3d::UnitX());
-  AngleAxis pitchAngle(pitch, Eigen::Vector3d::UnitY());
-  AngleAxis yawAngle(yaw, Eigen::Vector3d::UnitZ());
-
-  Quaternion q(yawAngle);
-
-  q = q * pitchAngle;
-  q = q * rollAngle;
-
-  return q;
+  return Quaternion(AngleAxis(yaw, Eigen::Vector3d::UnitZ())) * AngleAxis(pitch, Eigen::Vector3d::UnitY())
+         * AngleAxis(roll, Eigen::Vector3d::UnitX());
 }
 
 inline Quaternion rollPitchYawToQuaternion(const Vector3 & rpy)
