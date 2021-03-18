@@ -670,3 +670,13 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::writeInFile(const char * filena
   }
 
 }
+
+inline bool isApprox(double a, double b, double relativePrecision)
+{
+  return fabs(a - b) < fabs(a + b) * relativePrecision;
+}
+
+inline bool isApproxAbs(double a, double b, double absolutePrecision)
+{
+  return fabs(a - b) < absolutePrecision;
+}
