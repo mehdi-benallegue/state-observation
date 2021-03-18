@@ -160,8 +160,9 @@ inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1)
 /// @return false is not pure yaw
 inline bool isPureYaw(const Matrix3 & R);
 
-/// @brief Gets a vector that remains horizontal with this rotation. This vector is not normalized and if norm == 0
-/// then the rotation is pure yaw and any horizontal vector is a solution
+/// @brief Gets a vector that remains horizontal with this rotation. This vector is NOT normalized
+/// @details There is a general version in getInvariantOrthogonalVector(). This can be used to extract yaw angle from 
+/// a rotation matrix without needing to specify an order in the tils (e.g. roll then pich).
 ///
 /// @param R the input rotation
 /// @return Vector3 the output horizontal vector
