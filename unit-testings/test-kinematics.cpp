@@ -12,7 +12,19 @@ using namespace kine;
 /// @return int
 int testRotationOperations(int errorCode)
 {
-
+  {
+    ///test pure yaw
+    if(!isPureYaw(AngleAxis(-1.02, Vector3::UnitZ()).matrix())
+       || isPureYaw(AngleAxis(0.5, Vector3::UnitZ() + 0.01 * Vector3::UnitX()).matrix()))
+    {
+      std::cout << "Pure yaw detection failed " << std::endl;
+      return errorCode;
+    }
+    else
+    {
+      std::cout << "Pure yaw detection succeeded" << std::endl;
+    }
+  }
   {
     Vector3 axis = Vector3::Random().normalized();
     Vector3 v = Vector3::Random().cross(axis).normalized();
