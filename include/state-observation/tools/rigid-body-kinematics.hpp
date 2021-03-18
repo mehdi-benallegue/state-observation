@@ -166,7 +166,17 @@ inline bool isPureYaw(const Matrix3 & R);
 ///
 /// @param R the input rotation
 /// @return Vector3 the output horizontal vector
-inline Vector3 getInvariantHorizontalVector(Matrix3 & R);
+inline Vector3 getInvariantHorizontalVector(const Matrix3 & R);
+
+/// @brief Gets a vector \f$v\f$ that is orthogonal to \f$e_z\f$ and such that \f$\hat{R}^T e_z\f$ is orthogonal to
+/// the tilt \f$R^T e_z\f$. This vector is NOT normalized.
+/// @details This is a generalization of getInvariantHorizontalVector() which corresponds to no tilt
+/// \f$\hat{R}^T e_z=e_z\f$. This function is useful to merge the yaw from the rotation matrix with the tilt.
+///
+/// @param Rhat the input rotation matrix \f$\hat{R}^T\f$
+/// @param Rtez the input tilt \f$\hat{R}^T e_z\f$
+/// @return Vector3 the output horizontal vector
+inline Vector3 getInvariantOrthogonalVector(const Matrix3 & Rhat, const Vector3 &Rtez);
 
 /// @brief Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation matrix (minimizes the
 /// deviation of the v vector)
@@ -235,7 +245,26 @@ inline double rotationMatrixToYaw(const Matrix3 & rotation);
 /// @return double the angle
 inline double rotationMatrixToYawAxisAgnostic(const Matrix3 & rotation);
 
+/// @brief Get the Identity Quaternion
+/// 
+/// @return Quaternion 
 inline Quaternion zeroRotationQuaternion();
+
+/// @brief Get a uniformly random Quaternion
+///
+/// @return Quaternion
+inline Quaternion randomRotationQuaternion();
+
+/// @brief get a randomAngle between -pi and pu
+/// 
+/// @return double the random angle
+inline double randomAngle();
+
+/// @brief Checks if it is a rotation matrix (right-hand orthonormal) or not
+/// @param precision the absolute precision of the test
+/// @return true when it is a rotation matrix
+/// @return false when not
+inline bool isRotationMatrix(const Matrix3 &,  double precision = 2*cst::epsilon1);
 
 /// transforms a rotation into translation given a constraint of a fixed point
 inline void fixedPointRotationToTranslation(const Matrix3 & R,

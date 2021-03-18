@@ -357,6 +357,19 @@ inline Vector3 getInvariantHorizontalVector(const Matrix3 & R)
   }
 }
 
+inline Vector3 getInvariantOrthogonalVector(const Matrix3 & Rhat, const Vector3 & Rtez)
+{
+  Vector3 Rhat_Rtez = Rhat * Rtez;
+  if (Rhat_Rtez.head<2>().isZero(cst::epsilon1))
+  { /// any vector is a solution
+    return Vector3::UnitX();
+  }
+  else
+  {
+    return Vector3(Rhat_Rtez(1), -Rhat_Rtez(0), 0);
+  }
+}
+
 inline Matrix3 mergeTiltWithYaw(const Vector3 & Rtez, const Matrix3 & R2, const Vector3 & m)
 {
   /*
@@ -407,7 +420,31 @@ inline Matrix3 mergeRoll1Pitch1WithYaw2(const Matrix3 & R1, const Matrix3 & R2, 
 
 inline Matrix3 mergeTiltWithYawAxisAgnostic(const Vector3 & Rtez, const Matrix3 & R2)
 {
-  return mergeTiltWithYaw(Rtez, R2, getInvariantHorizontalVector(R2.transpose()).normalized());
+  /*
+ R&=\left(\begin{array}{ccc}
+ \frac{m\times e_{z}}{\left\Vert m\times e_{z}\right\Vert } & \frac{e_{z}\times m\times e_{z}}{\left\Vert m\times
+ e_{z}\right\Vert } & e_{z}\end{array}\right)\left(\begin{array}{ccc} \frac{m_{l}\times v_{1}}{\left\Vert
+ m_{l}\times v_{1}\right\Vert } & \frac{v_{1}\times m_{l}\times v_{1}}{\left\Vert m_{l}\times v_{1}\right\Vert } &
+ v_{1}\end{array}\right)^{T}\\&v_{1}=R_{1}^{T}e_{z}\qquad m_{l}=R_{2}^{T}m
+ */
+  const Vector3 & ez = Vector3::UnitZ();
+
+  const Vector3 & v1 = Rtez;
+
+  Vector3 m = getInvariantOrthogonalVector(R2, Rtez).normalized();
+
+  Vector3 ml = R2.transpose() * m;
+
+  Matrix3 R_temp1, R_temp2;
+  R_temp1 << m.cross(ez), m, ez;
+
+  // clang-format off
+  R_temp2 << ml.cross(v1).transpose(),
+             ml.transpose(),
+             v1.transpose();
+  // clang-format on
+
+  return R_temp1 * R_temp2;
 }
 
 inline Matrix3 mergeRoll1Pitch1WithYaw2AxisAgnostic(const Matrix3 & R1, const Matrix3 & R2)
@@ -461,6 +498,13 @@ inline Quaternion randomRotationQuaternion()
 inline double randomAngle()
 {
   return tools::ProbabilityLawSimulation::getUniformScalar(-M_PI, M_PI);
+}
+
+inline bool isRotationMatrix(const Matrix3 & M, double precision)
+{
+  return (M.isUnitary()
+          && (isApproxAbs(M.topLeftCorner<2, 2>().determinant(), M(2, 2) * precision)
+              || isApproxAbs(M.bottomLeftCorner<2, 2>().determinant(), M(0, 2), precision)));
 }
 
 /// transforms a rotation into translation given a constraint of a fixed point
