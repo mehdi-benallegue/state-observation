@@ -124,7 +124,7 @@ int test()
   std::ofstream f;
   f.open("trajectory.dat");
 
-  double dx=0;
+  double dx = 0;
 
   /// the reconstruction of the state
   for(TimeIndex i = y.getFirstIndex(); i < y.getNextIndex(); ++i)

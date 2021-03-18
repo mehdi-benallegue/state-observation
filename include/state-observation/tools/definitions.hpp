@@ -68,7 +68,7 @@ struct EigenType : std::enable_if<isEigen<T>::value, T>
 };
 
 template<typename T>
-struct MatrixType :std::enable_if<isMatrix<T>::value, T>
+struct MatrixType : std::enable_if<isMatrix<T>::value, T>
 {
 };
 
@@ -559,7 +559,7 @@ constexpr double epsilon1 = std::numeric_limits<double>::epsilon();
 } // namespace cst
 
 /// @brief checks if two scalars have approximately the same value up to a given relative precision
-/// 
+///
 /// @param a the first scalar
 /// @param b the second scalar
 /// @param relativePrecision the relative precision (no need to multiply by the scales of a and b)
@@ -571,7 +571,7 @@ inline bool isApprox(double a, double b, double relativePrecision = cst::epsilon
 ///
 /// @param a the first scalar
 /// @param b the second scalar
-/// @param absolutePrecision the absoilute precision 
+/// @param absolutePrecision the absoilute precision
 /// @return true they are equal
 /// @return false they are not
 inline bool isApproxAbs(double a, double b, double absolutePrecision = cst::epsilon1);

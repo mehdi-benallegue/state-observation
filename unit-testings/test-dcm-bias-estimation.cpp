@@ -242,11 +242,9 @@ int testDcmBiasEstimator(int errorCode)
   }
 }
 
-
 int main()
 {
   int exitCode;
-
 
   exitCode = testUnidimDcmBiasEstimator(2);
 

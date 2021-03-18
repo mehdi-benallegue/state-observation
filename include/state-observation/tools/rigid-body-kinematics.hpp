@@ -148,7 +148,7 @@ inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 /// @brief Builds the smallest angle matrix allowing to get from a NORMALIZED vector v1 to its imahe Rv1
 /// This is based on Rodrigues formula
 ///
-/// @param v1 the NORMALIZED vector 
+/// @param v1 the NORMALIZED vector
 /// @param Rv1 the NORMALIZED image of this vector by the rotation matrix R
 /// @return Matrix3 the rotation matrix R
 inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1);
@@ -161,7 +161,7 @@ inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1)
 inline bool isPureYaw(const Matrix3 & R);
 
 /// @brief Gets a vector that remains horizontal with this rotation. This vector is NOT normalized
-/// @details There is a general version in getInvariantOrthogonalVector(). This can be used to extract yaw angle from 
+/// @details There is a general version in getInvariantOrthogonalVector(). This can be used to extract yaw angle from
 /// a rotation matrix without needing to specify an order in the tils (e.g. roll then pich).
 ///
 /// @param R the input rotation
@@ -176,7 +176,7 @@ inline Vector3 getInvariantHorizontalVector(const Matrix3 & R);
 /// @param Rhat the input rotation matrix \f$\hat{R}^T\f$
 /// @param Rtez the input tilt \f$\hat{R}^T e_z\f$
 /// @return Vector3 the output horizontal vector
-inline Vector3 getInvariantOrthogonalVector(const Matrix3 & Rhat, const Vector3 &Rtez);
+inline Vector3 getInvariantOrthogonalVector(const Matrix3 & Rhat, const Vector3 & Rtez);
 
 /// @brief Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation matrix (minimizes the
 /// deviation of the v vector)
@@ -246,8 +246,8 @@ inline double rotationMatrixToYaw(const Matrix3 & rotation);
 inline double rotationMatrixToYawAxisAgnostic(const Matrix3 & rotation);
 
 /// @brief Get the Identity Quaternion
-/// 
-/// @return Quaternion 
+///
+/// @return Quaternion
 inline Quaternion zeroRotationQuaternion();
 
 /// @brief Get a uniformly random Quaternion
@@ -256,7 +256,7 @@ inline Quaternion zeroRotationQuaternion();
 inline Quaternion randomRotationQuaternion();
 
 /// @brief get a randomAngle between -pi and pu
-/// 
+///
 /// @return double the random angle
 inline double randomAngle();
 
@@ -264,7 +264,7 @@ inline double randomAngle();
 /// @param precision the absolute precision of the test
 /// @return true when it is a rotation matrix
 /// @return false when not
-inline bool isRotationMatrix(const Matrix3 &,  double precision = 2*cst::epsilon1);
+inline bool isRotationMatrix(const Matrix3 &, double precision = 2 * cst::epsilon1);
 
 /// transforms a rotation into translation given a constraint of a fixed point
 inline void fixedPointRotationToTranslation(const Matrix3 & R,

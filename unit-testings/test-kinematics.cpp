@@ -97,8 +97,8 @@ int testRotationOperations(int errorCode)
 
       if(error > cst::epsilon1 * 1000 * M_PI) /// this function is really not precise
       {
-        std::cout << "Test number " << currentTest << " axis-based failed. Angle" << yawangle << " Angle error " << error
-                  << std::endl;
+        std::cout << "Test number " << currentTest << " axis-based failed. Angle" << yawangle << " Angle error "
+                  << error << std::endl;
         return errorCode;
       }
 
@@ -175,10 +175,9 @@ int testRotationOperations(int errorCode)
 
       double error = AngleAxis(initialMatrix * estimatedMatrix.transpose()).angle();
 
-      if(error > cst::epsilon1 * 1000 * M_PI) 
+      if(error > cst::epsilon1 * 1000 * M_PI)
       {
-        std::cout << "Test mergeTiltWithYawAxisAgnostic failed. Reconstructed matrix is wrong"
-                  << std::endl;
+        std::cout << "Test mergeTiltWithYawAxisAgnostic failed. Reconstructed matrix is wrong" << std::endl;
         return errorCode;
       }
     }
