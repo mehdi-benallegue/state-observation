@@ -709,9 +709,7 @@ inline Orientation & Orientation::fromVector4(const Vector4 & v)
 
 inline Orientation & Orientation::setRandom()
 {
-  tools::ProbabilityLawSimulation s;
-  fromVector4(s.getGaussianVector(Matrix4::Identity(), Vector4::Zero(), 4).normalized());
-  return (*this);
+  return (*this) = randomRotationQuaternion();
 }
 
 template<>
