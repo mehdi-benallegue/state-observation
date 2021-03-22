@@ -95,7 +95,7 @@ int testRotationOperations(int errorCode)
 
       double error = fabs(yawangle - kine::rotationMatrixToYaw(m));
 
-      if(error > cst::epsilon1 * 1000 * M_PI) /// this function is really not precise
+      if(error > cst::epsilon1 * 1e5 * M_PI) /// this function is really not precise
       {
         std::cout << "Test number " << currentTest << " axis-based failed. Angle" << yawangle << " Angle error "
                   << error << std::endl;
@@ -106,7 +106,7 @@ int testRotationOperations(int errorCode)
       Vector3 rpy = kine::rotationMatrixToRollPitchYaw(m);
       error = fabs(yawangle - rpy(2));
 
-      if(error > cst::epsilon1 * 1000 * M_PI)
+      if(error > cst::epsilon1 * 1e5 * M_PI)
       {
         std::cout << "Test number " << currentTest << "eigen-based failed. Angle" << yawangle << " Angle error "
                   << error << std::endl;
