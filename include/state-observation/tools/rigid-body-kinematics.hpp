@@ -145,6 +145,14 @@ inline Vector6 homogeneousMatrixToVector6(const Matrix4 & M);
 /// transforms a 6d vector (position theta mu) into a homogeneous matrix
 inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 
+/// @brief Builds the smallest angle matrix allowing to get from a NORMALIZED vector v1 to its imahe Rv1
+/// This is based on Rodrigues formula
+///
+/// @param v1 the NORMALIZED vector
+/// @param Rv1 the NORMALIZED image of this vector by the rotation matrix R
+/// @return Matrix3 the rotation matrix R
+inline Matrix3 twoVectorsToRotationMatrix(const Vector3 & v1, const Vector3 Rv1);
+
 /// @brief checks if this matrix is a pure yaw matrix or not
 ///
 /// @param R the rotation matrix
@@ -152,12 +160,23 @@ inline Matrix4 vector6ToHomogeneousMatrix(const Vector6 & v);
 /// @return false is not pure yaw
 inline bool isPureYaw(const Matrix3 & R);
 
-/// @brief Gets a vector that remains horizontal with this rotation. This vector is not normalized and if norm == 0
-/// then the rotation is pure yaw and any horizontal vector is a solution
+/// @brief Gets a vector that remains horizontal with this rotation. This vector is NOT normalized
+/// @details There is a general version in getInvariantOrthogonalVector(). This can be used to extract yaw angle from
+/// a rotation matrix without needing to specify an order in the tils (e.g. roll then pich).
 ///
 /// @param R the input rotation
 /// @return Vector3 the output horizontal vector
-inline Vector3 getInvariantHorizontalVector(Matrix3 & R);
+inline Vector3 getInvariantHorizontalVector(const Matrix3 & R);
+
+/// @brief Gets a vector \f$v\f$ that is orthogonal to \f$e_z\f$ and such that \f$\hat{R}^T e_z\f$ is orthogonal to
+/// the tilt \f$R^T e_z\f$. This vector is NOT normalized.
+/// @details This is a generalization of getInvariantHorizontalVector() which corresponds to no tilt
+/// \f$\hat{R}^T e_z=e_z\f$. This function is useful to merge the yaw from the rotation matrix with the tilt.
+///
+/// @param Rhat the input rotation matrix \f$\hat{R}^T\f$
+/// @param Rtez the input tilt \f$\hat{R}^T e_z\f$
+/// @return Vector3 the output horizontal vector
+inline Vector3 getInvariantOrthogonalVector(const Matrix3 & Rhat, const Vector3 & Rtez);
 
 /// @brief Merge the roll and pitch from the tilt (R^T e_z) with the yaw from a rotation matrix (minimizes the
 /// deviation of the v vector)
@@ -214,9 +233,7 @@ inline double rotationMatrixToAngle(const Matrix3 & rotation, const Vector3 & ax
 inline double rotationMatrixToYaw(const Matrix3 & rotation, const Vector2 & v);
 
 /// @brief take 3x3 matrix represeting a rotation and gives the yaw angle from roll pitch yaw representation
-/// @details this is a generalization of yaw extraction (yaw is equivalent to v = Matrix3::UnitX())
 /// @param rotation The 3x3 rotation matrix
-/// @param v the rotated vector (expressed in the horizontal plane, must be normalized)
 /// @return double the angle
 inline double rotationMatrixToYaw(const Matrix3 & rotation);
 
@@ -228,7 +245,26 @@ inline double rotationMatrixToYaw(const Matrix3 & rotation);
 /// @return double the angle
 inline double rotationMatrixToYawAxisAgnostic(const Matrix3 & rotation);
 
+/// @brief Get the Identity Quaternion
+///
+/// @return Quaternion
 inline Quaternion zeroRotationQuaternion();
+
+/// @brief Get a uniformly random Quaternion
+///
+/// @return Quaternion
+inline Quaternion randomRotationQuaternion();
+
+/// @brief get a randomAngle between -pi and pu
+///
+/// @return double the random angle
+inline double randomAngle();
+
+/// @brief Checks if it is a rotation matrix (right-hand orthonormal) or not
+/// @param precision the absolute precision of the test
+/// @return true when it is a rotation matrix
+/// @return false when not
+inline bool isRotationMatrix(const Matrix3 &, double precision = 2 * cst::epsilon1);
 
 /// transforms a rotation into translation given a constraint of a fixed point
 inline void fixedPointRotationToTranslation(const Matrix3 & R,
@@ -337,9 +373,6 @@ public:
   Orientation(const double & roll, const double & pitch, const double & yaw);
 
   Orientation(const Orientation & multiplier1, const Orientation & multiplier2);
-  Orientation(Orientation & multiplier1, const Orientation & multiplier2);
-  Orientation(const Orientation & multiplier1, Orientation & multiplier2);
-  Orientation(Orientation & multiplier1, Orientation & multiplier2);
 
   inline Orientation & operator=(const Vector3 & v);
 
@@ -361,48 +394,25 @@ public:
   inline Orientation & setZeroRotation();
 
   /// get a const reference on the matrix or the quaternion
-  inline const Matrix3 & matrix3();
-  inline const Quaternion & quaternion();
+  inline const Matrix3 & toMatrix3() const;
+  inline const Quaternion & toQuaternion() const;
 
-  inline const Matrix3 & matrix3() const;
-  inline const Quaternion & quaternion() const;
+  inline operator const Matrix3 &() const;
+  inline operator const Quaternion &() const;
 
   inline Vector4 toVector4() const;
-  inline Vector4 toVector4();
-
-  inline operator Matrix3();
-
-  inline operator Quaternion();
-
-  inline operator Matrix3() const;
-
-  inline operator Quaternion() const;
 
   inline Vector3 toRotationVector() const;
   inline Vector3 toRollPitchYaw() const;
-  inline Vector3 toRollPitchYaw();
   inline AngleAxis toAngleAxis() const;
 
   /// Multiply the rotation (orientation) by another rotation R2
   /// the non const versions allow to use more optimized methods
 
-  inline Orientation operator*(Orientation & R2);
-
-  inline Orientation operator*(const Orientation & R2);
-
-  inline Orientation operator*(Orientation & R2) const;
-
   inline Orientation operator*(const Orientation & R2) const;
 
   /// Noalias versions of the operator*
-
-  inline Orientation setToProductNoAlias(Orientation & R1, Orientation & R2);
-
-  inline Orientation setToProductNoAlias(Orientation & R1, const Orientation & R2);
-
-  inline Orientation setToProductNoAlias(const Orientation & R1, Orientation & R2);
-
-  inline Orientation setToProductNoAlias(const Orientation & R1, const Orientation & R2);
+  inline const Orientation & setToProductNoAlias(const Orientation & R1, const Orientation & R2);
 
   inline Orientation inverse() const;
 
@@ -417,8 +427,6 @@ public:
   /// Rotate a vector
   inline Vector3 operator*(const Vector3 & v) const;
 
-  inline Vector3 operator*(const Vector3 & v);
-
   inline bool isSet() const;
   inline void reset();
 
@@ -430,7 +438,7 @@ public:
   inline void setMatrix(bool b = true);
   inline void setQuaternion(bool b = true);
 
-  /// no checks are performed for these functionsm use with caution
+  /// no checks are performed for these functions, use with caution
 
   inline CheckedMatrix3 & getMatrixRefUnsafe();
   inline CheckedQuaternion & getQuaternionRefUnsafe();
@@ -449,17 +457,11 @@ public:
 private:
   void check_() const;
 
-  inline Matrix3 & quaternionToMatrix_();
-  inline Quaternion & matrixToQuaternion_();
-  inline Matrix3 quaternionToMatrix_() const;
-  inline Quaternion matrixToQuaternion_() const;
+  inline const Matrix3 & quaternionToMatrix_() const;
+  inline const Quaternion & matrixToQuaternion_() const;
 
-  /// this is a helper function to avoid code duplication
-  template<typename Ori1, typename Ori2>
-  inline Orientation templateSetToProductNoAlias_(Ori1 & multiplier1, Ori2 & multiplier2);
-
-  CheckedQuaternion q_;
-  CheckedMatrix3 m_;
+  mutable CheckedQuaternion q_;
+  mutable CheckedMatrix3 m_;
 };
 
 struct Kinematics
@@ -488,9 +490,6 @@ struct Kinematics
   Kinematics(const Vector & v, Flags::Byte = Flags::all);
 
   Kinematics(const Kinematics & multiplier1, const Kinematics & multiplier2);
-  Kinematics(Kinematics & multiplier1, const Kinematics & multiplier2);
-  Kinematics(const Kinematics & multiplier1, Kinematics & multiplier2);
-  Kinematics(Kinematics & multiplier1, Kinematics & multiplier2);
 
   /// Fills from vector
   /// the flags show which parts of the kinematics to be loaded from the vector
@@ -522,14 +521,8 @@ struct Kinematics
 
   /// composition of transformation
   inline Kinematics operator*(const Kinematics &)const;
-  inline Kinematics operator*(const Kinematics &);
-  inline Kinematics operator*(Kinematics &)const;
-  inline Kinematics operator*(Kinematics &);
 
   inline Kinematics setToProductNoAlias(const Kinematics & operand1, const Kinematics & operand2);
-  inline Kinematics setToProductNoAlias(const Kinematics & operand1, Kinematics & operand2);
-  inline Kinematics setToProductNoAlias(Kinematics & operand1, const Kinematics & operand2);
-  inline Kinematics setToProductNoAlias(Kinematics & operand1, Kinematics & operand2);
 
   inline void reset();
 
@@ -546,9 +539,6 @@ struct Kinematics
 
 protected:
   inline const Kinematics & update_deprecated(const Kinematics & newValue, double dt, Flags::Byte = Flags::all);
-  /// this is a helper function to avoid code duplication
-  template<typename operand1, typename operand2>
-  inline Kinematics templateSetToProductNoAlias_(operand1 & multilplier1, operand2 & multiplier2);
 
   Vector3 tempVec_;
 };

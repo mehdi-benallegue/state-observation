@@ -180,13 +180,13 @@ inline bool IndexedMatrixT<MatrixType,lazy>::isSet()const
 }
 
 ///Set the value of the matrix and the time sample
-template <typename MatrixType, bool lazy>
-inline MatrixType IndexedMatrixT<MatrixType,lazy>::set(const MatrixType& v,TimeIndex k)
+template<typename MatrixType, bool lazy>
+inline IndexedMatrixT<MatrixType, lazy> & IndexedMatrixT<MatrixType, lazy>::set(const MatrixType & v, TimeIndex k)
 {
   IsSet::set(true);
   k_=k;
   v_=v;
-  return(v);
+  return *this;
 }
 
 ///Switch the matrix to set
@@ -669,4 +669,14 @@ void IndexedMatrixArrayT<MatrixType, Allocator>::writeInFile(const char * filena
     throw e;
   }
 
+}
+
+inline bool isApprox(double a, double b, double relativePrecision)
+{
+  return fabs(a - b) < fabs(a + b) * relativePrecision;
+}
+
+inline bool isApproxAbs(double a, double b, double absolutePrecision)
+{
+  return fabs(a - b) < absolutePrecision;
 }

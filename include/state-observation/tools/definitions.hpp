@@ -41,6 +41,37 @@
 
 namespace stateObservation
 {
+/// @brief Checks if it is derived from EigenBase (the base class of all dense functions)
+///
+/// @tparam T The class that you want to check
+template<typename T>
+struct isEigen
+{
+  static constexpr bool value = std::is_base_of<Eigen::EigenBase<T>, T>::value;
+};
+
+/// @brief Checks if a class is a specialization of Eigen::Matrix
+/// @tparam T The class that you want to check
+template<typename T>
+struct isMatrix : std::false_type
+{
+};
+
+template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+struct isMatrix<Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols>> : std::true_type
+{
+};
+
+template<typename T>
+struct EigenType : std::enable_if<isEigen<T>::value, T>
+{
+};
+
+template<typename T>
+struct MatrixType : std::enable_if<isMatrix<T>::value, T>
+{
+};
+
 /// Dynamic sized scalar vector
 typedef Eigen::VectorXd Vector;
 
@@ -332,7 +363,7 @@ public:
   IndexedMatrixT(const MatrixType & v, TimeIndex k);
 
   /// Set the value of the matrix and the time sample
-  inline MatrixType set(const MatrixType & v, TimeIndex k);
+  inline IndexedMatrixT & set(const MatrixType & v, TimeIndex k);
 
   /// Switch the vector to "initialized" state
   inline void set(bool value = true);
@@ -523,9 +554,27 @@ const Vector gravity = gravityConstant * Vector3::UnitZ();
 constexpr double epsilonAngle = 1e-16;
 
 /// number considered zero when compared to 1
-constexpr double epsilon1 = 1e-14;
+constexpr double epsilon1 = std::numeric_limits<double>::epsilon();
 
 } // namespace cst
+
+/// @brief checks if two scalars have approximately the same value up to a given relative precision
+///
+/// @param a the first scalar
+/// @param b the second scalar
+/// @param relativePrecision the relative precision (no need to multiply by the scales of a and b)
+/// @return true they are equal
+/// @return false they are not
+inline bool isApprox(double a, double b, double relativePrecision = cst::epsilon1);
+
+/// @brief checks if two scalars have approximately the same value up to a given absolute precision
+///
+/// @param a the first scalar
+/// @param b the second scalar
+/// @param absolutePrecision the absoilute precision
+/// @return true they are equal
+/// @return false they are not
+inline bool isApproxAbs(double a, double b, double absolutePrecision = cst::epsilon1);
 
 typedef boost::timer::auto_cpu_timer auto_cpu_timer;
 typedef boost::timer::cpu_timer cpu_timer;
