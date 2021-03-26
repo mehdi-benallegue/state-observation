@@ -496,9 +496,10 @@ inline double randomAngle()
 
 inline bool isRotationMatrix(const Matrix3 & M, double precision)
 {
+  /// The test checks that it is unitary then checks that the cross product of the two first vectors gets you the last
   return (M.isUnitary()
           && (isApproxAbs(M.topLeftCorner<2, 2>().determinant(), M(2, 2) * precision)
-              || isApproxAbs(M.bottomLeftCorner<2, 2>().determinant(), M(0, 2), precision)));
+              && isApproxAbs(M.bottomLeftCorner<2, 2>().determinant(), M(0, 2), precision)));
 }
 
 /// transforms a rotation into translation given a constraint of a fixed point
