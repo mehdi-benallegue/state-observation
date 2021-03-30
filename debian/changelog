@@ -1,12 +1,10 @@
-
 state-observation (1.4.1-1ubuntu1) unstable; urgency=medium
 
   * Simplify and correct Kinematics classes and functions
   * Improve Random variable generators
   * Improve documentation
 
- -- Mehdi Benallegue <mehdi.benallegue@gmail.com>  Wed, 20 Dec 2020 18:00:00 +0900
-
+ -- Mehdi Benallegue <mehdi.benallegue@gmail.com>  Tue, 30 Mar 2021 11:25:04 +0900
 
 state-observation (1.4.0-1ubuntu1) unstable; urgency=medium
 
