@@ -18,24 +18,25 @@ int testRotationOperations(int errorCode)
     { /// test isRotation
 
       Matrix3 R = Matrix3::Random();
-      if(isRotationMatrix(R, cst::epsilon1 * 10))
+      double testPecision = cst::epsilon1 * 20;
+      if(isRotationMatrix(R, testPecision))
       {
         std::cout << "Test number " << currentTest << "isRotationTest failed: false positive" << std::endl;
         return errorCode;
       }
       R = randomRotationQuaternion().toRotationMatrix();
-      if(!isRotationMatrix(R, cst::epsilon1 * 10))
+      if(!isRotationMatrix(R, testPecision))
       {
         std::cout << R.isUnitary() << " " << R.topLeftCorner<2, 2>().determinant() << " " << R(2, 2) << " "
                   << R.bottomLeftCorner<2, 2>().determinant() << " " << R(0, 2) << " "
                   << R.topLeftCorner<2, 2>().determinant() - R(2, 2) << " "
-                  << R.bottomLeftCorner<2, 2>().determinant() - R(0, 2) << std::endl;
+                  << R.bottomLeftCorner<2, 2>().determinant() - R(0, 2) << " " << testPecision << std::endl;
         std::cout << "Test number " << currentTest << "isRotationTest failed: false negative" << std::endl;
         return errorCode;
       }
       Matrix3 R2;
       R2 << R.col(1), R.col(0), R.col(2); /// Non right handed orthogonal matrix
-      if(isRotationMatrix(R2, cst::epsilon1 * 10))
+      if(isRotationMatrix(R2, testPecision))
       {
         std::cout << "isRotationTest failed: false positive (right-handedness)" << std::endl;
         return errorCode;
