@@ -255,7 +255,7 @@ int test()
     }
   }
 
-  if(Release_BUILD)
+  if(Release_BUILD && TEST_COMPUTATION_TIME)
   {
     if(computeTime[0] > 2e5)
     {
